@@ -13,6 +13,10 @@ import { NextResponse } from "next/server";
    · czy Twilio przyjmuje Auth Token i klucz API (zapytanie o dane konta,
      NIE wysyła SMS-a i nic nie kosztuje).
 
+   Z ?wyslij=1 wysyła JEDEN testowy SMS na Twój numer z SMS_TRENERA
+   (tylko na ten, na żaden inny) i pokazuje dokładną odpowiedź Twilio:
+     https://maks-strona.vercel.app/api/diagnostyka-sms?wyslij=1
+
    Gdy SMS-y zaczną działać, USUŃ cały folder app/api/diagnostyka-sms.
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -51,7 +55,29 @@ async function sprawdzLogowanie(sid: string, login: string, haslo: string) {
   }
 }
 
-export async function GET() {
+async function testowySms(sid: string, token: string) {
+  const nadawca = czysta("TWILIO_NADAWCA");
+  const do_ = czysta("SMS_TRENERA")?.replace(/\D/g, "");
+  if (!nadawca || !do_) return "pominięty: brak TWILIO_NADAWCA albo SMS_TRENERA";
+  try {
+    const odp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ To: `+${do_.length === 9 ? `48${do_}` : do_}`, From: nadawca, Body: "Test SMS ze strony Maks Treningi" }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const dane = (await odp.json().catch(() => ({}))) as Record<string, unknown>;
+    return { http: odp.status, status: dane.status, kod: dane.code, komunikat: dane.message, od: dane.from, do: dane.to };
+  } catch (e) {
+    return { blad: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function GET(req: Request) {
+  const wyslij = new URL(req.url).searchParams.get("wyslij") === "1";
   const sid = czysta("TWILIO_ACCOUNT_SID");
   const token = czysta("TWILIO_AUTH_TOKEN");
   const klucz = czysta("TWILIO_API_KEY");
@@ -75,6 +101,7 @@ export async function GET() {
       },
       test_auth_tokena: sid && token ? await sprawdzLogowanie(sid, sid, token) : "pominięty: brak SID albo tokena",
       test_klucza_api: sid && klucz && sekret ? await sprawdzLogowanie(sid, klucz, sekret) : "pominięty: brak klucza API",
+      testowy_sms: !wyslij ? "dodaj ?wyslij=1, żeby wysłać 1 SMS na SMS_TRENERA" : sid && token ? await testowySms(sid, token) : "brak SID albo tokena",
     },
     { headers: { "Cache-Control": "no-store" } },
   );
