@@ -13,6 +13,9 @@ import { doGsm } from "./maile";
    ── TWILIO (.env.local, a na produkcji Vercel) ───────────────────────
      TWILIO_ACCOUNT_SID=AC...         Console → Account Info
      TWILIO_AUTH_TOKEN=...            Console → Account Info
+       albo zamiast tokena klucz API (zalecane przez Twilio):
+     TWILIO_API_KEY=SK...             Console → API keys & auth tokens → Create API key
+     TWILIO_API_SECRET=...            sekret pokazany raz przy tworzeniu klucza
      TWILIO_NADAWCA=MaksTren          nazwa nadawcy, max 11 znaków, litery
                                       i cyfry, bez spacji. Dla Polski nie
                                       trzeba jej rejestrować.
@@ -114,11 +117,16 @@ const BLEDY_TWILIO: Record<number, string> = {
 
 async function twilio(numer: string, wiadomosc: string, czesci: number): Promise<boolean> {
   const sid = env("TWILIO_ACCOUNT_SID");
-  const token = env("TWILIO_AUTH_TOKEN");
+  /* Logowanie: klucz API (TWILIO_API_KEY + TWILIO_API_SECRET, zalecane
+     przez Twilio) albo Auth Token. Klucz API ma pierwszeństwo. */
+  const kluczApi = env("TWILIO_API_KEY");
+  const sekretApi = env("TWILIO_API_SECRET");
+  const login = kluczApi && sekretApi ? kluczApi : sid;
+  const token = kluczApi && sekretApi ? sekretApi : env("TWILIO_AUTH_TOKEN");
   const nadawca = env("TWILIO_NADAWCA");
   const usluga = env("TWILIO_MESSAGING_SERVICE_SID");
 
-  if (!sid || !token || (!nadawca && !usluga)) {
+  if (!sid || !login || !token || (!nadawca && !usluga)) {
     console.log(
       `[sms · nie wysłano, brak TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN albo TWILIO_NADAWCA]\nDo: +${numer} (${wiadomosc.length} zn., ${czesci} SMS)\n\n${wiadomosc}`,
     );
@@ -138,7 +146,7 @@ async function twilio(numer: string, wiadomosc: string, czesci: number): Promise
     const odp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${login}:${token}`).toString("base64")}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body,
@@ -158,8 +166,12 @@ async function twilio(numer: string, wiadomosc: string, czesci: number): Promise
       if (dane.code === 20003) {
         /* Podpowiedź bez ujawniania sekretu: długość i początek/koniec. */
         console.error(
-          `[sms] sprawdź zmienne: SID ${sid.length} zn. (${sid.slice(0, 4)}…${sid.slice(-4)}), ` +
-            `token ${token.length} zn. (${token.slice(0, 3)}…${token.slice(-3)}). Poprawnie: SID 34 zn., token 32 zn.`,
+          kluczApi && sekretApi
+            ? `[sms] sprawdź zmienne: SID ${sid.length} zn. (${sid.slice(0, 4)}…${sid.slice(-4)}), ` +
+                `klucz API ${login.length} zn. (${login.slice(0, 4)}…${login.slice(-4)}), sekret ${token.length} zn. ` +
+                `Poprawnie: SID 34 zn. (AC…), klucz 34 zn. (SK…), sekret 32 zn. Klucz musi być z tego samego konta co SID.`
+            : `[sms] sprawdź zmienne: SID ${sid.length} zn. (${sid.slice(0, 4)}…${sid.slice(-4)}), ` +
+                `token ${token.length} zn. (${token.slice(0, 3)}…${token.slice(-3)}). Poprawnie: SID 34 zn., token 32 zn.`,
         );
       }
       return false;
