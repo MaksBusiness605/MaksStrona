@@ -68,13 +68,17 @@ export async function platnoscZFormularza(req: Request) {
 function tekstZgody(p: Produkt, regulamin: string): string {
   const link = `[regulamin](${regulamin})`;
   if (p.rodzaj === "ebook") {
-    return `Akceptuję ${link}. Proszę o dostarczenie e-booka od razu i przyjmuję do wiadomości, że tracę wtedy ustawowe prawo do odstąpienia od umowy. Zwrot w 30 dni obowiązuje niezależnie od tego.`;
+    return `Akceptuję ${link}. Proszę o dostarczenie e-booka od razu, przed upływem 14 dni na odstąpienie od umowy, i przyjmuję do wiadomości, że z chwilą rozpoczęcia dostarczenia tracę prawo odstąpienia od umowy.`;
   }
-  return `Akceptuję ${link} i proszę o rozpoczęcie usługi przed upływem 14 dni na odstąpienie od umowy. Wiem, że po pełnym wykonaniu usługi to prawo tracę.`;
+  return `Akceptuję ${link} i żądam rozpoczęcia usługi przed upływem 14 dni na odstąpienie od umowy. Przyjmuję do wiadomości, że po pełnym wykonaniu usługi tracę prawo odstąpienia, a przy odstąpieniu wcześniej płacę za część już wykonaną.`;
 }
 
 async function utworzPlatnosc(req: Request, dane: Dane) {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
+  /* SITE_URL: adres strony bez ukośnika na końcu, np. https://www.trenerlodz.pl.
+     Stąd Stripe bierze adres powrotu (/dziekujemy i strona produktu).
+     Bez niej: adres, z którego klient przyszedł. NEXT_PUBLIC_SITE_URL
+     zostaje dla zgodności ze starszymi ustawieniami. */
+  const origin = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin).replace(/\/+$/, "");
   const p = znajdzProdukt(dane.produkt);
 
   if (!p) return NextResponse.redirect(`${origin}/`, 303);

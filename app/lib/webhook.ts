@@ -2,7 +2,9 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "./klient";
-import { mailDoKlienta, mailDoTrenera, mailNieudana } from "./maile";
+import { mailDoKlienta, mailDoTrenera, mailNieudana, potwierdzenie, smsDoKlienta, smsDoTrenera, smsNieudana } from "./maile";
+import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
+import { wyslijSms } from "./Wyslij-sms";
 import { cena, znajdzProdukt } from "./produkty";
 import { wyslijMail } from "./wyslij-mail";
 
@@ -86,6 +88,42 @@ function daneKlienta(s: Stripe.Checkout.Session) {
   };
 }
 
+/* ─────────────────────────────────────────────────────── BEZ DUBLI
+   Stripe może wysłać to samo zdarzenie kilka razy (ponowienie po błędzie,
+   timeout). Żeby klient nie dostał dwóch maili i dwóch SMS-ów, zapisujemy
+   w metadanych płatności, co już wyszło: pole `powiadomienia`, np.
+   "mail_trener,mail_klient,sms_klient". Bez bazy danych, w samym Stripe.
+
+   Płatność jednorazowa → metadane PaymentIntent.
+   Prowadzenie (subskrypcja) → metadane Subscription.
+   ─────────────────────────────────────────────────────────────────── */
+
+type Krok = "mail_trener" | "mail_klient" | "sms_klient" | "sms_trener";
+
+function celMetadanych(s: Stripe.Checkout.Session) {
+  const pi = typeof s.payment_intent === "string" ? s.payment_intent : s.payment_intent?.id;
+  const sub = typeof s.subscription === "string" ? s.subscription : s.subscription?.id;
+  if (pi) return { typ: "pi" as const, id: pi };
+  if (sub) return { typ: "sub" as const, id: sub };
+  return undefined;
+}
+
+async function wykonaneKroki(s: Stripe.Checkout.Session): Promise<Set<Krok>> {
+  const cel = celMetadanych(s);
+  if (!stripe || !cel) return new Set();
+  const obj =
+    cel.typ === "pi" ? await stripe.paymentIntents.retrieve(cel.id) : await stripe.subscriptions.retrieve(cel.id);
+  return new Set((obj.metadata?.powiadomienia ?? "").split(",").filter(Boolean) as Krok[]);
+}
+
+async function zapiszKroki(s: Stripe.Checkout.Session, kroki: Set<Krok>) {
+  const cel = celMetadanych(s);
+  if (!stripe || !cel || kroki.size === 0) return;
+  const metadata = { powiadomienia: [...kroki].join(",") };
+  if (cel.typ === "pi") await stripe.paymentIntents.update(cel.id, { metadata });
+  else await stripe.subscriptions.update(cel.id, { metadata });
+}
+
 async function potwierdz(s: Stripe.Checkout.Session) {
   const p = znajdzProdukt(s.metadata?.produkt);
   const k = daneKlienta(s);
@@ -95,25 +133,65 @@ async function potwierdz(s: Stripe.Checkout.Session) {
   }
 
   const kwota = cena(s.amount_total ?? p.cenaGrosze);
+  const zrobione = await wykonaneKroki(s);
+  const bledy: unknown[] = [];
 
-  if (k.email) {
-    await wyslijMail({
-      do: k.email,
-      temat: `Potwierdzenie zamówienia ${k.numer} · ${p.nazwa}`,
-      tresc: mailDoKlienta(p, k.numer, kwota, k.imie),
-      odpowiedzDo: process.env.MAIL_TRENERA,
-    });
+  /** Każdy krok osobno: błąd jednego nie zatrzymuje pozostałych. */
+  async function krok(nazwa: Krok, akcja: () => Promise<boolean | void>) {
+    if (zrobione.has(nazwa)) return;
+    try {
+      const wynik = await akcja();
+      if (wynik !== false) zrobione.add(nazwa);
+    } catch (e) {
+      console.error(`[stripe/webhook] ${nazwa} nie wyszedł:`, e);
+      bledy.push(e);
+    }
   }
 
+  /* 1 · Ty dostajesz informację pierwszy: to od niej zależy telefon w 24 h. */
   const trener = process.env.MAIL_TRENERA;
   if (trener) {
-    const platnosc = typeof s.payment_intent === "string" ? s.payment_intent : "";
-    await wyslijMail({
-      do: trener,
-      temat: `Nowe zamówienie: ${k.imieNazwisko || "klient"} · ${p.nazwa} · ${kwota}`,
-      tresc: mailDoTrenera(p, { ...k, kwota, panel: `https://dashboard.stripe.com/${s.livemode ? "" : "test/"}payments/${platnosc}` }),
-    });
+    const platnosc = celMetadanych(s);
+    const panel = `https://dashboard.stripe.com/${s.livemode ? "" : "test/"}${
+      platnosc?.typ === "sub" ? "subscriptions" : "payments"
+    }/${platnosc?.id ?? ""}`;
+    await krok("mail_trener", () =>
+      wyslijMail({
+        do: trener,
+        temat: `Nowe zamówienie: ${k.imieNazwisko || "klient"} · ${p.nazwa} · ${kwota}`,
+        tresc: mailDoTrenera(p, { ...k, kwota, panel }),
+        odpowiedzDo: k.email,
+      }),
+    );
   }
+
+  /* 2 · Mail do klienta. */
+  if (k.email) {
+    const temat = `Potwierdzenie zamówienia ${k.numer} · ${p.nazwa}`;
+    await krok("mail_klient", () =>
+      wyslijMail({
+        do: k.email!,
+        temat,
+        tresc: mailDoKlienta(p, k.numer, kwota, k.imie),
+        html: htmlPotwierdzenia(potwierdzenie(p, k.numer, kwota, k.imie), temat),
+        odpowiedzDo: process.env.MAIL_TRENERA,
+      }),
+    );
+  }
+
+  /* 3 · SMS-y. wyslijSms nie rzuca błędów: przy braku tokenu albo środków
+     zwraca false i krok nie jest odhaczony. */
+  await krok("sms_klient", () => wyslijSms(k.telefon, smsDoKlienta(p, k.numer, k.imie)));
+  const smsTrenera = process.env.SMS_TRENERA;
+  if (smsTrenera) {
+    await krok("sms_trener", () => wyslijSms(smsTrenera, smsDoTrenera(p, k.imieNazwisko, k.telefon, kwota)));
+  }
+
+  await zapiszKroki(s, zrobione).catch((e) => console.error("[stripe/webhook] zapis metadanych:", e));
+
+  /* Nie wyszedł któryś mail: błąd → kod 500 → Stripe ponowi zdarzenie,
+     ale powtórzy tylko to, co się nie udało. */
+  if (bledy.length) throw bledy[0];
 }
 
 async function nieudana(s: Stripe.Checkout.Session) {
@@ -126,4 +204,5 @@ async function nieudana(s: Stripe.Checkout.Session) {
       tresc: mailNieudana(p, k.imie),
     });
   }
+  await wyslijSms(k.telefon, smsNieudana(p));
 }
