@@ -47,6 +47,14 @@ import { doGsm } from "./maile";
 
 type Dostawca = "twilio" | "smsapi";
 
+/** Zmienna środowiskowa bez spacji, enterów i cudzysłowów na brzegach.
+    Przy wklejaniu do Vercela łatwo złapać spację albo enter na końcu,
+    a wtedy Twilio odrzuca token (kod 20003), choć wygląda na dobry. */
+function env(nazwa: string): string | undefined {
+  const w = process.env[nazwa]?.trim().replace(/^["']|["']$/g, "").trim();
+  return w || undefined;
+}
+
 function dostawca(): Dostawca {
   return process.env.SMS_DOSTAWCA === "smsapi" ? "smsapi" : "twilio";
 }
@@ -105,10 +113,10 @@ const BLEDY_TWILIO: Record<number, string> = {
 };
 
 async function twilio(numer: string, wiadomosc: string, czesci: number): Promise<boolean> {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  const nadawca = process.env.TWILIO_NADAWCA;
-  const usluga = process.env.TWILIO_MESSAGING_SERVICE_SID;
+  const sid = env("TWILIO_ACCOUNT_SID");
+  const token = env("TWILIO_AUTH_TOKEN");
+  const nadawca = env("TWILIO_NADAWCA");
+  const usluga = env("TWILIO_MESSAGING_SERVICE_SID");
 
   if (!sid || !token || (!nadawca && !usluga)) {
     console.log(
@@ -147,6 +155,13 @@ async function twilio(numer: string, wiadomosc: string, czesci: number): Promise
     if (!odp.ok) {
       const opis = (dane.code && BLEDY_TWILIO[dane.code]) || dane.message || `HTTP ${odp.status}`;
       console.error(`[sms] Twilio odrzuciło wiadomość do +${numer}: ${opis} (kod ${dane.code ?? "-"})`);
+      if (dane.code === 20003) {
+        /* Podpowiedź bez ujawniania sekretu: długość i początek/koniec. */
+        console.error(
+          `[sms] sprawdź zmienne: SID ${sid.length} zn. (${sid.slice(0, 4)}…${sid.slice(-4)}), ` +
+            `token ${token.length} zn. (${token.slice(0, 3)}…${token.slice(-3)}). Poprawnie: SID 34 zn., token 32 zn.`,
+        );
+      }
       return false;
     }
 
@@ -171,14 +186,14 @@ const BLEDY_SMSAPI: Record<number, string> = {
 };
 
 async function smsapi(numer: string, wiadomosc: string, czesci: number): Promise<boolean> {
-  const token = process.env.SMSAPI_TOKEN;
+  const token = env("SMSAPI_TOKEN");
   if (!token) {
     console.log(`[sms · nie wysłano, brak SMSAPI_TOKEN]\nDo: ${numer} (${wiadomosc.length} zn., ${czesci} SMS)\n\n${wiadomosc}`);
     return false;
   }
 
   const test = trybTestowy();
-  const nadawca = process.env.SMSAPI_NADAWCA;
+  const nadawca = env("SMSAPI_NADAWCA");
   if (!nadawca) console.warn("[sms] brak SMSAPI_NADAWCA: SMS przyjdzie od nadawcy „Test”");
 
   const body = new URLSearchParams({
