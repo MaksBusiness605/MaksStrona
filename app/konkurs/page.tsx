@@ -1,7 +1,9 @@
+// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na MAIL_TRENERA
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Footer, Header } from "@/app/components/sections";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
+import { wyslijMail } from "@/app/lib/wyslij-mail";
 
 export const metadata: Metadata = {
   title: "Konkurs: wygraj 3 treningi personalne w Just GYM Łódź | Maks Treningi",
@@ -13,22 +15,20 @@ export const metadata: Metadata = {
    KONKURS — cała strona w jednym pliku. Daty i telefon są w app/lib/dane.ts.
 
    Formularz działa bez JavaScriptu: przeglądarka sprawdza pola sama,
-   a zgłoszenie idzie przez server action na webhook (Make, Zapier, n8n).
+   a zgłoszenie obsługuje server action `wyslij` niżej.
 
-   ZMIANY WZGLĘDEM POPRZEDNIEJ WERSJI
-   - Usunięte pole „nazwisko" (mniej tarcia; zwycięzcę identyfikuje numer).
-     Webhook nie wysyła już pola nazwisko. Popraw kolumny w arkuszu
-     i zapis w regulaminie.
-   - Przykłady odpowiedzi nad formularzem: pusty textarea to główny powód
-     porzucenia takiego formularza.
-   - Po wysłaniu strona nie kończy się ślepo: pokazuje następny krok.
+   GDZIE TRAFIA ZGŁOSZENIE
+   1. MAIL do Ciebie na MAIL_TRENERA, przez Resend (te same zmienne co
+      maile po zakupie: RESEND_API_KEY, MAIL_NADAWCA, MAIL_TRENERA).
+   2. Opcjonalnie WEBHOOK (Make, Zapier, n8n → np. arkusz Google), jeśli
+      ustawisz KONKURS_WEBHOOK_URL. Bez niego wystarczy sam mail.
+   Zgłoszenie uznajemy za przyjęte, gdy doszło przynajmniej jednym z nich.
 
    ZANIM OPUBLIKUJESZ
-   1. Zmienna KONKURS_WEBHOOK_URL w Vercelu. Bez niej formularz zgłasza błąd.
-   2. Regulamin pod /konkurs/regulamin i dane administratora w ADMIN.
-   3. Pytanie konkursowe zostaw. Bez zadania ocenianego przez Ciebie to jest
+   1. Regulamin pod /konkurs/regulamin i dane administratora w ADMIN.
+   2. Pytanie konkursowe zostaw. Bez zadania ocenianego przez Ciebie to jest
       losowanie, czyli loteria promocyjna wymagająca zezwolenia.
-   4. DLA_WSZYSTKICH: jeśli chcesz dać coś każdemu uczestnikowi (np. niższą
+   3. DLA_WSZYSTKICH: jeśli chcesz dać coś każdemu uczestnikowi (np. niższą
       cenę pierwszej sesji), wpisz to tutaj i w regulaminie. null = ukryte.
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -44,6 +44,12 @@ const BLEDY: Record<string, string> = {
   zamkniete: "Zgłoszenia są już zamknięte.",
   serwer: `Zgłoszenie nie doszło. Spróbuj za chwilę albo zadzwoń: ${TELEFON}.`,
 };
+
+/** 537483233 / +48537483233 → "+48 537 483 233" (do maila, żeby dało się kliknąć i zadzwonić). */
+function telefonCzytelny(t: string) {
+  const cyfry = t.replace(/\D/g, "").replace(/^48(?=\d{9}$)/, "");
+  return cyfry.length === 9 ? `+48 ${cyfry.slice(0, 3)} ${cyfry.slice(3, 6)} ${cyfry.slice(6)}` : t;
+}
 
 async function wyslij(f: FormData) {
   "use server";
@@ -63,29 +69,62 @@ async function wyslij(f: FormData) {
   if (!poprawne) redirect("/konkurs?blad=dane#zgloszenie");
   if (f.get("zgodaRegulamin") !== "on") redirect("/konkurs?blad=zgoda#zgloszenie");
 
-  let ok = false;
+  const zgodaMarketing = f.get("zgodaMarketing") === "on";
+  const zgloszono = new Date();
+
+  /* 1 · Mail do Ciebie. */
+  let mailOk = false;
+  const trener = process.env.MAIL_TRENERA;
+  if (trener) {
+    try {
+      await wyslijMail({
+        do: trener,
+        temat: `Konkurs: nowe zgłoszenie · ${imie}`,
+        tresc: [
+          "NOWE ZGŁOSZENIE DO KONKURSU",
+          `Wysłane: ${zgloszono.toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}`,
+          "",
+          "UCZESTNIK",
+          `Imię:     ${imie}`,
+          `Telefon:  ${telefonCzytelny(telefon)}`,
+          `SMS-y marketingowe: ${zgodaMarketing ? "TAK, zgoda wyrażona" : "nie"}`,
+          "",
+          "ODPOWIEDŹ KONKURSOWA",
+          odpowiedz,
+        ].join("\n"),
+      });
+      mailOk = true;
+    } catch (e) {
+      console.error("[konkurs] mail nie wyszedł:", e);
+    }
+  } else {
+    console.error("[konkurs] Brak MAIL_TRENERA");
+  }
+
+  /* 2 · Opcjonalnie webhook (arkusz). */
+  let webhookOk = false;
   const url = process.env.KONKURS_WEBHOOK_URL;
   if (url) {
     try {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imie, telefon, odpowiedz,
-          zgodaMarketing: f.get("zgodaMarketing") === "on",
-          zgloszono: new Date().toISOString(),
-        }),
+        body: JSON.stringify({ imie, telefon, odpowiedz, zgodaMarketing, zgloszono: zgloszono.toISOString() }),
         signal: AbortSignal.timeout(8000),
       });
-      ok = res.ok;
+      webhookOk = res.ok;
     } catch (e) {
-      console.error("[konkurs]", e);
+      console.error("[konkurs] webhook:", e);
     }
-  } else {
-    console.error("[konkurs] Brak KONKURS_WEBHOOK_URL");
   }
 
-  redirect(ok ? "/konkurs?wyslane=1#zgloszenie" : "/konkurs?blad=serwer#zgloszenie");
+  /* Bez maila i bez webhooka zgłoszenie by przepadło: pokazujemy błąd,
+     a dane zostają w logach Vercela, żeby nic nie zginęło. */
+  if (!mailOk && !webhookOk) {
+    console.error("[konkurs] ZGŁOSZENIE NIEZAPISANE:", { imie, telefon, odpowiedz, zgodaMarketing });
+  }
+
+  redirect(mailOk || webhookOk ? "/konkurs?wyslane=1#zgloszenie" : "/konkurs?blad=serwer#zgloszenie");
 }
 
 export default async function Page({
