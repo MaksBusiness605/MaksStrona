@@ -56,7 +56,13 @@ async function wyslij(f: FormData) {
   const t = (k: string) => String(f.get(k) ?? "").trim();
 
   if (Date.now() > KONKURS.koniec.getTime()) redirect("/konkurs?blad=zamkniete#zgloszenie");
-  if (t("firma")) redirect("/konkurs?wyslane=1#zgloszenie"); // bot: udajemy sukces
+  /* Pułapka na boty. Nazwa celowo nic nie znaczy: pole „firma” potrafiło
+     uzupełnić autouzupełnianie przeglądarki i prawdziwe zgłoszenie
+     znikało po cichu. */
+  if (t("k_hp_9x")) {
+    console.warn("[konkurs] pominięte jako bot (wypełnione ukryte pole)");
+    redirect("/konkurs?wyslane=1#zgloszenie");
+  }
 
   const imie = t("imie");
   const telefon = t("telefon").replace(/[\s()-]/g, "");
@@ -94,6 +100,7 @@ async function wyslij(f: FormData) {
         ].join("\n"),
       });
       mailOk = true;
+      console.log(`[konkurs] mail wysłany do ${trener} (${imie})`);
     } catch (e) {
       console.error("[konkurs] mail nie wyszedł:", e);
     }
@@ -216,7 +223,7 @@ export default async function Page({
                 </label>
 
                 <div className="k-ukryte" aria-hidden="true">
-                  <label>Zostaw to pole puste <input name="firma" tabIndex={-1} autoComplete="off" /></label>
+                  <label>Zostaw to pole puste <input name="k_hp_9x" tabIndex={-1} autoComplete="new-password" /></label>
                 </div>
 
                 <label className="k-zgoda">
