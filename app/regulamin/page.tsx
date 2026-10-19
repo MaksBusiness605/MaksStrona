@@ -1,405 +1,348 @@
-// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.email (firma.ts)
+// PLIK: app/regulamin/page.tsx · STRONA /regulamin · regulamin sprzedaży usług treningowych i e-booka
+
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { Footer, Header } from "@/app/components/sections";
-import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
-import { wyslijMail } from "@/app/lib/wyslij-mail";
-import { FIRMA } from "@/app/tresc/firma";
+import { StronaPrawna, type Paragraf } from "@/app/components/Prawne";
+import { FIRMA, daneSprzedawcy } from "@/app/tresc/firma";
 
 export const metadata: Metadata = {
-  title: "Konkurs: wygraj 3 treningi personalne w Just GYM Łódź | Maks Treningi",
-  description:
-    "Napisz w dwóch zdaniach, co chcesz poprawić w treningu, i wygraj trzy sesje jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Wartość 420 zł. Bez losowania.",
+  title: `Regulamin · ${FIRMA.marka}`,
+  robots: { index: true, follow: false },
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
-   KONKURS — cała strona w jednym pliku. Daty i telefon są w app/lib/dane.ts.
+   REGULAMIN · tutaj edytujesz treść
 
-   Formularz działa bez JavaScriptu: przeglądarka sprawdza pola sama,
-   a zgłoszenie obsługuje server action `wyslij` niżej.
+   ZAŁOŻENIA, NA KTÓRYCH STOI TEN DOKUMENT
+   · Sprzedajesz: treningi stacjonarne (Just GYM), treningi online przez
+     kamerę, e-book, indywidualny plan i prowadzenie miesięczne.
+   · Płatność z góry przez Stripe, termin ustalany po zakupie.
+   · Brak zwrotu za usługę, która została już wykonana.
+   · Prawo odstąpienia od umowy: 14 DNI, nie 7. To minimum z ustawy
+     o prawach konsumenta (art. 27). Krótszy termin w regulaminie byłby
+     nieważny (art. 7), a sprzedający z nieważnym zapisem ryzykuje
+     wydłużenie terminu do 12 miesięcy, jeśli nie poinformuje
+     prawidłowo o prawie odstąpienia (art. 29).
+   · E-book: po rozpoczęciu dostarczenia za zgodą klienta prawo
+     odstąpienia nie przysługuje (art. 38 ust. 1 pkt 13).
+   · Usługa w pełni wykonana za zgodą klienta: brak prawa odstąpienia
+     (art. 38 ust. 1 pkt 1). Pakiet częściowo wykorzystany: klient płaci
+     tylko za odbyte sesje (art. 35).
 
-   GDZIE TRAFIA ZGŁOSZENIE
-   1. MAIL do Ciebie, wyłącznie na adres z app/tresc/firma.ts
-      (maksymilian.lehman.treningi@gmail.com), przez Resend.
-   2. Opcjonalnie WEBHOOK (Make, Zapier, n8n → np. arkusz Google), jeśli
-      ustawisz KONKURS_WEBHOOK_URL. Bez niego wystarczy sam mail.
-   Zgłoszenie uznajemy za przyjęte, gdy doszło przynajmniej jednym z nich.
+   ⚠ To wzór przygotowany pod Twój model sprzedaży, nie porada prawna.
+   Przed publikacją niech go przeczyta prawnik albo księgowy, zwłaszcza
+   § 3 ust. 4 (VAT) i dane w app/tresc/firma.ts.
 
-   ZANIM OPUBLIKUJESZ
-   1. Regulamin pod /konkurs/regulamin. Dane administratora (ADMIN) biorą
-      się z app/tresc/firma.ts: imię i nazwisko, e-mail, telefon, a adres
-      i NIP dopiero wtedy, gdy je tam uzupełnisz.
-   2. Pytanie konkursowe zostaw. Bez zadania ocenianego przez Ciebie to jest
-      losowanie, czyli loteria promocyjna wymagająca zezwolenia.
-   3. DLA_WSZYSTKICH: jeśli chcesz dać coś każdemu uczestnikowi (np. niższą
-      cenę pierwszej sesji), wpisz to tutaj i w regulaminie. null = ukryte.
+   ⚠ SPÓJNOŚĆ ZE STRONAMI. Regulamin wiąże, ale obietnice na stronie też.
+   Jeśli strona obiecuje więcej (np. „30 dni na zwrot”), klient może się
+   na to powołać. Zmieniasz zasady tutaj, sprawdź teksty na stronach.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/** Pole z firma.ts jest uzupełnione, gdy nie ma w nim „[…]”. */
-const jest = (s: string) => Boolean(s.trim()) && !s.includes("[");
+const F = FIRMA;
 
-const ADMIN = [
-  `Administrator danych: ${jest(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel}`,
-  jest(FIRMA.adres) ? FIRMA.adres : "",
-  `e-mail: ${FIRMA.email}`,
-  `tel. ${FIRMA.telefon}.`,
-]
-  .filter(Boolean)
-  .join(", ")
-  .concat(
-    " Dane z konkursu usuwam 30 dni po ogłoszeniu wyników, chyba że zgodzisz się na SMS-y o ofertach: wtedy do czasu wycofania zgody.",
-  );
+const PARAGRAFY: Paragraf[] = [
+  {
+    tytul: "Postanowienia ogólne",
+    tresc: [
+      {
+        lista: [
+          `Regulamin określa zasady sprzedaży usług treningowych i treści cyfrowych przez stronę ${F.strona} („Strona”) oraz zasady korzystania ze Strony.`,
+          `Usługodawcą i sprzedawcą jest ${daneSprzedawcy()} („Usługodawca”).`,
+          `Kontakt z Usługodawcą: e-mail ${F.email}, telefon ${F.telefon} (w dni robocze).`,
+          "Regulamin jest udostępniany nieodpłatnie na Stronie w sposób, który pozwala go pobrać, zapisać i wydrukować. Przed złożeniem zamówienia Klient zapoznaje się z Regulaminem i akceptuje go.",
+          "Usługi są przeznaczone dla osób pełnoletnich. Osoba niepełnoletnia może skorzystać z usług wyłącznie za zgodą przedstawiciela ustawowego, który składa zamówienie w jej imieniu.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Definicje",
+    tresc: [
+      {
+        definicje: [
+          ["Klient", "Osoba fizyczna, osoba prawna albo jednostka organizacyjna, która składa zamówienie."],
+          ["Konsument", "Klient będący osobą fizyczną, który kupuje usługę niezwiązaną bezpośrednio z jego działalnością gospodarczą lub zawodową."],
+          [
+            "Przedsiębiorca na prawach konsumenta",
+            "Osoba fizyczna prowadząca jednoosobową działalność gospodarczą, która kupuje usługę związaną z tą działalnością, ale niemającą dla niej charakteru zawodowego (wynika to z wpisu w CEIDG). Przysługują jej prawa konsumenta opisane w § 9 i § 11.",
+          ],
+          ["Sesja", "Trening personalny jeden na jeden trwający 60 minut, stacjonarny albo online."],
+          ["Pakiet", "Określona liczba Sesji kupiona w jednym zamówieniu (3 albo 5)."],
+          ["Trening stacjonarny", `Sesja prowadzona osobiście w siłowni ${F.sala}.`],
+          ["Trening online", "Sesja prowadzona na żywo przez połączenie wideo, w miejscu wybranym przez Klienta."],
+          ["E-book", "Treść cyfrowa (materiały, wideo, arkusz) udostępniana w formie elektronicznej, bez nośnika materialnego."],
+          ["Plan indywidualny", "Usługa przygotowania 12-tygodniowego planu treningowego na podstawie Ankiety, dostarczanego w formie elektronicznej."],
+          ["Prowadzenie", "Usługa świadczona w okresach miesięcznych, obejmująca plan, cotygodniowe podsumowania i korekty, opisana na Stronie."],
+          ["Ankieta", "Formularz, w którym Klient po zakupie podaje informacje potrzebne do realizacji usługi, w tym o stanie zdrowia, kontuzjach i dostępności."],
+          ["Dzień roboczy", "Dzień od poniedziałku do piątku z wyjątkiem dni ustawowo wolnych od pracy."],
+        ],
+      },
+    ],
+  },
+  {
+    tytul: "Usługi i ceny",
+    tresc: [
+      "Za pośrednictwem Strony Usługodawca sprzedaje:",
+      {
+        lista: [
+          "Treningi stacjonarne: pojedyncza Sesja albo Pakiet 3 lub 5 Sesji. Cena nie obejmuje wejścia na salę: Klient opłaca je osobno w Just GYM (karnet albo jednorazowe wejście). Pakiety stacjonarne nie mają daty ważności.",
+          "Treningi online: pojedyncza Sesja albo Pakiet 3 lub 5 Sesji. Pakiet 3 Sesji należy wykorzystać w ciągu 8 tygodni, a Pakiet 5 Sesji w ciągu 12 tygodni od zakupu. Po tym czasie niewykorzystane Sesje wygasają, chyba że nie odbyły się z przyczyn leżących po stronie Usługodawcy.",
+          "E-book.",
+          "Plan indywidualny.",
+          "Prowadzenie, opłacane z góry za każdy miesiąc i odnawiane automatycznie do czasu rezygnacji (§ 7).",
+        ],
+        numerowana: true,
+      },
+      "Szczegółowy opis każdej usługi znajduje się na jej stronie. Opis z chwili złożenia zamówienia jest częścią umowy.",
+      "Ceny podane na Stronie są cenami końcowymi w złotych polskich i obejmują wszystkie składniki ceny. Klient nie ponosi kosztów dostawy.",
+      "Usługodawca prowadzi działalność nierejestrowaną i korzysta ze zwolnienia podmiotowego z VAT (art. 113 ust. 1 ustawy o podatku od towarów i usług), dlatego ceny nie zawierają podatku VAT. Na życzenie Klient otrzymuje rachunek.",
+      "Usługodawca może zmieniać ceny. Zmiana nie dotyczy zamówień opłaconych przed jej wprowadzeniem.",
+    ],
+  },
+  {
+    tytul: "Zamówienie i płatność",
+    tresc: [
+      {
+        lista: [
+          "Klient wybiera usługę na Stronie i zostaje przekierowany na stronę płatności obsługiwaną przez Stripe Payments Europe, Limited („Stripe”).",
+          "Na stronie płatności Klient podaje imię i nazwisko, adres e-mail i numer telefonu, akceptuje Regulamin i wybiera metodę płatności: BLIK, kartę płatniczą, Przelewy24, Google Pay albo Apple Pay. Dostępne metody wyświetla Stripe.",
+          "Przy zakupie usług treningowych, Planu indywidualnego i Prowadzenia Klient składa żądanie rozpoczęcia świadczenia usługi przed upływem terminu na odstąpienie od umowy. Przy zakupie E-booka Klient wyraża zgodę na dostarczenie treści cyfrowej przed upływem tego terminu i przyjmuje do wiadomości utratę prawa odstąpienia (§ 9).",
+          "Umowa zostaje zawarta z chwilą potwierdzenia płatności przez Stripe. Płatność następuje z góry.",
+          "Po zawarciu umowy Klient otrzymuje na podany adres e-mail potwierdzenie zamówienia z numerem zamówienia, treścią zawartej umowy, informacją o złożonym żądaniu lub zgodzie z ust. 3 oraz linkiem do Ankiety. Potwierdzenie stanowi utrwalenie umowy na trwałym nośniku. Usługodawca może dodatkowo wysłać potwierdzenie SMS-em.",
+          "Usługodawca nie przechowuje danych kart płatniczych. Płatności przetwarza wyłącznie Stripe.",
+          "Usługodawca wystawia rachunek na żądanie Klienta zgłoszone e-mailem z numerem zamówienia.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Realizacja treningów stacjonarnych i online",
+    tresc: [
+      {
+        lista: [
+          "Po zakupie Klient wypełnia Ankietę. Jeśli tego nie zrobi, Usługodawca zbierze potrzebne informacje przy pierwszym kontakcie.",
+          `W ciągu 24 godzin od zakupu, w Dni robocze, Usługodawca kontaktuje się z Klientem kanałem wskazanym w Ankiecie (telefon z numeru ${F.telefon}, SMS albo e-mail) i proponuje terminy pierwszej Sesji. Termin ustalają strony wspólnie.`,
+          "Jeśli w ciągu 14 dni od zakupu strony nie ustalą terminu pierwszej Sesji z przyczyn leżących po stronie Usługodawcy, Klient otrzymuje zwrot całej zapłaconej kwoty.",
+          `Treningi stacjonarne odbywają się wyłącznie w siłowni ${F.sala}. Klient przestrzega regulaminu tej siłowni.`,
+          "Do Treningu online Klient potrzebuje urządzenia z kamerą i mikrofonem, stabilnego połączenia z internetem i miejsca do ćwiczeń. Link do połączenia Klient otrzymuje w potwierdzeniu terminu. Jeśli Klient ćwiczy w siłowni, odpowiada za zgodność ćwiczenia przed kamerą z regulaminem tej siłowni. Usługodawca może pomóc to sprawdzić przed pierwszą Sesją.",
+          "Usługodawca nie nagrywa Treningów online bez zgody Klienta. Nagrania przekazywane po Sesji służą wyłącznie Klientowi i nie są publikowane.",
+          "Usługodawca może przerwać lub zmodyfikować ćwiczenie, jeśli uzna, że zagraża ono zdrowiu Klienta.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Odwoływanie i przekładanie Sesji",
+    tresc: [
+      {
+        lista: [
+          "Trening stacjonarny Klient może odwołać lub przełożyć bez kosztów najpóźniej 24 godziny przed jego rozpoczęciem.",
+          "Trening online Klient może odwołać lub przełożyć bez kosztów najpóźniej 12 godzin przed jego rozpoczęciem.",
+          "Pierwsze odwołanie w krótszym terminie Usługodawca przekłada bez kosztów. Każde kolejne odwołanie w krótszym terminie albo niestawienie się na Sesji oznacza, że Sesja przepada i jest traktowana jak wykonana.",
+          "Choroba Klienta zgłoszona przed Sesją nie powoduje utraty Sesji. Strony ustalają nowy termin.",
+          "Spóźnienie Klienta nie wydłuża Sesji.",
+          "Jeśli Sesję odwołuje Usługodawca, strony ustalają nowy termin, a gdy to niemożliwe, Klient otrzymuje zwrot za tę Sesję.",
+          "Odwołanie lub przełożenie zgłasza się telefonicznie, SMS-em albo e-mailem.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Prowadzenie: płatność cykliczna i rezygnacja",
+    tresc: [
+      {
+        lista: [
+          "Prowadzenie jest opłacane z góry za kolejne okresy miesięczne. Płatność za następny miesiąc jest pobierana automatycznie w dniu odpowiadającym dniu pierwszego zakupu, tą samą metodą płatności.",
+          "Klient może zrezygnować w każdej chwili, bez podawania przyczyny i bez kosztów, przez panel klienta Stripe (link w e-mailu z potwierdzeniem) albo e-mailem do Usługodawcy. Rezygnacja zatrzymuje kolejne płatności, a Prowadzenie trwa do końca opłaconego miesiąca.",
+          "Za miesiąc, który już się rozpoczął, nie przysługuje zwrot, z zastrzeżeniem prawa odstąpienia od umowy opisanego w § 9.",
+          "Przed zmianą ceny Prowadzenia Usługodawca informuje Klienta e-mailem co najmniej 14 dni wcześniej. Klient, który nie akceptuje nowej ceny, może zrezygnować przed jej wejściem w życie.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "E-book i Plan indywidualny",
+    tresc: [
+      {
+        lista: [
+          "E-book jest udostępniany przez link przesłany e-mailem niezwłocznie po zawarciu umowy. Dostęp jest bezterminowy, z zastrzeżeniem ust. 4.",
+          "Plan indywidualny Usługodawca przygotowuje w ciągu 72 godzin od otrzymania wypełnionej Ankiety i udostępnia go elektronicznie.",
+          "Do korzystania z E-booka i Planu indywidualnego potrzebne jest urządzenie z dostępem do internetu i aktualną przeglądarką.",
+          "E-book i Plan indywidualny są przeznaczone wyłącznie do osobistego użytku Klienta i są chronione prawem autorskim. Nie wolno ich udostępniać, kopiować w celu rozpowszechniania ani odsprzedawać. W razie rażącego naruszenia tego zakazu Usługodawca może zablokować dostęp do materiałów.",
+          "Jeśli E-book albo Plan indywidualny nie zostaną dostarczone albo nie będą działać, Klientowi przysługują uprawnienia opisane w § 11.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Odstąpienie od umowy",
+    tresc: [
+      {
+        uwaga:
+          "W skrócie: masz 14 dni na rezygnację z usługi, której jeszcze nie wykonaliśmy, i dostajesz wtedy zwrot pieniędzy. Za usługę, która już się odbyła, zwrotu nie ma. Przy E-booku prawo rezygnacji wygasa, gdy dostaniesz do niego dostęp.",
+      },
+      {
+        lista: [
+          "Konsument i Przedsiębiorca na prawach konsumenta mogą odstąpić od umowy bez podawania przyczyny w terminie 14 dni od dnia jej zawarcia.",
+          `Aby odstąpić od umowy, wystarczy wysłać przed upływem terminu jednoznaczne oświadczenie, np. e-mailem na adres ${F.email}. Można skorzystać ze wzoru formularza zamieszczonego na końcu Regulaminu, ale nie jest to obowiązkowe. Usługodawca niezwłocznie potwierdza otrzymanie oświadczenia e-mailem.`,
+          "Usługodawca zwraca płatność w ciągu 14 dni od otrzymania oświadczenia, tą samą metodą płatności, której użył Klient, chyba że Klient zgodzi się na inną. Klient nie ponosi kosztów zwrotu.",
+          "Jeśli Klient zażądał rozpoczęcia usługi przed upływem terminu na odstąpienie (§ 4 ust. 3) i część usługi została już wykonana, Klient płaci za usługi spełnione do chwili odstąpienia. Przy Pakiecie jest to cena Pakietu podzielona przez liczbę Sesji, pomnożona przez liczbę Sesji odbytych lub przepadłych zgodnie z § 6 ust. 3. Przy Prowadzeniu jest to część ceny proporcjonalna do liczby dni świadczenia.",
+          "Prawo odstąpienia od umowy nie przysługuje:",
+        ],
+        numerowana: true,
+      },
+      {
+        lista: [
+          "przy umowie o usługę, którą Usługodawca wykonał w pełni za wyraźną i uprzednią zgodą Klienta, poinformowanego przed rozpoczęciem usługi, że po jej wykonaniu utraci prawo odstąpienia, i który przyjął to do wiadomości. Dotyczy to w szczególności odbytej pojedynczej Sesji, wykorzystanego w całości Pakietu i dostarczonego Planu indywidualnego;",
+          "przy umowie o dostarczenie E-booka, jeśli dostarczanie rozpoczęło się za wyraźną i uprzednią zgodą Klienta przed upływem terminu na odstąpienie, po poinformowaniu go o utracie prawa odstąpienia, a Usługodawca przekazał Klientowi potwierdzenie tej zgody.",
+        ],
+      },
+      "Postanowienia tego paragrafu nie dotyczą Klientów będących przedsiębiorcami innymi niż Przedsiębiorca na prawach konsumenta.",
+    ],
+  },
+  {
+    tytul: "Dodatkowe zobowiązania Usługodawcy",
+    tresc: [
+      "Niezależnie od uprawnień ustawowych Usługodawca zobowiązuje się, że:",
+      {
+        lista: [
+          "zwraca pieniądze za niewykorzystane Sesje z Pakietu na prośbę Klienta zgłoszoną w okresie ważności Pakietu. Kwotę zwrotu oblicza się tak jak w § 9 ust. 4;",
+          "zwraca całość ceny, jeśli w ciągu 14 dni od zakupu nie ustalono terminu pierwszej Sesji z przyczyn leżących po stronie Usługodawcy (§ 5 ust. 3);",
+          "odlicza całą cenę E-booka od ceny Planu indywidualnego albo pierwszego miesiąca Prowadzenia, jeśli Klient kupi je w ciągu 30 dni od zakupu E-booka i zgłosi to e-mailem przed zakupem. Odliczenie jest rabatem, a nie zwrotem płatności za E-book.",
+        ],
+      },
+      "Zobowiązania jakościowe opisane na Stronie w sekcji „Moja gwarancja” (m.in. pełna uwaga przez całą Sesję, pisemna karta lub notatka po Sesji) nie są gwarancją efektu treningowego. Efekt zależy także od regularności, regeneracji i odżywiania Klienta, na które Usługodawca nie ma wpływu.",
+    ],
+  },
+  {
+    tytul: "Reklamacje",
+    tresc: [
+      {
+        lista: [
+          `Reklamację można złożyć e-mailem na adres ${F.email} albo pisemnie na adres ${F.adres}.`,
+          "W reklamacji warto podać imię i nazwisko, numer zamówienia, opis problemu i oczekiwany sposób jego rozwiązania. Ułatwia to rozpatrzenie, ale nie jest warunkiem przyjęcia reklamacji.",
+          "Usługodawca odpowiada na reklamację w ciągu 14 dni od jej otrzymania, e-mailem albo w inny sposób wskazany przez Klienta. Brak odpowiedzi w tym terminie oznacza uznanie reklamacji.",
+          "Jeśli usługa, E-book albo Plan indywidualny są niezgodne z umową, Konsument i Przedsiębiorca na prawach konsumenta mogą żądać doprowadzenia ich do zgodności z umową, a gdy to niemożliwe albo nie nastąpi w rozsądnym czasie, obniżenia ceny albo odstąpienia od umowy, na zasadach ustawy o prawach konsumenta.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Zdrowie i odpowiedzialność",
+    tresc: [
+      {
+        lista: [
+          "Trening fizyczny wiąże się z wysiłkiem i ryzykiem urazu. Klient przed rozpoczęciem treningów powinien upewnić się u lekarza, że nie ma przeciwwskazań do wysiłku fizycznego, zwłaszcza gdy choruje przewlekle, jest w ciąży, przyjmuje leki albo jest po urazie.",
+          "Klient informuje Usługodawcę w Ankiecie i przed każdą Sesją o kontuzjach, dolegliwościach i zmianach stanu zdrowia. Usługodawca dostosowuje do nich trening.",
+          "Usługodawca jest trenerem personalnym. Nie jest lekarzem, fizjoterapeutą ani dietetykiem i nie stawia diagnoz. Wskazówki dotyczące odżywiania mają charakter ogólny. Jeśli stan Klienta wymaga konsultacji specjalisty, Usługodawca o tym informuje.",
+          "Klient wykonuje samodzielnie, bez obecności Usługodawcy, ćwiczenia z planu, E-booka i zaleceń między Sesjami. Powinien przerwać ćwiczenie w razie bólu lub niepokojących objawów.",
+          "Postanowienia tego paragrafu nie wyłączają ani nie ograniczają odpowiedzialności Usługodawcy wobec Konsumenta wynikającej z bezwzględnie obowiązujących przepisów.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Korzystanie ze Strony i formularzy",
+    tresc: [
+      {
+        lista: [
+          "Usługodawca świadczy drogą elektroniczną nieodpłatne usługi: przeglądanie Strony, formularze kontaktowe i zapisowe oraz Ankietę. Umowa o korzystanie z formularza zostaje zawarta z chwilą jego wysłania i wygasa po udzieleniu odpowiedzi. Klient może z niej zrezygnować w każdej chwili, nie wysyłając formularza.",
+          "Do korzystania ze Strony potrzebne jest urządzenie z dostępem do internetu, aktualna przeglądarka z włączoną obsługą JavaScript i, do otrzymywania wiadomości, aktywny adres e-mail lub numer telefonu.",
+          "Zakazane jest dostarczanie przez Stronę treści o charakterze bezprawnym.",
+          `Reklamacje dotyczące działania Strony i formularzy składa się i rozpatruje tak jak w § 11.`,
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+  {
+    tytul: "Dane osobowe",
+    tresc: [
+      "Administratorem danych osobowych Klientów jest Usługodawca. Zasady przetwarzania danych, w tym danych o zdrowiu z Ankiety, oraz informacje o plikach cookies, Google Analytics, Meta Pixel i Conversions API opisuje Polityka prywatności dostępna pod adresem /polityka-prywatnosci.",
+    ],
+  },
+  {
+    tytul: "Pozasądowe rozwiązywanie sporów",
+    tresc: [
+      "Konsument może skorzystać z pozasądowych sposobów rozpatrywania reklamacji i dochodzenia roszczeń, w szczególności:",
+      {
+        lista: [
+          "zwrócić się o bezpłatną pomoc do miejskiego lub powiatowego rzecznika konsumentów;",
+          "złożyć wniosek o mediację albo o rozpatrzenie sprawy przez stały polubowny sąd konsumencki przy wojewódzkim inspektoracie Inspekcji Handlowej;",
+          "skorzystać z informacji i adresów dostępnych na stronie prokonsument.gov.pl prowadzonej przez UOKiK.",
+        ],
+      },
+      "Skorzystanie z tych sposobów jest dobrowolne i wymaga zgody obu stron.",
+    ],
+  },
+  {
+    tytul: "Postanowienia końcowe",
+    tresc: [
+      {
+        lista: [
+          "W sprawach nieuregulowanych w Regulaminie stosuje się przepisy prawa polskiego, w szczególności Kodeksu cywilnego, ustawy o prawach konsumenta i ustawy o świadczeniu usług drogą elektroniczną.",
+          "Postanowienia Regulaminu nie ograniczają praw Konsumenta ani Przedsiębiorcy na prawach konsumenta wynikających z bezwzględnie obowiązujących przepisów. Postanowienia mniej korzystne niż te przepisy nie obowiązują, a w ich miejsce stosuje się przepisy ustawy.",
+          "Usługodawca może zmienić Regulamin z ważnych przyczyn, takich jak zmiana przepisów, zmiana zakresu usług lub metod płatności. Zmiana obowiązuje od daty publikacji na Stronie i nie dotyczy umów zawartych wcześniej. Klientów z aktywnym Prowadzeniem Usługodawca informuje o zmianie e-mailem co najmniej 14 dni przed jej wejściem w życie.",
+          "Spory z Konsumentami rozstrzyga sąd właściwy zgodnie z przepisami Kodeksu postępowania cywilnego.",
+        ],
+        numerowana: true,
+      },
+    ],
+  },
+];
 
-// TODO: np. "Każdy uczestnik dostanie SMS-em kod na pierwszą sesję za 120 zł zamiast 150 zł, ważny do 30 listopada."
-const DLA_WSZYSTKICH: string | null = null;
+/* ─────────────────────────────────────────────────────── WZÓR FORMULARZA
+   Załącznik wymagany przez ustawę o prawach konsumenta (załącznik nr 2). */
 
-const BLEDY: Record<string, string> = {
-  dane: "Sprawdź imię, numer telefonu i odpowiedź (co najmniej 20 znaków), a potem wyślij jeszcze raz.",
-  zgoda: "Zaakceptuj regulamin, żeby wysłać zgłoszenie.",
-  zamkniete: "Zgłoszenia są już zamknięte.",
-  serwer: `Zgłoszenie nie doszło. Spróbuj za chwilę albo zadzwoń: ${TELEFON}.`,
-};
-
-/** 666222699 / +48666222699 → "+48 666 222 699" (do maila, żeby dało się kliknąć i zadzwonić). */
-function telefonCzytelny(t: string) {
-  const cyfry = t.replace(/\D/g, "").replace(/^48(?=\d{9}$)/, "");
-  return cyfry.length === 9 ? `+48 ${cyfry.slice(0, 3)} ${cyfry.slice(3, 6)} ${cyfry.slice(6)}` : t;
-}
-
-async function wyslij(f: FormData) {
-  "use server";
-  const t = (k: string) => String(f.get(k) ?? "").trim();
-
-  if (Date.now() > KONKURS.koniec.getTime()) redirect("/konkurs?blad=zamkniete#zgloszenie");
-  /* Pułapka na boty. Nazwa celowo nic nie znaczy: pole „firma” potrafiło
-     uzupełnić autouzupełnianie przeglądarki i prawdziwe zgłoszenie
-     znikało po cichu. */
-  if (t("k_hp_9x")) {
-    console.warn("[konkurs] pominięte jako bot (wypełnione ukryte pole)");
-    redirect("/konkurs?wyslane=1#zgloszenie");
-  }
-
-  const imie = t("imie");
-  const telefon = t("telefon").replace(/[\s()-]/g, "");
-  const odpowiedz = t("odpowiedz");
-
-  const poprawne =
-    imie && imie.length <= 40 &&
-    /^(?:\+?48)?[1-9]\d{8}$/.test(telefon) &&
-    odpowiedz.length >= 20 && odpowiedz.length <= 500;
-  if (!poprawne) redirect("/konkurs?blad=dane#zgloszenie");
-  if (f.get("zgodaRegulamin") !== "on") redirect("/konkurs?blad=zgoda#zgloszenie");
-
-  const zgodaMarketing = f.get("zgodaMarketing") === "on";
-  const zgloszono = new Date();
-
-  /* 1 · Mail do Ciebie. */
-  let mailOk = false;
-  /* Zgłoszenia idą wyłącznie na adres z app/tresc/firma.ts. */
-  const trener = FIRMA.email;
-  if (trener) {
-    try {
-      await wyslijMail({
-        do: trener,
-        temat: `Konkurs: nowe zgłoszenie · ${imie}`,
-        tresc: [
-          "NOWE ZGŁOSZENIE DO KONKURSU",
-          `Wysłane: ${zgloszono.toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}`,
-          "",
-          "UCZESTNIK",
-          `Imię:     ${imie}`,
-          `Telefon:  ${telefonCzytelny(telefon)}`,
-          `SMS-y marketingowe: ${zgodaMarketing ? "TAK, zgoda wyrażona" : "nie"}`,
-          "",
-          "ODPOWIEDŹ KONKURSOWA",
-          odpowiedz,
-        ].join("\n"),
-      });
-      mailOk = true;
-      console.log(`[konkurs] mail wysłany do ${trener} (${imie})`);
-    } catch (e) {
-      console.error("[konkurs] mail nie wyszedł:", e);
-    }
-  } else {
-    console.error("[konkurs] Brak adresu w firma.ts");
-  }
-
-  /* 2 · Opcjonalnie webhook (arkusz). */
-  let webhookOk = false;
-  const url = process.env.KONKURS_WEBHOOK_URL;
-  if (url) {
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imie, telefon, odpowiedz, zgodaMarketing, zgloszono: zgloszono.toISOString() }),
-        signal: AbortSignal.timeout(8000),
-      });
-      webhookOk = res.ok;
-    } catch (e) {
-      console.error("[konkurs] webhook:", e);
-    }
-  }
-
-  /* Bez maila i bez webhooka zgłoszenie by przepadło: pokazujemy błąd,
-     a dane zostają w logach Vercela, żeby nic nie zginęło. */
-  if (!mailOk && !webhookOk) {
-    console.error("[konkurs] ZGŁOSZENIE NIEZAPISANE:", { imie, telefon, odpowiedz, zgodaMarketing });
-  }
-
-  redirect(mailOk || webhookOk ? "/konkurs?wyslane=1#zgloszenie" : "/konkurs?blad=serwer#zgloszenie");
-}
-
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ wyslane?: string; blad?: string }>;
-}) {
-  const { wyslane, blad } = await searchParams;
-  const trwa = Date.now() < KONKURS.koniec.getTime();
-  const komunikat = blad ? BLEDY[blad] : undefined;
-
+function WzorOdstapienia() {
   return (
-    <>
-      <style>{CSS}</style>
-      <Header
-        cta={trwa ? "Wyślij zgłoszenie" : "Trening na sali"}
-        ctaHref={trwa ? "#zgloszenie" : TRASY.sala}
-      />
+    <section id="formularz-odstapienia" className="mt-16 scroll-mt-8 border-t-4 border-grafit pt-10">
+      <p className="font-display text-xs font-bold uppercase tracking-[0.12em] text-stal">Załącznik</p>
+      <h2 className="mt-3 font-display text-[clamp(1.25rem,1.1rem_+_0.6vw,1.5rem)] leading-tight">
+        Wzór formularza odstąpienia od umowy
+      </h2>
+      <p className="mt-3 text-sm leading-relaxed text-stal">
+        Formularz należy wypełnić i odesłać tylko w przypadku chęci odstąpienia od umowy. Możesz też po prostu napisać
+        e-mail własnymi słowami.
+      </p>
 
-      <main className="k">
-        <section className="k-hero" aria-labelledby="k-tytul">
-          <div className="k-w">
-            <p className="k-miejsce">Konkurs w Just GYM, Piotrkowska 157A w Łodzi</p>
-            <h1 id="k-tytul" className="k-tytul">Wygraj trzy treningi jeden na jeden</h1>
-            <p className="k-lead">
-              Napisz w dwóch, trzech zdaniach, co chcesz poprawić w swoim treningu. Najbardziej konkretna
-              odpowiedź wygrywa trzy sesje ze mną na sali.
-            </p>
-            <dl className="k-fakty">
-              <div><dt>Nagroda</dt><dd>3 sesje po 60 minut, wartość {KONKURS.wartosc}</dd></div>
-              <div><dt>Zgłoszenia</dt><dd>{trwa ? `do ${dzienPL(KONKURS.koniec)}` : "zamknięte"}</dd></div>
-              <div><dt>Jak wybieram</dt><dd>Czytam każdą odpowiedź. Nie losuję.</dd></div>
-            </dl>
-          </div>
-        </section>
-
-        <div className="k-w k-uklad">
-          <section id="zgloszenie" className="k-formularz" aria-labelledby="k-zgl">
-            {!trwa ? (
-              <>
-                <h2 id="k-zgl" className="k-h2">Konkurs zakończony</h2>
-                <p>Zgłoszenia zamknięte. Zwycięzcę powiadomię SMS-em do {dataPL(KONKURS.wyniki)}.</p>
-                <p>Nie chcesz czekać na kolejny konkurs? Pierwsza sesja na sali kosztuje 150 zł.</p>
-                <a className="k-przycisk" href={TRASY.sala}>Zobacz trening na sali</a>
-              </>
-            ) : wyslane ? (
-              <div role="status">
-                <h2 id="k-zgl" className="k-h2">Zgłoszenie wysłane</h2>
-                <p>
-                  Wyniki do {dataPL(KONKURS.wyniki)}. Jeśli wygrasz, napiszę SMS-em z numeru {TELEFON}.
-                  Zapisz go, żeby wiadomość nie wylądowała w spamie.
-                </p>
-                {DLA_WSZYSTKICH && <p className="k-wyroznienie">{DLA_WSZYSTKICH}</p>}
-                <div className="k-dalej">
-                  <p className="k-dalej-tytul">Nie chcesz czekać do wyników?</p>
-                  <p>
-                    Pojedyncza sesja na sali kosztuje 150 zł z wejściem. Termin ustalamy SMS-em w ciągu
-                    24 godzin od zakupu.
-                  </p>
-                  <a className="k-przycisk" href={TRASY.sala}>Zobacz trening na sali</a>
-                </div>
-              </div>
-            ) : (
-              <form action={wyslij}>
-                <h2 id="k-zgl" className="k-h2">Twoje zgłoszenie</h2>
-                <p className="k-podpowiedz k-czas">Zajmie Ci to około dwóch minut.</p>
-                {komunikat && <p role="alert" className="k-blad">{komunikat}</p>}
-
-                <label className="k-pole">
-                  <span className="k-etykieta">Imię</span>
-                  <input name="imie" required maxLength={40} autoComplete="given-name" className="k-wejscie" />
-                </label>
-
-                <label className="k-pole">
-                  <span className="k-etykieta">Numer telefonu</span>
-                  <span className="k-podpowiedz">Na ten numer napiszę, jeśli wygrasz.</span>
-                  <input name="telefon" type="tel" required inputMode="tel" autoComplete="tel"
-                    pattern="(\+?48)? ?[1-9]( ?[0-9]){8}" title="9 cyfr, np. 600 100 200"
-                    className="k-wejscie" />
-                </label>
-
-                <label className="k-pole">
-                  <span className="k-etykieta">Co chcesz poprawić w swoim treningu i dlaczego akurat to?</span>
-                  <span className="k-podpowiedz">
-                    Napisz, z czym masz problem i od kiedy. Wygrywa konkret, nie długość.
-                  </span>
-                  <textarea name="odpowiedz" required minLength={20} maxLength={500} className="k-wejscie"
-                    placeholder="Np. przy przysiadzie ze sztangą od 50 kg…" />
-                </label>
-
-                <div className="k-ukryte" aria-hidden="true">
-                  <label>Zostaw to pole puste <input name="k_hp_9x" tabIndex={-1} autoComplete="new-password" /></label>
-                </div>
-
-                <label className="k-zgoda">
-                  <input type="checkbox" name="zgodaRegulamin" required />
-                  <span>
-                    Akceptuję <a href="/konkurs/regulamin">regulamin konkursu</a> i zgadzam się na
-                    przetwarzanie moich danych w celu jego przeprowadzenia.
-                  </span>
-                </label>
-                <label className="k-zgoda">
-                  <input type="checkbox" name="zgodaMarketing" />
-                  <span>
-                    Chcę dostawać SMS-y o wolnych terminach i nowych ofertach. Mogę z tego zrezygnować
-                    w każdej chwili. <span className="k-podpowiedz">Nieobowiązkowe.</span>
-                  </span>
-                </label>
-
-                <button type="submit" className="k-przycisk">Wyślij zgłoszenie</button>
-                <p className="k-drobne">{ADMIN}</p>
-              </form>
-            )}
-          </section>
-
-          <section className="k-przyklady" aria-labelledby="k-prz">
-            <h2 id="k-prz" className="k-h2">Jaka odpowiedź wygrywa</h2>
-            <p>
-              Szukam problemu, z którym da się coś zrobić w trzy sesje. Nie musisz umieć trenować ani
-              pisać ładnie. Wystarczy, że opiszesz, co się dzieje.
-            </p>
-            <figure className="k-przyklad k-przyklad-slaby">
-              <figcaption>Za ogólnie</figcaption>
-              <blockquote>„Chcę być silniejszy i lepiej wyglądać.”</blockquote>
-            </figure>
-            <figure className="k-przyklad">
-              <figcaption>Konkretnie</figcaption>
-              <blockquote>
-                „Przy martwym ciągu od 60 kg zaokrąglam plecy i po treningu boli mnie lędźwia. Stoję na
-                tym ciężarze od dwóch miesięcy i boję się dokładać.”
-              </blockquote>
-            </figure>
-            <figure className="k-przyklad">
-              <figcaption>Też konkretnie</figcaption>
-              <blockquote>
-                „Nigdy nie robiłam przysiadu ze sztangą, bo wstydzę się, że zrobię to źle przy ludziach.
-                Chcę się go nauczyć na tyle, żeby robić go sama.”
-              </blockquote>
-            </figure>
-          </section>
-
-          <section className="k-nagroda" aria-labelledby="k-nag">
-            <h2 id="k-nag" className="k-h2">Co wygrywasz</h2>
-            <p>
-              Trzy godziny jeden na jeden, po jednym ruchu na sesję, ustawionym do końca. Stoję obok i
-              poprawiam w tej samej serii. Wejście na salę opłacasz osobno w Just GYM. Zaczynamy od ciężaru, który dziś jest
-              dla Ciebie właściwy, nawet jeśli to pusta sztanga.
-            </p>
-            <table className="k-karta">
-              <caption>Karta obciążeń zwycięzcy. Zostaje u Ciebie po ostatniej sesji.</caption>
-              <thead>
-                <tr><th scope="col">Sesja</th><th scope="col">Ruch</th><th scope="col">Ciężar</th><th scope="col">Powt.</th></tr>
-              </thead>
-              <tbody>
-                {["Przysiad", "Martwy ciąg", "Wyciskanie"].map((ruch, i) => (
-                  <tr key={ruch}>
-                    <th scope="row">{i + 1}</th>
-                    <td>{ruch}</td>
-                    <td className="k-puste" aria-label="do wpisania" />
-                    <td className="k-puste" aria-label="do wpisania" />
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="k-drobne">
-              Kolejność ruchów ustalamy na pierwszej sesji. Nagrody nie da się wymienić na gotówkę.
-            </p>
-          </section>
-
-          <section className="k-zasady" aria-labelledby="k-zas">
-            <h2 id="k-zas" className="k-h2">Jak to przebiega</h2>
-            <ol className="k-lista">
-              <li>Zgłoszenia przyjmuję do {dataPL(KONKURS.koniec)}. Jedno zgłoszenie na osobę.</li>
-              <li>Czytam wszystkie odpowiedzi i wybieram tę, która najkonkretniej opisuje problem, z którym da się coś zrobić w trzy sesje.</li>
-              <li>Do {dataPL(KONKURS.wyniki)} piszę SMS-em do zwycięzcy z numeru {TELEFON} i ustalamy pierwszy termin.</li>
-            </ol>
-            <p className="k-kto">
-              Prowadzę ja, {TRENER.imie}, trener personalny w Just GYM przy Piotrkowskiej. Pytania o
-              konkurs: <a href={TELEFON_HREF}>{TELEFON}</a>.
-            </p>
-          </section>
-        </div>
-      </main>
-
-      <Footer />
-    </>
+      <div className="mt-6 space-y-4 bg-mgla p-6 font-mono text-[0.875rem] leading-[1.75] text-grafit sm:p-8">
+        <p>
+          Adresat: {FIRMA.nazwa}, {FIRMA.adres}, e-mail: {FIRMA.email}
+        </p>
+        <p>
+          Ja/My(*) niniejszym informuję/informujemy(*) o moim/naszym(*) odstąpieniu od umowy o świadczenie następującej
+          usługi / dostarczenie następującej treści cyfrowej(*):
+        </p>
+        <p>.................................................................</p>
+        <p>Numer zamówienia: .........................................</p>
+        <p>Data zawarcia umowy: .....................................</p>
+        <p>Imię i nazwisko konsumenta(-ów): ..........................</p>
+        <p>Adres konsumenta(-ów): ....................................</p>
+        <p>
+          Podpis konsumenta(-ów) (tylko jeżeli formularz jest przesyłany w wersji papierowej): ..........................
+        </p>
+        <p>Data: ....................</p>
+        <p className="text-stal">(*) Niepotrzebne skreślić.</p>
+      </div>
+    </section>
   );
 }
 
-const CSS = `
-.k{--g:#111820;--s:#D6FF3F;--m:#EDEFF2;--sl:#5F6A77;--l:#D3D8DE;--jas:#B4BCC6;--b:#B42318;color:var(--g);background:var(--m)}
-.k-w{box-sizing:border-box;max-width:70rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
-.k p{line-height:1.6}
-
-.k-hero{background:var(--g);color:#fff;padding:clamp(2.5rem,6vw,4rem) 0 clamp(2rem,5vw,3rem)}
-.k-miejsce{margin:0 0 .9rem;color:var(--s);font-weight:600;font-size:.95rem}
-.k-tytul{margin:0 0 1rem;max-width:44rem;font-size:clamp(2.3rem,6vw,4rem);font-weight:800;line-height:1;letter-spacing:-.035em}
-.k-lead{margin:0;max-width:36rem;font-size:1.15rem;color:#D5DBE2}
-.k-fakty{display:grid;gap:1rem 2.5rem;margin:2.25rem 0 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.16)}
-@media(min-width:44rem){.k-fakty{grid-template-columns:repeat(3,auto);justify-content:start}}
-.k-fakty dt{font-size:.85rem;color:var(--jas);margin-bottom:.2rem}
-.k-fakty dd{margin:0;font-weight:700}
-
-.k-uklad{display:grid;gap:2.5rem 4rem;padding-top:clamp(2rem,5vw,3.5rem);padding-bottom:clamp(3rem,7vw,5rem);grid-template-areas:"f" "p" "g" "z"}
-.k-formularz{grid-area:f}.k-przyklady{grid-area:p}.k-nagroda{grid-area:g}.k-zasady{grid-area:z}
-.k-przyklady,.k-nagroda,.k-zasady{max-width:36rem}
-@media(min-width:60rem){
-  .k-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"p f" "g f" "z f";align-items:start}
-  .k-formularz{position:sticky;top:1.5rem}
+export default function Page() {
+  return (
+    <StronaPrawna
+      tytul="Regulamin"
+      wstep={`Zasady zakupu treningów stacjonarnych, treningów online, e-booka, planu indywidualnego i prowadzenia w ${FIRMA.marka}. Najważniejsze punkty: płacisz z góry, termin ustalamy po zakupie, masz 14 dni na rezygnację z usługi, która jeszcze się nie odbyła.`}
+      paragrafy={PARAGRAFY}
+      zalaczniki={<WzorOdstapienia />}
+    />
+  );
 }
-.k-formularz{background:#fff;border:1px solid var(--l);border-radius:6px;padding:clamp(1.25rem,3vw,2rem);box-shadow:0 12px 32px -18px rgba(17,24,32,.45)}
-
-.k-h2{margin:0 0 .75rem;font-size:1.45rem;font-weight:800;line-height:1.2;letter-spacing:-.015em}
-.k-czas{margin:-.4rem 0 1.25rem;display:block}
-.k-drobne{margin:.9rem 0 0;font-size:.85rem;color:var(--sl)}
-
-.k-przyklad{margin:1rem 0 0;padding:1rem 1.1rem;background:#fff;border:1px solid var(--l);border-radius:4px}
-.k-przyklad figcaption{font-size:.85rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem}
-.k-przyklad figcaption::before{content:"";width:10px;height:10px;background:var(--s);outline:1px solid var(--g)}
-.k-przyklad-slaby figcaption::before{background:transparent}
-.k-przyklad-slaby{background:transparent}
-.k-przyklad blockquote{margin:0;line-height:1.55}
-.k-przyklad-slaby blockquote{color:var(--sl)}
-
-.k-karta{width:100%;margin-top:1.25rem;border-collapse:collapse;background:#fff;font-variant-numeric:tabular-nums}
-.k-karta caption{caption-side:top;padding-bottom:.5rem;text-align:left;font-weight:600}
-.k-karta th,.k-karta td{border:1px solid var(--l);padding:.7rem .8rem;text-align:left}
-.k-karta thead th{font-size:.85rem;font-weight:600;color:var(--sl)}
-.k-karta tbody th{width:3.5rem;font-weight:800;background:var(--g);color:var(--s)}
-.k-puste{width:5.5rem;background:linear-gradient(to top,var(--l) 1px,transparent 1px) no-repeat .8rem calc(100% - .7rem)/calc(100% - 1.6rem) 100%}
-
-.k-lista{margin:0;padding-left:1.25rem;line-height:1.55}.k-lista li+li{margin-top:.6rem}
-.k-lista li::marker{font-weight:800}
-.k-kto{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--l)}
-.k-kto a{color:var(--g);font-weight:700}
-
-.k-pole{display:grid;gap:.35rem;margin-bottom:1.1rem}
-.k-etykieta{font-weight:700;font-size:.95rem}.k-podpowiedz{font-size:.85rem;color:var(--sl)}
-.k-wejscie{box-sizing:border-box;width:100%;padding:.8rem .85rem;font:inherit;color:inherit;background:#fff;border:1px solid #B9C1CA;border-radius:4px}
-textarea.k-wejscie{min-height:8rem;resize:vertical}
-.k-wejscie::placeholder{color:#8A94A0}
-.k-wejscie:focus-visible{outline:3px solid var(--g);outline-offset:1px;border-color:var(--g)}
-.k-wejscie:user-invalid{border-color:var(--b)}
-.k-blad{margin:0 0 1rem;padding:.75rem .9rem;color:var(--b);background:#FDF0EF;border-radius:4px;font-weight:600}
-.k-zgoda{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start;margin-bottom:.75rem;font-size:.9rem;line-height:1.45}
-.k-zgoda input{width:1.15rem;height:1.15rem;margin:.15rem 0 0;accent-color:var(--g)}
-.k-zgoda input:focus-visible{outline:3px solid var(--g);outline-offset:2px}.k-zgoda a{color:var(--g);font-weight:600}
-.k-przycisk{box-sizing:border-box;display:block;width:100%;margin-top:.75rem;padding:1rem 1.25rem;font:inherit;font-weight:800;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;text-decoration:none;color:var(--g);background:var(--s);border:0;border-radius:2px;cursor:pointer}
-.k-przycisk:hover{background:#C6F020}.k-przycisk:focus-visible{outline:3px solid var(--g);outline-offset:3px}
-.k-wyroznienie{padding:.9rem 1rem;background:var(--s);font-weight:700;border-radius:4px}
-.k-dalej{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--l)}
-.k-dalej-tytul{margin:0 0 .25rem;font-weight:800}
-.k-dalej p{margin-top:0}
-.k-ukryte{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-`;
