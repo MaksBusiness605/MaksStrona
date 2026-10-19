@@ -5,7 +5,7 @@ import { doGsm, mailDoKlienta, mailDoTrenera, potwierdzenie, smsDoKlienta, smsDo
 import { htmlPotwierdzenia } from "@/app/lib/szablon-potwierdzenia";
 import { cena, znajdzProdukt } from "@/app/lib/produkty";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
-import { czesciSms, wyslijSms } from "@/app/lib/Wyslij-sms";
+import { czesciSms, wyslijSms } from "@/app/lib/wyslij-sms";
 
 /* ═══════════════════════════════════════════════════════════════════════
    TEST POWIADOMIEŃ · wysyła dokładnie te maile i SMS-y, które wychodzą
