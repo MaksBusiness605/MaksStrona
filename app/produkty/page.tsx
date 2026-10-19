@@ -73,7 +73,8 @@ export const metadata: Metadata = {
       prawdziwy.
    ═══════════════════════════════════════════════════════════════════════ */
 
-const POKAZ_PLACEHOLDERY = process.env.NODE_ENV !== "production";
+/* Historie (case study) widoczne wszędzie, także na produkcji. Ukryć: false. */
+const POKAZ_PLACEHOLDERY = true;
 
 const CTA = "Zobacz trzy poziomy";
 
@@ -144,7 +145,7 @@ const CASE_STUDIES = {
       zmiana: "Ułożyłem mu indywidualny plan i prowadziłem go na odległość. Nagrywał swoje serie i podsyłał mi filmiki, a ja poprawiałem mu technikę wyciskania i pokazywałem, jak trenować poprawnie. Każda poprawka szła od razu do kolejnego treningu.",
       wynik: "Rok po tym, jak utknął na setce, wyciska 140 kg, trenując trzy razy w tygodniu zamiast pięciu. Na każdym treningu wie, co robi i po co.",
       cytat: "Myślałem, że setka to mój sufit, a ja po prostu sam sobie źle układałem plany.",
-      czas: "[plan indywidualny + prowadzenie przez filmiki · 12 miesięcy]",
+      czas: "plan indywidualny + prowadzenie przez filmiki · 12 miesięcy",
       ...blok(Z.przypadek2),
     },
     {
@@ -160,7 +161,7 @@ const CASE_STUDIES = {
       zmiana: "Najpierw nauka ruchu i czucia własnego ciała, potem stała rutyna treningowa. Do tego kilka prostych zasad jedzenia, które pasują do zwykłego tygodnia, a nie wywracają go do góry nogami.",
       wynik: "Lepsza sylwetka i mobilność, ból zniknął z codziennego życia, a w planach są pierwsze zawody.",
       cytat: "Polubiłam siłownię.",
-      czas: "[treningi na sali · 8 tygodni]",
+      czas: "treningi na sali · 8 tygodni",
       ...blok(Z.przypadek1),
     },
   ],
