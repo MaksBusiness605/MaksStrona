@@ -69,8 +69,8 @@ export async function GET(req: Request) {
   }
 
   /* Podgląd SMS-ów zawsze, nawet bez wysyłki: treść, długość, liczba części. */
-  const smsKlient = doGsm(smsDoKlienta(p, numer, "Jan"));
-  const smsTrener = doGsm(smsDoTrenera(p, imieNazwisko, telefon || "48600100200", kwota));
+  const smsKlient = doGsm(smsDoKlienta(p, numer, "Jan", kwota, email));
+  const smsTrener = doGsm(smsDoTrenera(p, imieNazwisko, telefon || "48600100200", kwota, numer, email));
   const podglad = {
     sms_klient_tresc: smsKlient,
     sms_klient_dlugosc: `${smsKlient.length} zn., ${czesciSms(smsKlient)} SMS`,
