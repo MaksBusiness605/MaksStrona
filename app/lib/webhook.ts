@@ -4,7 +4,7 @@ import type Stripe from "stripe";
 import { stripe } from "./klient";
 import { mailDoKlienta, mailDoTrenera, mailNieudana, potwierdzenie, smsDoKlienta, smsDoTrenera, smsNieudana } from "./maile";
 import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
-import { linkDoEbooka, maEbooka } from "./ebook";
+import { linkDoEbooka, maEbooka } from "../lib/ebook";
 import { FIRMA } from "@/app/tresc/firma";
 import { wyslijSms } from "./wyslij-sms";
 import { cena, znajdzProdukt } from "./produkty";
@@ -186,10 +186,10 @@ async function potwierdz(s: Stripe.Checkout.Session) {
 
   /* 3 · SMS-y. wyslijSms nie rzuca błędów: przy braku tokenu albo środków
      zwraca false i krok nie jest odhaczony. */
-  await krok("sms_klient", () => wyslijSms(k.telefon, smsDoKlienta(p, k.numer, k.imie)));
+  await krok("sms_klient", () => wyslijSms(k.telefon, smsDoKlienta(p, k.numer, k.imie, kwota, k.email)));
   const smsTrenera = process.env.SMS_TRENERA;
   if (smsTrenera) {
-    await krok("sms_trener", () => wyslijSms(smsTrenera, smsDoTrenera(p, k.imieNazwisko, k.telefon, kwota)));
+    await krok("sms_trener", () => wyslijSms(smsTrenera, smsDoTrenera(p, k.imieNazwisko, k.telefon, kwota, k.numer, k.email ?? "")));
   }
 
   await zapiszKroki(s, zrobione).catch((e) => console.error("[stripe/webhook] zapis metadanych:", e));

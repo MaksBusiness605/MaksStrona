@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { doGsm, mailDoKlienta, mailDoTrenera, potwierdzenie, smsDoKlienta, smsDoTrenera } from "@/app/lib/maile";
 import { htmlPotwierdzenia } from "@/app/lib/szablon-potwierdzenia";
 import { cena, znajdzProdukt } from "@/app/lib/produkty";
+import { linkDoEbooka, maEbooka } from "@/app/lib/ebook";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
 import { czesciSms, wyslijSms } from "@/app/lib/wyslij-sms";
 
@@ -15,7 +16,7 @@ import { czesciSms, wyslijSms } from "@/app/lib/wyslij-sms";
    Przykłady (w przeglądarce):
      /api/dev/test-powiadomien
      /api/dev/test-powiadomien?produkt=prowadzenie
-     /api/dev/test-powiadomien?produkt=online-3&telefon=537483233&sms=1
+     /api/dev/test-powiadomien?produkt=online-3&telefon=666222699&sms=1
 
    Parametry:
      produkt   id z app/lib/produkty.ts (domyślnie online-1)
@@ -58,8 +59,8 @@ export async function GET(req: Request) {
       await wyslijMail({
         do: email,
         temat,
-        tresc: mailDoKlienta(p, numer, kwota, "Jan"),
-        html: htmlPotwierdzenia(potwierdzenie(p, numer, kwota, "Jan"), temat),
+        tresc: mailDoKlienta(p, numer, kwota, "Jan", maEbooka(p) ? linkDoEbooka("demo") : undefined),
+        html: htmlPotwierdzenia(potwierdzenie(p, numer, kwota, "Jan", maEbooka(p) ? linkDoEbooka("demo") : undefined), temat),
         odpowiedzDo: process.env.MAIL_TRENERA,
       });
       wynik.mail_klient = "wysłany";
@@ -86,9 +87,9 @@ export async function GET(req: Request) {
   };
 
   if (q.get("sms") === "1") {
-    wynik.sms_klient = (await wyslijSms(telefon, smsDoKlienta(p, numer, "Jan"))) ? "wysłany" : "nie wysłany (szczegóły w terminalu)";
+    wynik.sms_klient = (await wyslijSms(telefon, smsDoKlienta(p, numer, "Jan", kwota, email))) ? "wysłany" : "nie wysłany (szczegóły w terminalu)";
     if (process.env.SMS_TRENERA) {
-      wynik.sms_trener = (await wyslijSms(process.env.SMS_TRENERA, smsDoTrenera(p, imieNazwisko, telefon, kwota)))
+      wynik.sms_trener = (await wyslijSms(process.env.SMS_TRENERA, smsDoTrenera(p, imieNazwisko, telefon, kwota, numer, email)))
         ? "wysłany"
         : "nie wysłany (szczegóły w terminalu)";
     }
