@@ -4,7 +4,9 @@ import type Stripe from "stripe";
 import { stripe } from "./klient";
 import { mailDoKlienta, mailDoTrenera, mailNieudana, potwierdzenie, smsDoKlienta, smsDoTrenera, smsNieudana } from "./maile";
 import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
-import { wyslijSms } from "./Wyslij-sms";
+import { linkDoEbooka, maEbooka } from "./ebook";
+import { FIRMA } from "@/app/tresc/firma";
+import { wyslijSms } from "./wyslij-sms";
 import { cena, znajdzProdukt } from "./produkty";
 import { wyslijMail } from "./wyslij-mail";
 
@@ -149,7 +151,8 @@ async function potwierdz(s: Stripe.Checkout.Session) {
   }
 
   /* 1 · Ty dostajesz informację pierwszy: to od niej zależy telefon w 24 h. */
-  const trener = process.env.MAIL_TRENERA;
+  /* Powiadomienie o zamówieniu: wyłącznie na adres z app/tresc/firma.ts. */
+  const trener = FIRMA.email;
   if (trener) {
     const platnosc = celMetadanych(s);
     const panel = `https://dashboard.stripe.com/${s.livemode ? "" : "test/"}${
@@ -168,13 +171,15 @@ async function potwierdz(s: Stripe.Checkout.Session) {
   /* 2 · Mail do klienta. */
   if (k.email) {
     const temat = `Potwierdzenie zamówienia ${k.numer} · ${p.nazwa}`;
+    /* E-book, plan i prowadzenie: link do pobrania e-booka w mailu. */
+    const ebook = maEbooka(p) ? linkDoEbooka(s.id) : undefined;
     await krok("mail_klient", () =>
       wyslijMail({
         do: k.email!,
         temat,
-        tresc: mailDoKlienta(p, k.numer, kwota, k.imie),
-        html: htmlPotwierdzenia(potwierdzenie(p, k.numer, kwota, k.imie), temat),
-        odpowiedzDo: process.env.MAIL_TRENERA,
+        tresc: mailDoKlienta(p, k.numer, kwota, k.imie, ebook),
+        html: htmlPotwierdzenia(potwierdzenie(p, k.numer, kwota, k.imie, ebook), temat),
+        odpowiedzDo: FIRMA.email,
       }),
     );
   }

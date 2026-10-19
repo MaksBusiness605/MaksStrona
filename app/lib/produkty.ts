@@ -1,10 +1,11 @@
+// PLIK: app/lib/produkty.ts · STRIPE · katalog 9 produktów i ceny w groszach
 /* ═══════════════════════════════════════════════════════════════════════
    KATALOG PRODUKTÓW · jedno źródło prawdy dla płatności
 
-   Z tego pliku korzystają: platnosc.ts (tworzy płatność), webhook.ts
+   Z tego pliku korzystają: app/lib/platnosc.ts (tworzy płatność), app/lib/webhook.ts
    (wysyła maile) i /dziekujemy (pokazuje, co dalej). Strona
    /zamowienie też powinna brać nazwy i ceny stąd:
-     import { znajdzProdukt, cena } from "@/app/_stripe/produkty";
+     import { znajdzProdukt, cena } from "@/app/lib/produkty";
    Next nie pozwala eksportować danych z pliku strony, dlatego katalog
    stoi tutaj, a nie w page.tsx.
 
@@ -138,5 +139,5 @@ export function noweZamowienie(): string {
   return `MT-${czesc}${los}`;
 }
 
-export const TELEFON = "537 483 233";
-export const TELEFON_HREF = "tel:+48537483233";
+export const TELEFON = "666 222 699";
+export const TELEFON_HREF = "tel:+48666222699";

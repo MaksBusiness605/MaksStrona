@@ -1,5 +1,6 @@
 // PLIK: app/lib/maile.ts · MAILE · treść maili i SMS-ów (wygląd maila do klienta: szablon-potwierdzenia.ts)
 import { TELEFON, type Produkt } from "./produkty";
+import { FIRMA } from "@/app/tresc/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════
    TREŚĆ MAILI · tutaj edytujesz to, co dostaje klient i Ty
@@ -67,22 +68,50 @@ const KROK_TELEFON: Krok = {
   opis: `W dni robocze, tak jak zaznaczysz w ankiecie. Dzwonię z numeru ${TELEFON}: zapisz go, żeby nie odrzucić połączenia. Jeśli nie odbierzesz, napiszę SMS-a.`,
 };
 
+/** Data zakupu po polsku, strefa Warszawy, np. „19.10.2026, 14:05”. */
+const dataZakupu = () =>
+  new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+/** Obietnica kontaktu: przy usługach telefon w 24 h, przy e-booku odpowiedź na maila. */
+const KONTAKT_24H = (p: Produkt) =>
+  p.telefon ? "Odezwę się w ciągu 24 godzin (dni robocze)" : "Na pytania odpowiadam w ciągu 24 godzin";
+
 const ZAMOWIENIE = (p: Produkt, numer: string, kwota: string) => [
   { etykieta: "Produkt", wartosc: p.nazwa },
   { etykieta: "Kwota", wartosc: `${kwota}${p.cykliczny ? " / miesiąc" : ""}` },
   { etykieta: "Numer zamówienia", wartosc: numer },
+  { etykieta: "Data", wartosc: dataZakupu() },
+  { etykieta: "Kontakt", wartosc: `${KONTAKT_24H(p)}. Tel. ${TELEFON}, ${FIRMA.email}` },
 ];
 
-export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: string): Potwierdzenie {
+/** Krok z przyciskiem do e-booka. Przy planie i prowadzeniu e-book jest w pakiecie. */
+function krokEbook(link: string | undefined, wPakiecie: boolean): Krok {
+  return link
+    ? {
+        tytul: wPakiecie ? "E-book w pakiecie, już teraz" : "Pobierz e-booka",
+        opis: wPakiecie
+          ? "Zanim dostaniesz plan, możesz przeczytać zasady, na których go układam. Link działa bezterminowo."
+          : "PDF otwiera się na telefonie i na komputerze. Link działa bezterminowo: zapisz ten mail, żeby pobrać go ponownie.",
+        przycisk: { etykieta: "Pobierz e-booka (PDF)", url: link },
+      }
+    : {
+        tytul: "Link do e-booka",
+        opis: "Wyślę go osobnym mailem w ciągu kilku minut. Sprawdź też Spam i Oferty.",
+      };
+}
+
+/** linkEbook: link z app/lib/ebook.ts (linkDoEbooka). Bez niego mail
+    mówi, że link przyjdzie osobno. */
+export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: string, linkEbook?: string): Potwierdzenie {
   const dzieki = imie ? `Dzięki, ${imie}!` : "Dziękuję!";
   const zamowienie = ZAMOWIENIE(p, numer, kwota);
 
   switch (p.rodzaj) {
     case "stacjonarny":
       return {
-        zajawka: "Płatność przyjęta. Pierwszy krok: ankieta, 3 minuty.",
+        zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Do zobaczenia na sali.`,
-        wstep: "Płatność przyjęta. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.",
+        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -97,7 +126,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
           tytul: "Gdzie i co zabrać",
           linie: [
             "Just GYM, ul. Piotrkowska 157A, Łódź (budynek HiPiotrkowska, przy Stajni Jednorożców).",
-            "Wejście na salę masz w cenie.",
+            "Wejście na salę nie jest w cenie sesji: potrzebujesz karnetu albo jednorazowego wejścia do Just GYM.",
             "Strój, buty na zmianę, woda i ręcznik.",
           ],
         },
@@ -106,9 +135,9 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
 
     case "online":
       return {
-        zajawka: "Płatność przyjęta. Pierwszy krok: ankieta, 3 minuty.",
+        zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Zaczynamy.`,
-        wstep: "Płatność przyjęta. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.",
+        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -134,20 +163,11 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       return {
         zajawka: "Płatność przyjęta. Twój e-book jest gotowy.",
         naglowek: `${dzieki} E-book jest Twój.`,
-        wstep: "Płatność przyjęta. Dostęp jest bezterminowy i działa na telefonie.",
+        wstep: `Płatność przyjęta. E-book w PDF jest gotowy do pobrania, dostęp jest bezterminowy. Masz pytanie? Odpisz na tego maila, odpowiadam w ciągu 24 godzin.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
-          process.env.EBOOK_URL
-            ? {
-                tytul: "Otwórz e-booka",
-                opis: "Zapisz ten mail albo dodaj link do zakładek. Dostęp się nie kończy.",
-                przycisk: { etykieta: "Otwórz e-booka", url: process.env.EBOOK_URL },
-              }
-            : {
-                tytul: "Link do e-booka",
-                opis: "Wyślę go osobnym mailem w ciągu kilku minut. Sprawdź też Spam i Oferty.",
-              },
+          krokEbook(linkEbook, false),
         ],
         gwarancje: [
           "Jeśli w ciągu 30 dni przejdziesz na plan indywidualny albo prowadzenie, cenę e-booka odliczam w całości.",
@@ -156,13 +176,14 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
 
     case "plan":
       return {
-        zajawka: "Płatność przyjęta. Pierwszy krok: ankieta, 3 minuty.",
+        zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Rozpisuję Twój plan.`,
-        wstep: "Płatność przyjęta. Tak wygląda droga do planu na 12 tygodni.",
+        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Tak wygląda droga do planu na 12 tygodni.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
           krokAnkieta(numer),
+          ...(linkEbook ? [krokEbook(linkEbook, true)] : []),
           { ...KROK_TELEFON, opis: `${KROK_TELEFON.opis} Kilka minut rozmowy o ankiecie.` },
           {
             tytul: "Plan w ciągu 72 godzin",
@@ -175,13 +196,14 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
     case "prowadzenie": {
       const portal = process.env.CUSTOMER_PORTAL_URL;
       return {
-        zajawka: "Płatność przyjęta. Pierwszy krok: ankieta, 3 minuty.",
+        zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Od teraz jestem w Twoim narożniku.`,
-        wstep: "Płatność przyjęta. Tak wygląda pierwszy tydzień prowadzenia.",
+        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Tak wygląda pierwszy tydzień prowadzenia.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
           krokAnkieta(numer),
+          ...(linkEbook ? [krokEbook(linkEbook, true)] : []),
           { ...KROK_TELEFON, tytul: "Rozmowa diagnostyczna" },
           {
             tytul: "Plan na pierwszy miesiąc",
@@ -211,8 +233,8 @@ export function linkDoAnkiety(numer: string): string | undefined {
 
 /** Wersja tekstowa tego samego maila: dla programów pocztowych bez HTML
     i dla filtrów antyspamowych. Wysyłana razem z HTML-em. */
-export function mailDoKlienta(p: Produkt, numer: string, kwota: string, imie: string): string {
-  const t = potwierdzenie(p, numer, kwota, imie);
+export function mailDoKlienta(p: Produkt, numer: string, kwota: string, imie: string, linkEbook?: string): string {
+  const t = potwierdzenie(p, numer, kwota, imie, linkEbook);
   const linie: string[] = [powitanie(imie), "", t.wstep, ""];
 
   for (const z of t.zamowienie) linie.push(`${z.etykieta}: ${z.wartosc}`);
@@ -225,7 +247,7 @@ export function mailDoKlienta(p: Produkt, numer: string, kwota: string, imie: st
   if (t.wskazowki) linie.push(t.wskazowki.tytul.toUpperCase(), ...t.wskazowki.linie, "");
   linie.push("SPOKOJNIE", ...t.gwarancje);
   if (t.linkDodatkowy) linie.push(`${t.linkDodatkowy.etykieta}: ${t.linkDodatkowy.url}`);
-  linie.push("", `Pytania: ${TELEFON} albo odpisz na tego maila.`, "Maks Treningi");
+  linie.push("", `Pytania: ${TELEFON}, ${FIRMA.email} albo odpisz na tego maila.`, "Maks Treningi");
   return linie.join("\n");
 }
 
@@ -274,11 +296,14 @@ export function mailDoTrenera(p: Produkt, d: DaneDoTrenera): string {
 
 /** Limit jednego SMS-a w alfabecie GSM (bez polskich znaków). */
 export const LIMIT_SMS = 160;
+/** Limit dwóch części (2 × 153). Potwierdzenie zakupu ma wszystkie
+    podstawowe dane, więc idzie w 2 częściach: około 0,37 zł za SMS. */
+export const LIMIT_SMS_2 = 306;
 
-/** Pierwsza wersja, która mieści się w jednym SMS-ie, albo najkrótsza. */
-function najkrotszaMieszczaca(wersje: string[]): string {
+/** Pierwsza wersja, która mieści się w limicie, albo najkrótsza. */
+function najkrotszaMieszczaca(wersje: string[], limit = LIMIT_SMS): string {
   const czyste = wersje.map((w) => doGsm(w.replace(/\s+/g, " ").trim()));
-  return czyste.find((w) => w.length <= LIMIT_SMS) ?? czyste.reduce((a, b) => (b.length < a.length ? b : a));
+  return czyste.find((w) => w.length <= limit) ?? czyste.reduce((a, b) => (b.length < a.length ? b : a));
 }
 
 /** Zamienia polskie litery i typograficzne znaki na zwykłe, żeby SMS
@@ -292,34 +317,44 @@ export function doGsm(s: string): string {
   return s.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ„”“’–—·…\u00a0]/g, (z) => mapa[z] ?? z);
 }
 
-export function smsDoKlienta(p: Produkt, numer: string, imie: string): string {
+/** SMS do klienta po zakupie: dane zamówienia, informacja, że potwierdzenie
+    czeka w mailu, i kontakt w 24 h. */
+export function smsDoKlienta(p: Produkt, numer: string, imie: string, kwota: string, email?: string): string {
   const tel = TELEFON.replace(/\s/g, "");
+  const dzieki = imie ? `${imie}, dziękuję za zakup!` : "Dziękuję za zakup!";
+  const cena = `${kwota}${p.cykliczny ? "/mies." : ""}`;
+  const mail = email ? `Potwierdzenie wysłałem na ${email}` : "Potwierdzenie wysłałem mailem";
+  const mailKrotko = email ? `Szczegóły w mailu (${email})` : "Szczegóły w mailu";
 
   if (p.rodzaj === "ebook") {
     return najkrotszaMieszczaca([
-      `${imie ? `${imie}, dziękuję` : "Dziękuję"} za zakup e-booka (zam. ${numer}). Link do materiałów jest w mailu, sprawdź też Spam i Oferty. Pytania: ${tel}`,
-      `Dziękuję za zakup e-booka (${numer}). Link jest w mailu, sprawdź też Spam. Pytania: ${tel}`,
-    ]);
+      `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail}, jest w nim link do pobrania PDF. Sprawdź też Spam i Oferty. Pytania? Odpowiadam w 24 h: ${tel}, ${FIRMA.email}`,
+      `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail}, jest w nim link do PDF (sprawdź też Spam). Pytania? Odpowiadam w 24 h: ${tel}`,
+      `${dzieki} E-book, ${cena}, zam. ${numer}. ${mailKrotko}, link do PDF. Pytania: ${tel}`,
+    ], LIMIT_SMS_2);
   }
 
   const link = linkDoAnkiety(numer);
-  const ankieta = link ? `Ankieta (3 min): ${link}` : "Link do ankiety masz w mailu.";
-  const ankietaKrotko = link ? `Ankieta: ${link}` : "Ankieta jest w mailu.";
+  const ankieta = link ? ` Ankieta (3 min): ${link}` : " Link do ankiety jest w mailu.";
 
   return najkrotszaMieszczaca([
-    `${imie ? `${imie}, dziękuję` : "Dziękuję"} za zakup: ${p.nazwa} (zam. ${numer}). ${ankieta} Odezwę się w 24 h w dni robocze z nr ${tel}.`,
-    `${imie ? `${imie}, dziękuję` : "Dziękuję"} za zakup (zam. ${numer}). ${ankieta} Odezwę się w 24 h w dni robocze z nr ${tel}.`,
-    `Dziękuję za zakup (${numer}). ${ankietaKrotko} Odezwę się w 24 h (dni robocze) z nr ${tel}.`,
-    `Dziękuję za zakup (${numer}). ${ankietaKrotko} Odezwę się w 24 h z nr ${tel}.`,
-  ]);
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} Odezwę się w ciągu 24 h (dni robocze) z nr ${tel}. Pytania: ${FIRMA.email}`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} Odezwę się w ciągu 24 h (dni robocze) z nr ${tel}.`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mailKrotko}.${ankieta} Odezwę się w 24 h z nr ${tel}.`,
+    `Dziękuję za zakup (${numer}, ${cena}). ${mailKrotko}. Odezwę się w 24 h z nr ${tel}.`,
+  ], LIMIT_SMS_2);
 }
 
-export function smsDoTrenera(p: Produkt, imieNazwisko: string, telefon: string, kwota: string): string {
+/** SMS do Ciebie (SMS_TRENERA): przyszło zamówienie, pełne dane są na Gmailu. */
+export function smsDoTrenera(p: Produkt, imieNazwisko: string, telefon: string, kwota: string, numer = "", email = ""): string {
   const tel = telefon || "brak tel.";
+  const kto = imieNazwisko || "Klient";
+  const doKiedy = p.telefon ? "Zadzwoń w 24 h." : "Sprawdź, czy wyszedł link do e-booka.";
   return najkrotszaMieszczaca([
-    `Nowe zamówienie: ${p.nazwa}, ${kwota}. ${imieNazwisko || "Klient"}, tel. ${tel}. Zadzwoń w 24 h. Szczegóły w mailu.`,
-    `Zamówienie: ${p.nazwa}, ${kwota}. ${imieNazwisko || "Klient"}, ${tel}.`,
-  ]);
+    `Nowe zamówienie! Pełne dane czekają na Gmailu (${FIRMA.email}). ${p.nazwa}, ${kwota}${p.cykliczny ? "/mies." : ""}, zam. ${numer}. Klient: ${kto}, tel. ${tel}${email ? `, ${email}` : ""}. ${doKiedy}`,
+    `Nowe zamówienie, szczegóły na Gmailu. ${p.nazwa}, ${kwota}, zam. ${numer}. ${kto}, tel. ${tel}. ${doKiedy}`,
+    `Zamówienie: ${p.nazwa}, ${kwota}. ${kto}, ${tel}. Szczegóły na Gmailu.`,
+  ], LIMIT_SMS_2);
 }
 
 /** SMS po nieudanej płatności (Przelewy24 odrzucony przez bank). */

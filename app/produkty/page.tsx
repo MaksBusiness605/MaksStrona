@@ -64,11 +64,11 @@ export const metadata: Metadata = {
    1. KOSZYK: podpięty do Stripe. Ankieta jest PO płatności (link na
       /dziekujemy i w mailu, zmienna ANKIETA_URL). Stąd zmienione teksty
       w ZAKUP, przy planie w cenniku i w FAQ „Co dostaję po zakupie”.
-   2. Zdjęcia: app/tresc/zdjecia.ts, klucz `produkty`. Hero nie ma
-      pliku, więc pokazuje brief.
-   3. CASE_STUDIES to placeholdery z sali, sekcja stoi za flagą. Dla tej
-      strony najmocniejszy dowód to dwie osoby z tym samym celem i dwoma
-      różnymi planami: pokazuje, że plan naprawdę powstaje z ankiety.
+   2. Zdjęcia: app/tresc/zdjecia.ts, klucz `produkty`. Hero to okładka
+      e-booka (public/ebook-okladka.jpg).
+   3. CASE_STUDIES: Jarosław i Marysia, te same historie co na stronie
+      stacjonarnej. Sekcja stoi za flagą. Gdy Jarosław potwierdzi swoją
+      historię i obie osoby dadzą zgodę na piśmie, zdejmij flagę.
    4. Prowadzenie: jeśli ma limit miejsc, dopisz go w `note`, ale tylko
       prawdziwy.
    ═══════════════════════════════════════════════════════════════════════ */
@@ -118,45 +118,50 @@ const ICON_STRIP = [
 ];
 
 /* 3 · CASE STUDY ───────────────────────────────────────────────────────
-   Te same dwie historie co na stronach treningów, za flagą. Zobacz punkt 3
-   w „Zanim opublikujesz": na tej stronie lepiej zadziała inny dowód.
+   Te same dwie osoby co na stronie stacjonarnej, ale w kolejności pod
+   tę stronę: najpierw Jarosław, bo jego historia to dokładnie ten
+   produkt (plan indywidualny i prowadzenie na odległość). Marysia
+   trenowała ze mną na sali, więc jej `czas` mówi to wprost, żeby nikt
+   nie pomyślał, że ten wynik dał sam PDF.
+   Sekcja stoi za flagą, dopóki Jarosław nie potwierdzi swojej historii
+   i obie osoby nie dadzą zgody na piśmie.
    ─────────────────────────────────────────────────────────────────────── */
 
 const CASE_STUDIES = {
-  heading: "Dwie osoby rozpisane od pierwszego tygodnia",
-  lead: "Punkt startu, co dokładnie zmieniliśmy i co pokazały arkusze. Bez zdjęć sylwetki przed i po, same liczby, które da się sprawdzić.",
-  note: "Historie publikowane za zgodą tych osób. Liczby pochodzą z ich arkuszy.",
+  heading: "Dwie osoby, dwa różne punkty startu",
+  lead: "Punkt startu, co dokładnie zmieniliśmy i co pokazały karty obciążeń. Bez zdjęć sylwetki przed i po, same liczby, które da się sprawdzić.",
+  note: "Historie publikowane za zgodą tych osób. Liczby pochodzą z ich kart obciążeń.",
   items: [
     {
-      kto: "[Imię], [wiek] lat",
-      kontekst: "[np. redukcja, siedząca praca]",
-      tytul: "[Jedno zdanie efektu: co się zmieniło i po ilu tygodniach]",
+      kto: "Jarosław, 20 lat",
+      kontekst: "rok treningu, zablokowany na 100 kg · plan i prowadzenie online",
+      tytul: "Z setki, na której utknął, do 140 kg na ławce w rok",
       liczby: [
-        { label: "Martwy ciąg", przed: "[..] kg", po: "[..] kg" },
-        { label: "Przysiad", przed: "[..] kg", po: "[..] kg" },
-        { label: "Treningi w tygodniu", przed: "[..]", po: "[..]" },
+        { label: "Wyciskanie na ławce", przed: "100 kg", po: "140 kg" },
+        { label: "Treningi w tygodniu", przed: "5", po: "3" },
       ],
-      start: "[Z czym przyszła: ile trenowała, co próbowała wcześniej i na czym się kończyło.]",
-      zmiana: "[Jak wyglądał jej plan po ankiecie i dlaczego właśnie tak.]",
-      wynik: "[Co pokazał arkusz po ośmiu tygodniach. Jedna rzecz poza liczbami.]",
-      cytat: "[Jedno zdanie tej osoby, słowo w słowo]",
-      czas: "[plan indywidualny · 8 tygodni]",
-      ...blok(Z.przypadek1),
+      start: "Rok na siłowni i pięć treningów w tygodniu według planów, które sam sobie układał i zmieniał co kilka tygodni. Na 100 kg na ławce się zatrzymał i dalej nie szło.",
+      zmiana: "Ułożyłem mu indywidualny plan i prowadziłem go na odległość. Nagrywał swoje serie i podsyłał mi filmiki, a ja poprawiałem mu technikę wyciskania i pokazywałem, jak trenować poprawnie. Każda poprawka szła od razu do kolejnego treningu.",
+      wynik: "Rok po tym, jak utknął na setce, wyciska 140 kg, trenując trzy razy w tygodniu zamiast pięciu. Na każdym treningu wie, co robi i po co.",
+      cytat: "Myślałem, że setka to mój sufit, a ja po prostu sam sobie źle układałem plany.",
+      czas: "[plan indywidualny + prowadzenie przez filmiki · 12 miesięcy]",
+      ...blok(Z.przypadek2),
     },
     {
-      kto: "[Imię], [wiek] lat",
-      kontekst: "[np. powrót po kontuzji kolana]",
-      tytul: "[Jedno zdanie efektu: co się zmieniło i po ilu tygodniach]",
+      kto: "Marysia, 50 lat",
+      kontekst: "redukcja, siedząca praca",
+      tytul: "Od zera ruchu do czterech treningów w tygodniu i planów startowych",
       liczby: [
-        { label: "Przysiad", przed: "[..] kg", po: "[..] kg" },
-        { label: "Ból w trakcie", przed: "[..]/10", po: "[..]/10" },
+        { label: "Martwy ciąg", przed: "0 kg", po: "105 kg" },
+        { label: "Przysiad", przed: "4 kg", po: "100 kg" },
+        { label: "Treningi w tygodniu", przed: "0", po: "4" },
       ],
-      start: "[Z czym przyszedł: uraz, zalecenia fizjoterapeuty, czego się bał.]",
-      zmiana: "[Jak plan omijał ograniczenie i kiedy wrócił ciężar.]",
-      wynik: "[Gdzie jest dziś: ciężar, samodzielny trening.]",
-      cytat: "[Jedno zdanie tej osoby, słowo w słowo]",
-      czas: "[prowadzenie · 3 miesiące]",
-      ...blok(Z.przypadek2),
+      start: "Siedzący tryb życia, zero regularnego ruchu i brak wiedzy o tym, jak jedzenie wpływa na samopoczucie i siłę.",
+      zmiana: "Najpierw nauka ruchu i czucia własnego ciała, potem stała rutyna treningowa. Do tego kilka prostych zasad jedzenia, które pasują do zwykłego tygodnia, a nie wywracają go do góry nogami.",
+      wynik: "Lepsza sylwetka i mobilność, ból zniknął z codziennego życia, a w planach są pierwsze zawody.",
+      cytat: "Polubiłam siłownię.",
+      czas: "[treningi na sali · 8 tygodni]",
+      ...blok(Z.przypadek1),
     },
   ],
 };
@@ -291,7 +296,7 @@ const ZAKUP = {
       details: ["Prowadzenie: check-in co 7 dni i moja odpowiedź, nie automat"],
     },
   ],
-  ctaNote: "Nie wiesz, który poziom? Zadzwoń: 537 483 233. Powiem też wtedy, gdy wystarczy najtańszy.",
+  ctaNote: "Nie wiesz, który poziom? Zadzwoń: 666 222 699. Powiem też wtedy, gdy wystarczy najtańszy.",
 };
 
 /* 9 · CENNIK ───────────────────────────────────────────────────────────
@@ -507,7 +512,7 @@ export default function Page() {
         {/* 2 · pasek */}
         <IconStrip items={ICON_STRIP} tone="fog" />
 
-        {/* 3 · dwie historie. Zdejmij flagę, gdy będą prawdziwe. */}
+        {/* 3 · dwie historie. Zdejmij flagę, gdy Jarosław potwierdzi swoją. */}
         {POKAZ_PLACEHOLDERY && <CaseStudies {...CASE_STUDIES} cta={CTA} ctaHref={CEL} />}
 
         {/* 4 · największy ból */}

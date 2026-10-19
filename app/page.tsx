@@ -1,6 +1,11 @@
+// STRONA: / · STRONA GŁÓWNA · rozdzielnia na trzy warianty (sala, online, plan)
 import type { Metadata } from "next";
-import { Footer, Header } from "@/app/components/sections";
-import { KONKURS, LICZBY, TELEFON, TELEFON_HREF, TRASY, TRENER, dzienPL, lataPL } from "@/app/lib/dane";
+import { CaseStudies, Footer, Header, Team } from "@/app/components/sections";
+import { KONKURS, TELEFON, TELEFON_HREF, TRASY, dzienPL } from "@/app/lib/dane";
+import { ZDJECIA, blok, kadr } from "@/app/tresc/zdjecia";
+
+/** Zdjęcia historii i trenera: te same pliki co na podstronach. */
+const Z = ZDJECIA.stacjonarny;
 
 // Strona sprawdza datę konkursu, więc odświeżamy ją co godzinę.
 export const revalidate = 3600;
@@ -20,7 +25,25 @@ export const metadata: Metadata = {
 
    Kolejność sekcji idzie za łańcuchem przekonań:
    hero (wybór) → diagnoza (1) → zasada pracy (2, 3, 5)
-   → porównanie z ryzykiem (4, 6) → trener → pytania → wybór jeszcze raz.
+   → porównanie z ryzykiem (4, 6) → historie → trener → pytania → wybór
+   jeszcze raz.
+
+   CO ZMIENIŁO SIĘ W TEJ WERSJI
+   · Wypadło „30 dni na zwrot” przy planie. Regulamin tego nie przewiduje,
+     strona /produkty też już tego nie obiecuje. W porównaniu stoi teraz
+     to, co mówi regulamin: 14 dni na odstąpienie, dopóki usługa nie jest
+     wykonana, e-book bez zwrotu po otrzymaniu dostępu, prowadzenie bez
+     umowy.
+   · Sala i online: „brak terminu w 14 dni = zwrot całości”, tak samo jak
+     na podstronach.
+   · HISTORIE i TRENER to te same komponenty co na podstronach
+     (<CaseStudies> i <Team>): zdjęcia, liczby przed i po, cytat, pełne
+     bio. Treść jest skopiowana z /trening-stacjonarny. Sekcja historii
+     stoi za flagą POKAZ_HISTORIE: widać ją lokalnie, na produkcji dopiero
+     po zgodzie na piśmie i potwierdzeniu historii Jarosława.
+   · Taśma: dopisana płatność (BLIK, karta, Przelewy24).
+   · Pytania: dopisane „Jak płacę i kiedy ustalamy termin?” i „Czy mogę
+     się rozmyślić?”, bo to dwie najczęstsze blokady przed kliknięciem.
    ═══════════════════════════════════════════════════════════════════════ */
 
 type Wariant = {
@@ -46,13 +69,13 @@ const WARIANTY: Wariant[] = [
     nazwa: "Trening na sali w Łodzi",
     kto: "Jesteś w Łodzi i chcesz, żeby ktoś stał obok przy sztandze",
     cena: "150 zł",
-    cenaDopisek: "60 minut, wejście w cenie",
+    cenaDopisek: "60 minut jeden na jeden",
     href: TRASY.sala,
     cta: "Zobacz trening na sali",
-    gdzie: "Just GYM, Piotrkowska 157A. Wejście na salę w cenie sesji.",
+    gdzie: "Just GYM, Piotrkowska 157A. Wejście na salę płatne osobno (karnet Just GYM).",
     technika: "Stoję obok i poprawiam w tej samej serii, także dłonią.",
     dalej: "3 sesje za 420 zł, 5 sesji za 650 zł. Bez daty ważności.",
-    ryzyko: "Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję pieniądze.",
+    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości. Za niewykorzystane sesje z pakietu też oddaję pieniądze.",
     dlaKogo: "Zaczynasz od zera albo chcesz asekuracji przy cięższych seriach.",
   },
   {
@@ -67,7 +90,7 @@ const WARIANTY: Wariant[] = [
     gdzie: "W domu albo na Twojej siłowni, w całej Polsce. Wystarczy telefon na statywie.",
     technika: "Widzę serię na żywo i mówię w trakcie, co zmienić.",
     dalej: "3 treningi za 260 zł, 5 treningów za 400 zł.",
-    ryzyko: "Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję pieniądze.",
+    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości.",
     dlaKogo: "Nie mieszkasz w Łodzi albo masz już swoją siłownię i swój plan.",
   },
   {
@@ -82,7 +105,7 @@ const WARIANTY: Wariant[] = [
     gdzie: "Gdziekolwiek trenujesz. Plan w panelu i wideo do każdego ćwiczenia.",
     technika: "W planie ćwiczysz sam, według kryterium. W prowadzeniu analizuję Twoje nagrania dwa razy w miesiącu.",
     dalej: "E-book 99 zł, plan na 12 tygodni 249 zł, prowadzenie 349 zł miesięcznie.",
-    ryzyko: "30 dni na zwrot. Piszesz jedno zdanie, oddaję pieniądze.",
+    ryzyko: "14 dni na odstąpienie, dopóki nie dostaniesz planu. Prowadzenie bez umowy, kończysz z końcem miesiąca.",
     dlaKogo: "Wiesz, jak wykonać ćwiczenia, ale żaden plan nie przetrwał Twojego zwykłego tygodnia.",
   },
 ];
@@ -95,6 +118,7 @@ const TASMA = [
   "Trening przez kamerę w całej Polsce",
   "Plan pod liczbę dni, które naprawdę masz",
   "Bez liczenia każdej kalorii",
+  "Płatność BLIK-iem, kartą albo Przelewy24",
 ];
 
 const CYKL = [
@@ -104,15 +128,70 @@ const CYKL = [
   { kiedy: "Znowu poniedziałek", co: "Zaczynasz od nowa i obwiniasz siebie" },
 ];
 
-// TODO: wpisz prawdziwe historie za zgodą tych osób. Pusta lista = sekcja się nie pokazuje.
-const OPINIE: { kto: string; wynik: string; cytat: string }[] = [
-  // { kto: "Ania, 34 lata, praca przy biurku", wynik: "Martwy ciąg: 40 → 70 kg w 8 tygodni", cytat: "…" },
-];
+/* Historie: te same co na /trening-stacjonarny. Widoczne lokalnie, na
+   produkcji dopiero po zgodzie na piśmie. Gdy obie osoby potwierdzą,
+   ustaw POKAZ_HISTORIE = true (i zdejmij flagę na podstronach). */
+const POKAZ_HISTORIE = process.env.NODE_ENV !== "production";
+
+const CASE_STUDIES = {
+  heading: "Dwie osoby, dwa różne punkty startu",
+  lead: "Punkt startu, co dokładnie zmieniliśmy i co pokazały karty obciążeń. Bez zdjęć sylwetki przed i po, same liczby, które da się sprawdzić.",
+  note: "Historie publikowane za zgodą tych osób. Liczby pochodzą z ich kart obciążeń.",
+  items: [
+    {
+      kto: "Marysia, 50 lat",
+      kontekst: "redukcja, siedząca praca · trening na sali",
+      tytul: "Od zera ruchu do czterech treningów w tygodniu i planów startowych",
+      liczby: [
+        { label: "Martwy ciąg", przed: "0 kg", po: "105 kg" },
+        { label: "Przysiad", przed: "4 kg", po: "100 kg" },
+        { label: "Treningi w tygodniu", przed: "0", po: "4" },
+      ],
+      start: "Siedzący tryb życia, zero regularnego ruchu i brak wiedzy o tym, jak jedzenie wpływa na samopoczucie i siłę.",
+      zmiana: "Najpierw nauka ruchu i czucia własnego ciała, potem stała rutyna treningowa. Do tego kilka prostych zasad jedzenia, które pasują do zwykłego tygodnia, a nie wywracają go do góry nogami.",
+      wynik: "Lepsza sylwetka i mobilność, ból zniknął z codziennego życia, a w planach są pierwsze zawody.",
+      cytat: "Polubiłam siłownię.",
+      czas: "[3 sesje regularnie · 8 tygodni]",
+      ...blok(Z.przypadek1),
+    },
+    {
+      kto: "Jarosław, 20 lat",
+      kontekst: "rok treningu, zablokowany na 100 kg · plan i prowadzenie online",
+      tytul: "Z setki, na której utknął, do 140 kg na ławce w rok",
+      liczby: [
+        { label: "Wyciskanie na ławce", przed: "100 kg", po: "140 kg" },
+        { label: "Treningi w tygodniu", przed: "5", po: "3" },
+      ],
+      start: "Rok na siłowni i pięć treningów w tygodniu według planów, które sam sobie układał i zmieniał co kilka tygodni. Na 100 kg na ławce się zatrzymał i dalej nie szło.",
+      zmiana: "Ułożyłem mu indywidualny plan i prowadziłem go na odległość. Nagrywał swoje serie i podsyłał mi filmiki, a ja poprawiałem mu technikę wyciskania i pokazywałem, jak trenować poprawnie. Każda poprawka szła od razu do kolejnego treningu.",
+      wynik: "Rok po tym, jak utknął na setce, wyciska 140 kg, trenując trzy razy w tygodniu zamiast pięciu. Na każdym treningu wie, co robi i po co.",
+      cytat: "Myślałem, że setka to mój sufit, a ja po prostu sam sobie źle układałem plany.",
+      czas: "[plan indywidualny + prowadzenie przez filmiki · 12 miesięcy]",
+      ...blok(Z.przypadek2),
+    },
+  ],
+};
+
+/* Kto prowadzi: to samo bio co na podstronach. */
+const TEAM = {
+  heading: "Kto prowadzi",
+  name: "Maksymilian Lehman",
+  role: "Trener personalny · Just GYM, Piotrkowska 157A, Łódź i online",
+  paragraphs: [
+    "Pracuję z ludźmi o różnym poziomie zaawansowania i w bardzo różnym wieku. Prowadzę zarówno treningi pod cele sportowe, jak i treningi prozdrowotne. Nie boję się pracy z osobami po kontuzjach i wiem, kiedy trzeba skorzystać z pomocy fizjoterapeuty albo ortopedy.",
+    "Pierwszy raz przyszedłem na siłownię 9 lat temu. Zaczynałem od pustej sztangi i nie potrafiłem podciągnąć się na drążku. Próbowałem treningu kulturystycznego i kalisteniki, aż odkryłem trójbój siłowy. Największą motywacją okazały się dla mnie wyniki w przysiadzie, wyciskaniu i martwym ciągu.",
+    "Jestem pasjonatem i zawodnikiem trójboju siłowego, ale na co dzień pracuję z lekarzami, informatykami, sportowcami, kobietami po ciąży i osobami, które dopiero zaczynają.",
+  ],
+};
 
 const PYTANIA = [
   {
     p: "Nigdy nie byłem na siłowni. Od czego zacząć?",
     o: "Od treningu na sali, jeśli jesteś w Łodzi. Przy pierwszych ciężarach najwięcej daje ktoś, kto stoi obok i asekuruje. Jeśli jesteś poza Łodzią, trening przez kamerę też zadziała: telefon stoi z boku, a ja mówię w trakcie serii, co poprawić.",
+  },
+  {
+    p: "Jak płacę i kiedy ustalamy termin?",
+    o: "Płacisz online BLIK-iem, kartą albo Przelewy24, bez wybierania godziny. Zaraz potem dostajesz maila z krótką ankietą, a w ciągu 24 h w dni robocze odzywam się i ustalamy termin. Jeśli w 14 dni nie znajdziemy wspólnej godziny, oddaję całą kwotę. E-book dostajesz od razu po płatności.",
   },
   {
     p: "Nie mam czasu trenować cztery razy w tygodniu.",
@@ -130,6 +209,10 @@ const PYTANIA = [
     p: "Czy będę musiał liczyć każdą kalorię?",
     o: "Nie. W planie dostajesz kartę talerza i zasady, które działają bez wagi kuchennej, aplikacji i kurczaka z ryżem przez cały tydzień.",
   },
+  {
+    p: "Czy mogę się rozmyślić?",
+    o: "Tak, w ciągu 14 dni od zakupu, dopóki usługa nie została wykonana: wystarczy odpisać na maila z potwierdzeniem. Za niewykorzystane sesje z pakietu oddaję pieniądze. Wyjątek to e-book: po otrzymaniu dostępu nie da się go zwrócić, bo materiały są już u Ciebie. Szczegóły w regulaminie.",
+  },
 ];
 
 function Strzalka() {
@@ -142,10 +225,6 @@ function Strzalka() {
 
 export default function Page() {
   const konkursTrwa = Date.now() < KONKURS.koniec.getTime();
-  const liczby = [
-    LICZBY.treningi ? { v: String(LICZBY.treningi), l: "treningów 1:1, policzonych z kalendarza" } : null,
-    LICZBY.lata ? { v: `${LICZBY.lata} ${lataPL(LICZBY.lata)}`, l: "pracy jako trener personalny" } : null,
-  ].filter(Boolean) as { v: string; l: string }[];
 
   return (
     <>
@@ -368,57 +447,13 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ── OPINIE (tylko gdy są prawdziwe) ──────────────────── */}
-        {OPINIE.length > 0 && (
-          <section className="h-opinie" aria-labelledby="h-op">
-            <div className="h-w">
-              <div className="h-naglowek-sekcji">
-                <p className="h-eyebrow h-eyebrow-ciemny">Policzone z kart obciążeń</p>
-                <h2 id="h-op" className="h-h2">Co pokazały karty</h2>
-              </div>
-              <div className="h-opinie-lista">
-                {OPINIE.map((o) => (
-                  <figure key={o.kto} className="h-opinia">
-                    <p className="h-opinia-wynik">{o.wynik}</p>
-                    <blockquote>„{o.cytat}”</blockquote>
-                    <figcaption>{o.kto}</figcaption>
-                  </figure>
-                ))}
-              </div>
-              <p className="h-drobne">Historie publikowane za zgodą tych osób. Liczby pochodzą z ich kart obciążeń.</p>
-            </div>
-          </section>
+        {/* ── HISTORIE: ten sam komponent co na podstronach ───── */}
+        {POKAZ_HISTORIE && (
+          <CaseStudies {...CASE_STUDIES} cta="Porównaj warianty" ctaHref="#porownanie" />
         )}
 
-        {/* ── TRENER ───────────────────────────────────────────── */}
-        <section className="h-trener" aria-labelledby="h-tr">
-          <div className={`h-w h-trener-uklad${TRENER.foto ? "" : " h-trener-bez-foto"}`}>
-            <div className="h-trener-tekst">
-              <p className="h-eyebrow h-eyebrow-ciemny">Kto prowadzi</p>
-              <h2 id="h-tr" className="h-h2">Jestem {TRENER.imie}. Wszystko robię sam.</h2>
-              <p>
-                Sam prowadzę każdą sesję, sam czytam raporty i sam odpisuję na wiadomości. Nie ma
-                asystenta ani automatu, który generuje plan.
-              </p>
-              {liczby.length > 0 && (
-                <dl className="h-liczby">
-                  {liczby.map((l) => (
-                    <div key={l.l}><dt>{l.v}</dt><dd>{l.l}</dd></div>
-                  ))}
-                </dl>
-              )}
-              <a className="h-tel-duzy" href={TELEFON_HREF}>
-                <span>Pytanie przed zakupem?</span>
-                {TELEFON}
-              </a>
-            </div>
-            {TRENER.foto && (
-              <div className="h-ramka h-foto-ramka">
-                <img className="h-foto" src={TRENER.foto} alt={`${TRENER.imie} na sali treningowej`} width={480} height={600} loading="lazy" />
-              </div>
-            )}
-          </div>
-        </section>
+        {/* ── TRENER: ten sam komponent co na podstronach ──────── */}
+        <Team {...TEAM} {...kadr(Z.team)} cta="Porównaj warianty" ctaHref="#porownanie" odstepGora />
 
         {/* ── PYTANIA ──────────────────────────────────────────── */}
         <section className="h-faq" aria-labelledby="h-pyt">
@@ -631,29 +666,6 @@ const CSS = `
 .h-dl dt{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sl);margin-bottom:.3rem}
 .h-dl dd{margin:0;line-height:1.5;font-size:.95rem}
 .h-dl-ryzyko dd{padding-left:.75rem;border-left:3px solid var(--s);font-weight:600}
-
-/* opinie */
-.h-opinie{background:var(--m);padding:clamp(4rem,9vw,7rem) 0}
-.h-opinie-lista{display:grid;gap:1rem}
-@media(min-width:48rem){.h-opinie-lista{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.h-opinia{margin:0;padding:1.75rem;background:#fff}
-.h-opinia-wynik{margin:0 0 .9rem;font-weight:800;font-size:1.35rem;letter-spacing:-.02em}
-.h-opinia blockquote{margin:0 0 1rem;padding-left:.9rem;border-left:3px solid var(--s);line-height:1.55}
-.h-opinia figcaption{font-size:.85rem;color:var(--sl)}
-
-/* trener */
-.h-trener{padding:0 0 clamp(4rem,9vw,7rem)}
-.h-trener-uklad{display:grid;gap:3rem;align-items:center;padding-top:clamp(4rem,9vw,7rem);border-top:1px solid var(--l)}
-@media(min-width:56rem){.h-trener-uklad{grid-template-columns:minmax(0,1fr) minmax(0,26rem)}}
-.h-trener-bez-foto .h-trener-tekst{max-width:44rem}
-.h-trener-tekst p:not(.h-eyebrow){max-width:36rem;margin:1.25rem 0 0;font-size:1.1rem;color:#3B4550}
-.h-liczby{display:flex;flex-wrap:wrap;gap:1.5rem 3rem;margin:2rem 0 0}
-.h-liczby dt{font-size:2.5rem;font-weight:800;letter-spacing:-.04em;line-height:1}
-.h-liczby dd{margin:.35rem 0 0;font-size:.85rem;color:var(--sl)}
-.h-tel-duzy{display:inline-grid;margin-top:2rem;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;text-decoration:none}
-.h-tel-duzy span{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sl)}
-.h-foto-ramka{padding:12px}
-.h-foto{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
 
 /* pytania */
 .h-faq{padding:0 0 clamp(4rem,9vw,7rem)}

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   title:
     "Trening personalny Łódź Centrum — 150 zł za sesję, termin ustalamy w 24 h | Maks Treningi",
   description:
-    "Trening personalny jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Korekta techniki na żywo, zapis obciążeń po każdej sesji, wejście na salę w cenie. 150 zł, po zakupie odzywam się w ciągu 24 h i ustalamy termin.",
+    "Trening personalny jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Korekta techniki na żywo, zapis obciążeń po każdej sesji. 150 zł, po zakupie odzywam się w ciągu 24 h i ustalamy termin.",
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -112,8 +112,8 @@ export const metadata: Metadata = {
 const POKAZ_PLACEHOLDERY = process.env.NODE_ENV !== "production";
 
 const CTA = "Kup trening za 150 zł";
-const TELEFON = "537 483 233";
-const TELEFON_HREF = "tel:+48537483233";
+const TELEFON = "666 222 699";
+const TELEFON_HREF = "tel:+48666222699";
 
 /* Linki do płatności Stripe. Identyfikatory produktów i ceny są
    w app/lib/produkty.ts. Przyciski poza cennikiem kupują jedną sesję. */
@@ -145,7 +145,7 @@ const HERO = {
     "Po każdym treningu zapis obciążeń: wiesz, czy jest progres, zamiast zgadywać",
   ],
   reassurance: [
-    "150 zł za 60 minut, wejście na salę w cenie",
+    "150 zł za 60 minut jeden na jeden",
     "BLIK, karta albo Przelewy24, termin w 24 h",
     "Brak terminu w 14 dni = zwrot całości",
   ],
@@ -160,7 +160,6 @@ const ICON_STRIP = [
   "Telefon, SMS albo e-mail: wybierasz w ankiecie",
   "Sesje jeden na jeden",
   "Korekta techniki na żywo",
-  "Wejście na salę w cenie",
   "Zapis obciążeń po każdej sesji",
   "Pakiety bez daty ważności",
   "Bez liczenia kalorii",
@@ -375,7 +374,7 @@ const LOKALIZACJA = {
     details: [
       "Budynek HiPiotrkowska, tuż przy Stajni Jednorożców, czyli węźle tramwajowym na skrzyżowaniu Piotrkowskiej i al. Mickiewicza",
       "Sala 1800 m², pełna strefa wolnych ciężarów",
-      "Wejście na salę wliczone w cenę sesji, bez osobnego karnetu",
+      "Wejście na salę nie jest w cenie sesji: potrzebujesz karnetu albo jednorazowego wejścia do Just GYM",
     ],
     query: "Just GYM Łódź Piotrkowska 157A",
   },
@@ -397,7 +396,7 @@ const CENNIK = {
   lead: "Każda sesja wygląda tak samo. Różni się tylko cena za godzinę i to, na ile z góry się umawiasz.",
   wspolne: [
     { ikona: "czas" as const, tekst: "60 minut jeden na jeden" },
-    { ikona: "sala" as const, tekst: "Wejście na salę w cenie" },
+    { ikona: "sala" as const, tekst: "Wejście na salę płatne osobno (karnet Just GYM)" },
     { ikona: "karta" as const, tekst: "Karta obciążeń po każdej sesji" },
     { ikona: "termin" as const, tekst: "Termin ustalamy w 24 h po zakupie" },
   ],
@@ -536,7 +535,7 @@ const ZOBOWIAZANIA = {
 const FAQ = [
   {
     q: "Gdzie odbywają się treningi?",
-    a: "Just GYM, ul. Piotrkowska 157A w Łodzi, budynek HiPiotrkowska przy Stajni Jednorożców. Wejście na salę jest wliczone w cenę sesji, więc nie potrzebujesz osobnego karnetu. Trenuję wyłącznie tutaj: nie dojeżdżam do domów i nie prowadzę sesji w innych klubach, bo każdą poprawkę sprawdzamy potem na tym samym sprzęcie.",
+    a: "Just GYM, ul. Piotrkowska 157A w Łodzi, budynek HiPiotrkowska przy Stajni Jednorożców. Wejście na salę nie jest wliczone w cenę sesji: potrzebujesz karnetu albo jednorazowego wejścia do Just GYM. Trenuję wyłącznie tutaj: nie dojeżdżam do domów i nie prowadzę sesji w innych klubach, bo każdą poprawkę sprawdzamy potem na tym samym sprzęcie.",
   },
   {
     q: "Płacę z góry. Jak ustalamy termin?",
@@ -552,7 +551,7 @@ const FAQ = [
   },
   {
     q: "Ile kosztuje sesja?",
-    a: "Pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). W każdej cenie jest wejście na salę, więc nie potrzebujesz osobnego karnetu. Pakiety nie mają daty ważności, a za niewykorzystane sesje zwracam pieniądze.",
+    a: "Pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). Ceny nie obejmują wejścia na salę: karnet albo jednorazowe wejście kupujesz w Just GYM. Pakiety nie mają daty ważności, a za niewykorzystane sesje zwracam pieniądze.",
   },
   {
     q: "Dlaczego pakiety są tak małe? Wszędzie sprzedają po dziesięć sesji.",

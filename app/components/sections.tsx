@@ -1,4 +1,4 @@
-// PLIK: app/components/sections.tsx · KOMPONENTY STRON · nowa stopka z regulaminem i danymi firmy
+// PLIK: app/components/sections.tsx · KOMPONENTY STRON · logo (public/logo-znak.svg) w nagłówku i stopce
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -183,6 +183,23 @@ export function Waypoint({
   );
 }
 
+/** Znak marki: limonkowy kwadrat ze sztangą i strzałką. Plik leży
+    w public/logo-znak.svg. Zwykły <img> zamiast next/image, bo SVG
+    nie potrzebuje optymalizacji, a tak działa bez zmian w next.config.
+    alt pusty: obok zawsze stoi nazwa „Maks Treningi”. */
+export function Logo({ className = "h-8 w-8" }: { className?: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-znak.svg"
+      alt=""
+      width={32}
+      height={32}
+      className={`shrink-0 ${className}`}
+    />
+  );
+}
+
 /** Przycisk. Pełna szerokość na telefonie, min. 52 px wysokości. */
 export function Cta({
   children,
@@ -294,8 +311,8 @@ function Corners({ tone = "light" }: { tone?: "light" | "dark" | "signal" }) {
 export function Header({
   cta,
   ctaHref = "#oferty",
-  phone = "537 483 233",
-  phoneHref = "tel:+48537483233",
+  phone = "666 222 699",
+  phoneHref = "tel:+48666222699",
 }: {
   cta: string;
   ctaHref?: string;
@@ -317,7 +334,7 @@ export function Header({
       >
         {/* Logo bez linku: kliknięcie nie wyprowadza ze strony. */}
         <div className="flex shrink-0 items-center gap-2.5">
-          <Waypoint n="↑" size="sm" dark />
+          <Logo className="h-8 w-8 sm:h-9 sm:w-9" />
           <span className="font-display text-[0.9375rem] font-extrabold tracking-tight sm:text-base">
             Maks Treningi
           </span>
@@ -2066,8 +2083,8 @@ export function Faq({
   heading,
   lead,
   items,
-  phone = "537 483 233",
-  phoneHref = "tel:+48537483233",
+  phone = "666 222 699",
+  phoneHref = "tel:+48666222699",
   phoneNote = "Odpisuję w 24 h w dni robocze.",
   cta,
   ctaHref = "#oferty",
@@ -3640,7 +3657,7 @@ export function Footer() {
         {/* Rząd 1: marka i linki prawne */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
-            <Waypoint n="↑" size="sm" dark />
+            <Logo className="h-8 w-8" />
             <span className="font-display text-sm font-extrabold tracking-tight">
               {FIRMA.marka}
             </span>

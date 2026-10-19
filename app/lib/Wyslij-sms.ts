@@ -34,7 +34,7 @@ import { doGsm } from "./maile";
      SMSAPI_NADAWCA=MaksTren   zatwierdzone pole nadawcy
 
    ── WSPÓLNE ──────────────────────────────────────────────────────────
-     SMS_TRENERA=48537483233   opcjonalnie: Twój numer na SMS o zakupie
+     SMS_TRENERA=48666222699   opcjonalnie: Twój numer na SMS o zakupie
      SMS_TEST=1                tryb testowy: nic nie wychodzi i nic nie
                                kosztuje. Twilio: kod sprawdza konfigurację
                                i pokazuje, co by wysłał. SMSAPI: serwer
@@ -67,7 +67,7 @@ function trybTestowy(): boolean {
   return process.env.SMS_TEST === "1" || process.env.SMSAPI_TEST === "1";
 }
 
-/** "+48 537-483-233" → "48537483233". Polski numer bez kierunkowego
+/** "+48 666-222-699" → "48666222699". Polski numer bez kierunkowego
     dostaje 48 na początku. Zwraca undefined, gdy to nie wygląda na numer. */
 export function numerDoSms(telefon: string | undefined): string | undefined {
   if (!telefon) return undefined;
@@ -105,7 +105,7 @@ export async function wyslijSms(telefon: string | undefined, tresc: string): Pro
 /* ─────────────────────────────────────────────────────── TWILIO */
 
 const BLEDY_TWILIO: Record<number, string> = {
-  20003: "zły TWILIO_ACCOUNT_SID albo TWILIO_AUTH_TOKEN",
+  20003: "Twilio odmówiło dostępu (zły SID/token albo niezatwierdzony profil w Trust Hub)",
   21211: "zły numer odbiorcy",
   21212: "zły nadawca: TWILIO_NADAWCA może mieć max 11 znaków, tylko litery i cyfry",
   21408: "Polska nie jest włączona w Console → Messaging → Settings → Geo permissions",
@@ -161,9 +161,13 @@ async function twilio(numer: string, wiadomosc: string, czesci: number): Promise
     };
 
     if (!odp.ok) {
-      const opis = (dane.code && BLEDY_TWILIO[dane.code]) || dane.message || `HTTP ${odp.status}`;
-      console.error(`[sms] Twilio odrzuciło wiadomość do +${numer}: ${opis} (kod ${dane.code ?? "-"})`);
-      if (dane.code === 20003) {
+      const opis = (dane.code && BLEDY_TWILIO[dane.code]) || `HTTP ${odp.status}`;
+      /* Zawsze także oryginalny komunikat Twilio: ten sam kod (np. 20003)
+         może znaczyć zły token albo niezatwierdzony profil w Trust Hub. */
+      console.error(`[sms] Twilio odrzuciło wiadomość do +${numer}: ${opis} (kod ${dane.code ?? "-"}). Twilio: ${dane.message ?? "-"}`);
+      if (dane.code === 20003 && /compliance|KYC|Trust Hub/i.test(dane.message ?? "")) {
+        console.error("[sms] To NIE jest zły token: Twilio wymaga zatwierdzonego profilu w Trust Hub (Console → Trust Hub → Profiles → Primary profile).");
+      } else if (dane.code === 20003) {
         /* Podpowiedź bez ujawniania sekretu: długość i początek/koniec. */
         console.error(
           kluczApi && sekretApi

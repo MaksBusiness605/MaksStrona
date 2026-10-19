@@ -1,9 +1,10 @@
-// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na MAIL_TRENERA
+// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.email (firma.ts)
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Footer, Header } from "@/app/components/sections";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
+import { FIRMA } from "@/app/tresc/firma";
 
 export const metadata: Metadata = {
   title: "Konkurs: wygraj 3 treningi personalne w Just GYM Łódź | Maks Treningi",
@@ -18,22 +19,36 @@ export const metadata: Metadata = {
    a zgłoszenie obsługuje server action `wyslij` niżej.
 
    GDZIE TRAFIA ZGŁOSZENIE
-   1. MAIL do Ciebie na MAIL_TRENERA, przez Resend (te same zmienne co
-      maile po zakupie: RESEND_API_KEY, MAIL_NADAWCA, MAIL_TRENERA).
+   1. MAIL do Ciebie, wyłącznie na adres z app/tresc/firma.ts
+      (maksymilian.lehman.treningi@gmail.com), przez Resend.
    2. Opcjonalnie WEBHOOK (Make, Zapier, n8n → np. arkusz Google), jeśli
       ustawisz KONKURS_WEBHOOK_URL. Bez niego wystarczy sam mail.
    Zgłoszenie uznajemy za przyjęte, gdy doszło przynajmniej jednym z nich.
 
    ZANIM OPUBLIKUJESZ
-   1. Regulamin pod /konkurs/regulamin i dane administratora w ADMIN.
+   1. Regulamin pod /konkurs/regulamin. Dane administratora (ADMIN) biorą
+      się z app/tresc/firma.ts: imię i nazwisko, e-mail, telefon, a adres
+      i NIP dopiero wtedy, gdy je tam uzupełnisz.
    2. Pytanie konkursowe zostaw. Bez zadania ocenianego przez Ciebie to jest
       losowanie, czyli loteria promocyjna wymagająca zezwolenia.
    3. DLA_WSZYSTKICH: jeśli chcesz dać coś każdemu uczestnikowi (np. niższą
       cenę pierwszej sesji), wpisz to tutaj i w regulaminie. null = ukryte.
    ═══════════════════════════════════════════════════════════════════════ */
 
-const ADMIN =
-  "Administrator danych: [imię i nazwisko albo firma, adres, e-mail]. Dane z konkursu usuwam [termin] po ogłoszeniu wyników, chyba że zgodzisz się na SMS-y.";
+/** Pole z firma.ts jest uzupełnione, gdy nie ma w nim „[…]”. */
+const jest = (s: string) => Boolean(s.trim()) && !s.includes("[");
+
+const ADMIN = [
+  `Administrator danych: ${jest(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel}`,
+  jest(FIRMA.adres) ? FIRMA.adres : "",
+  `e-mail: ${FIRMA.email}`,
+  `tel. ${FIRMA.telefon}.`,
+]
+  .filter(Boolean)
+  .join(", ")
+  .concat(
+    " Dane z konkursu usuwam 30 dni po ogłoszeniu wyników, chyba że zgodzisz się na SMS-y o ofertach: wtedy do czasu wycofania zgody.",
+  );
 
 // TODO: np. "Każdy uczestnik dostanie SMS-em kod na pierwszą sesję za 120 zł zamiast 150 zł, ważny do 30 listopada."
 const DLA_WSZYSTKICH: string | null = null;
@@ -45,7 +60,7 @@ const BLEDY: Record<string, string> = {
   serwer: `Zgłoszenie nie doszło. Spróbuj za chwilę albo zadzwoń: ${TELEFON}.`,
 };
 
-/** 537483233 / +48537483233 → "+48 537 483 233" (do maila, żeby dało się kliknąć i zadzwonić). */
+/** 666222699 / +48666222699 → "+48 666 222 699" (do maila, żeby dało się kliknąć i zadzwonić). */
 function telefonCzytelny(t: string) {
   const cyfry = t.replace(/\D/g, "").replace(/^48(?=\d{9}$)/, "");
   return cyfry.length === 9 ? `+48 ${cyfry.slice(0, 3)} ${cyfry.slice(3, 6)} ${cyfry.slice(6)}` : t;
@@ -80,7 +95,8 @@ async function wyslij(f: FormData) {
 
   /* 1 · Mail do Ciebie. */
   let mailOk = false;
-  const trener = process.env.MAIL_TRENERA;
+  /* Zgłoszenia idą wyłącznie na adres z app/tresc/firma.ts. */
+  const trener = FIRMA.email;
   if (trener) {
     try {
       await wyslijMail({
@@ -105,7 +121,7 @@ async function wyslij(f: FormData) {
       console.error("[konkurs] mail nie wyszedł:", e);
     }
   } else {
-    console.error("[konkurs] Brak MAIL_TRENERA");
+    console.error("[konkurs] Brak adresu w firma.ts");
   }
 
   /* 2 · Opcjonalnie webhook (arkusz). */
@@ -209,7 +225,7 @@ export default async function Page({
                   <span className="k-etykieta">Numer telefonu</span>
                   <span className="k-podpowiedz">Na ten numer napiszę, jeśli wygrasz.</span>
                   <input name="telefon" type="tel" required inputMode="tel" autoComplete="tel"
-                    pattern="(\+?48)? ?[1-9]( ?[0-9]){8}" title="9 cyfr, np. 537 483 233"
+                    pattern="(\+?48)? ?[1-9]( ?[0-9]){8}" title="9 cyfr, np. 600 100 200"
                     className="k-wejscie" />
                 </label>
 

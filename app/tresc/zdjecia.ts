@@ -220,9 +220,12 @@ function makieta(
    treningu na sali.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* Pliki leżą w /public jako opinia1.png i opinia2.png: małe litery,
+   bez spacji. Nazwa musi się zgadzać co do znaku: na Vercelu
+   „Opinia1.png” albo „opinia 1.png” to inny plik niż „opinia1.png”. */
 const PRZYPADEK1 = {
-  plik: "/Opinia 1.jpg",
-  alt: "[Imię] w górnej fazie martwego ciągu, sztanga z talerzami olimpijskimi",
+  plik: "/opinia1.png",
+  alt: "Marysia w trakcie treningu w Just GYM",
   brief:
     "KADR poziomy 1,618, z boku, na wysokości sztangi. " +
     "W KADRZE: osoba z historii 1 w trakcie ćwiczenia, o którym mówi historia. Jeśli nie ma zgody na twarz, kadruj od barków w dół. " +
@@ -231,8 +234,8 @@ const PRZYPADEK1 = {
 } satisfies Foto;
 
 const PRZYPADEK2 = {
-  plik: stacjonarny3,
-  alt: "[Imię] w trakcie treningu",
+  plik: "/opinia2.png",
+  alt: "Jarosław w trakcie treningu w Just GYM",
   brief:
     "KADR poziomy 1,618, z boku, na wysokości sztangi. " +
     "W KADRZE: osoba z historii 2 w trakcie ćwiczenia, o którym mówi historia. Jeśli nie ma zgody na twarz, kadruj od barków w dół. " +
@@ -266,7 +269,7 @@ export const ZDJECIA = {
      1 · /trening-stacjonarny
 
      Podpięte pliki: hero = hero-stacjonarny.jpg, pierwsza historia =
-     Opinia 1.jpg, druga = stacjonarny3, korzyści = korzysc1.svg,
+     opinia1.png, druga = opinia2.png, korzyści = korzysc1.svg,
      korzysc2.svg, korzysc3.svg.
      Sloty opinia1 i opinia2 zostają na wypadek powrotu do nagrań.
      ───────────────────────────────────────────────────────────────────── */
@@ -399,8 +402,11 @@ export const ZDJECIA = {
      ───────────────────────────────────────────────────────────────────── */
   produkty: {
     hero: {
-      plik: makieta("pion", "Hero", "TELEFON Z PLANEM", "telefon"),
-      alt: "Telefon z otwartym planem oparty o sztangę, obok kartka z ciężarami",
+      /* Okładka e-booka „Plan Bez Zgadywania” w proporcji hero (0,786).
+         Plik: public/ebook-okladka.jpg. Gdy zmienisz okładkę w PDF,
+         podmień też ten plik. */
+      plik: "/ebook-okladka.jpg",
+      alt: "Okładka e-booka Plan Bez Zgadywania: trening, jedzenie i plan na 12 tygodni",
       brief:
         "KADR pionowy 4:5, aparat nisko, na wysokości sztangi, ogniskowa 35–50 mm, ostrość na ekranie telefonu. " +
         "W KADRZE: telefon z otwartym planem oparty o gryf, obok kartka z odręcznie zapisanymi ciężarami i długopis. Na ekranie widać realny plan z panelu, czytelne nazwy ćwiczeń i serie. W tle rozmyta sala. " +
@@ -769,9 +775,8 @@ export function zNagraniami<T extends object>(
      Vercelu), a na macOS i Windowsie nie. `stacjonarny1.png` musi być
      dokładnie tak nazwany w repo, inaczej lokalnie działa, a na
      produkcji kadr znika.
-   · Spacja w nazwie pliku (`/Opinia 1.jpg`) działa w <img src>, ale
-     bezpieczniej przemianować plik na `/opinia-1.jpg` i poprawić ścieżkę
-     w stałej PRZYPADEK1.
+   · Spacja w nazwie pliku (np. `/Opinia 1.jpg`) działa w <img src>, ale
+     bezpieczniej trzymać nazwy bez spacji, tak jak opinia1.png.
    · Makiety to data URI w <img src>, więc `dangerouslyAllowSVG`
      z next.config ich nie dotyczy — to ustawienie działa wyłącznie
      na <Image> ze zdalnymi plikami.

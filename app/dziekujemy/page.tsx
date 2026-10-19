@@ -1,606 +1,707 @@
-// PLIK: app/dziekujemy/page.tsx · STRONA /dziekujemy · powrót klienta po płatności Stripe
+// STRONA: / · STRONA GŁÓWNA · rozdzielnia na trzy warianty (sala, online, plan)
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Footer } from "@/app/components/sections";
-import { TELEFON, TELEFON_HREF, znajdzProdukt, type IdProduktu } from "@/app/lib/produkty";
-import { stripe, trybPokazowy } from "@/app/lib/klient";
-import { linkDoAnkiety } from "@/app/lib/maile";
+import { CaseStudies, Footer, Header, Team } from "@/app/components/sections";
+import { KONKURS, TELEFON, TELEFON_HREF, TRASY, dzienPL } from "@/app/lib/dane";
+import { ZDJECIA, blok, kadr } from "@/app/tresc/zdjecia";
 
-/* ═══════════════════════════════════════════════════════════════════════
-   /dziekujemy?session_id=<id sesji Stripe> · W JEDNYM PLIKU
+/** Zdjęcia historii i trenera: te same pliki co na podstronach. */
+const Z = ZDJECIA.stacjonarny;
 
-   Tu wraca kupujący ze Stripe (adres ustawia /api/platnosc). Strona
-   sama pyta Stripe o sesję, więc produkt i numer zamówienia biorą się
-   z płatności, nie z adresu, który każdy może wpisać ręcznie.
-
-   Trzy stany:
-   · opłacone      BLIK, karta i większość płatności: pełna strona,
-   · w toku        Przelewy24 albo przelew, bank jeszcze potwierdza:
-                   ta sama strona, krok „Płatność" nieodhaczony,
-   · niepotwierdzone  brak sesji albo nieznana sesja: krótka informacja
-                   i telefon, bez kroków.
-   Bez klucza Stripe w trybie deweloperskim działa ?produkt=…&demo=1.
-
-   Kolejność na stronie:
-   1. potwierdzenie i numer zamówienia,
-   2. telefon w ciągu 24 h, z przyciskiem „Zapisz numer”,
-   3. cały proces krok po kroku i lista „na pierwszy trening”,
-   4. przypomnienie na dole: trzy rzeczy w skrócie.
-
-   CO ZMIENIŁO SIĘ W TEJ WERSJI
-   · ANKIETA PO PŁATNOŚCI: krok „Ankieta” nie jest już odhaczony, stoi
-     zaraz po płatności, a nad telefonem jest przycisk „Wypełnij ankietę”
-     (link z ANKIETA_URL i numerem zamówienia). Bez ANKIETA_URL przycisk
-     się nie pokazuje, a krok mówi, że link jest w mailu.
-   · Nazwy i ceny z app/lib/produkty.ts zamiast osobnej listy.
-   · Weryfikacja płatności przez Stripe.
-   · Wypadła gwarancja „+20 kg albo kolejne na mój koszt”. Tej obietnicy
-     nie ma już na żadnej stronie sprzedażowej, a klient po zapłacie nie
-     może zobaczyć innych warunków niż przed. Zamiast niej to samo, co
-     obiecują strony: przy treningach zobowiązania i zwrot przy braku
-     terminu w 14 dni, przy e-booku, planie i prowadzeniu zwrot w 30 dni.
-
-   ⚠ Obietnica „telefon w ciągu 24 h w dni robocze” stoi też na
-   stronach produktów, na /zamowienie i w mailu z webhooka. Zmieniasz
-   ją, zmień wszędzie.
-   ═══════════════════════════════════════════════════════════════════════ */
+// Strona sprawdza datę konkursu, więc odświeżamy ją co godzinę.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Dziękuję · Maks Treningi",
-  robots: { index: false, follow: false },
+  title: "Maks Treningi | Trener personalny w Łodzi i online",
+  description:
+    "Trening na sali w Łodzi, trening przez kamerę albo plan pod Twój tydzień. Przestań zgadywać, czy trening coś daje: kryterium progresji i zapis, który zostaje u Ciebie.",
 };
 
-export const dynamic = "force-dynamic";
+/* ═══════════════════════════════════════════════════════════════════════
+   STRONA GŁÓWNA. Jedno zadanie: w kilka sekund wysłać człowieka do jednego
+   z trzech wariantów. Nie sprzedaje sama, tylko kieruje.
 
-/** Wizytówka do zapisania w kontaktach jednym kliknięciem. */
-const VCARD = `data:text/vcard;charset=utf-8,${encodeURIComponent(
-  ["BEGIN:VCARD", "VERSION:3.0", "FN:Maks Treningi", "ORG:Maks Treningi", "TEL;TYPE=CELL:+48537483233", "END:VCARD"].join("\r\n"),
-)}`;
+   Język wizualny wzięty z podstron: grafitowe tło z siatką, limonkowe
+   narożniki kadru (motyw kamery), numerowane kwadraty, taśma z faktami.
 
-type Krok = { kiedy: string; co: string; opis: string; zrobione?: boolean };
+   Kolejność sekcji idzie za łańcuchem przekonań:
+   hero (wybór) → diagnoza (1) → zasada pracy (2, 3, 5)
+   → porównanie z ryzykiem (4, 6) → historie → trener → pytania → wybór
+   jeszcze raz.
 
-type PoZakupie = {
-  trening: boolean;
-  /** Co obiecuję. Jedno, dwa zdania, te same co na stronie produktu. */
-  gwarancja: string;
-  /** Co zapisywać, żeby było z czym porównać. */
-  pomiar?: string;
-  kroki: Krok[];
-  przygotuj: string[];
-  strona: { href: string; nazwa: string };
+   CO ZMIENIŁO SIĘ W TEJ WERSJI
+   · Wypadło „30 dni na zwrot” przy planie. Regulamin tego nie przewiduje,
+     strona /produkty też już tego nie obiecuje. W porównaniu stoi teraz
+     to, co mówi regulamin: 14 dni na odstąpienie, dopóki usługa nie jest
+     wykonana, e-book bez zwrotu po otrzymaniu dostępu, prowadzenie bez
+     umowy.
+   · Sala i online: „brak terminu w 14 dni = zwrot całości”, tak samo jak
+     na podstronach.
+   · HISTORIE i TRENER to te same komponenty co na podstronach
+     (<CaseStudies> i <Team>): zdjęcia, liczby przed i po, cytat, pełne
+     bio. Treść jest skopiowana z /trening-stacjonarny. Sekcja historii
+     stoi za flagą POKAZ_HISTORIE: widać ją lokalnie, na produkcji dopiero
+     po zgodzie na piśmie i potwierdzeniu historii Jarosława.
+   · Taśma: dopisana płatność (BLIK, karta, Przelewy24).
+   · Pytania: dopisane „Jak płacę i kiedy ustalamy termin?” i „Czy mogę
+     się rozmyślić?”, bo to dwie najczęstsze blokady przed kliknięciem.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+type Wariant = {
+  nr: string;
+  tryb: string;
+  nazwa: string;
+  kto: string;
+  cena: string;
+  cenaDopisek: string;
+  href: string;
+  cta: string;
+  gdzie: string;
+  technika: string;
+  dalej: string;
+  ryzyko: string;
+  dlaKogo: string;
 };
 
-/* ─────────────────────────────────────────────────────── KROKI */
-
-/* Ankieta jest PO płatności (wariant A): ten krok nie jest odhaczony. */
-const ANKIETA_TERAZ: Krok = {
-  kiedy: "Teraz · 3 minuty",
-  co: "Ankieta",
-  opis: "Kontuzje, staż, cel, kiedy możesz trenować i jak mam się kontaktować. Link masz niżej i w mailu z potwierdzeniem. Nie zdążysz? Zapytam przy pierwszym kontakcie.",
-};
-
-const PLATNOSC_ZROBIONA: Krok = {
-  kiedy: "Zrobione",
-  co: "Płatność",
-  opis: "Potwierdzenie z numerem zamówienia idzie na Twój e-mail. Sprawdź też folder Oferty i Spam.",
-  zrobione: true,
-};
-
-const PLATNOSC_W_TOKU: Krok = {
-  kiedy: "W toku",
-  co: "Płatność",
-  opis: "Bank jeszcze ją potwierdza, zwykle to kwestia minut. Gdy dojdzie, przyjdzie mail z potwierdzeniem.",
-};
-
-const telefon = (opis: string): Krok => ({
-  kiedy: "W ciągu 24 h w dni robocze",
-  co: "Telefon ode mnie",
-  opis: `Dzwonię z numeru ${TELEFON}. ${opis} Jeśli nie odbierzesz, piszę SMS-a i dzwonię jeszcze raz.`,
-});
-
-const krokiStacjonarne = (pakiet: boolean): Krok[] => [
-  PLATNOSC_ZROBIONA,
-  ANKIETA_TERAZ,
-  telefon("Ustalamy termin pierwszej sesji i dopytuję o to, co jest w ankiecie."),
+const WARIANTY: Wariant[] = [
   {
-    kiedy: "Zaraz po rozmowie",
-    co: "SMS i mail z terminem i dojściem",
-    opis: "Just GYM, ul. Piotrkowska 157A, budynek HiPiotrkowska, przy Stajni Jednorożców.",
-  },
-  {
-    kiedy: "W dniu sesji, 60 minut",
-    co: "Trening na sali",
-    opis: "Wejście na salę masz w cenie, na recepcji mówisz, że idziesz na sesję ze mną. Po sesji dostajesz kartę obciążeń.",
-  },
-  ...(pakiet
-    ? [
-        {
-          kiedy: "Po trzeciej sesji",
-          co: "Karta pierwsza obok trzeciej",
-          opis: "Kładziemy obok siebie karty z pierwszej i trzeciej sesji. Jeśli coś stoi, mówię dokładnie co i dlaczego.",
-        },
-      ]
-    : []),
-];
-
-const krokiOnline = (pakiet: boolean): Krok[] => [
-  PLATNOSC_ZROBIONA,
-  ANKIETA_TERAZ,
-  telefon("Ustalamy termin i sprawdzamy, czy u Ciebie na siłowni albo w domu da się ustawić telefon z boku."),
-  {
-    kiedy: "Zaraz po rozmowie",
-    co: "SMS i mail z linkiem do rozmowy",
-    opis: "Link działa w przeglądarce telefonu, bez zakładania konta.",
+    nr: "1",
+    tryb: "Na sali",
+    nazwa: "Trening na sali w Łodzi",
+    kto: "Jesteś w Łodzi i chcesz, żeby ktoś stał obok przy sztandze",
+    cena: "150 zł",
+    cenaDopisek: "60 minut jeden na jeden",
+    href: TRASY.sala,
+    cta: "Zobacz trening na sali",
+    gdzie: "Just GYM, Piotrkowska 157A. Wejście na salę płatne osobno (karnet Just GYM).",
+    technika: "Stoję obok i poprawiam w tej samej serii, także dłonią.",
+    dalej: "3 sesje za 420 zł, 5 sesji za 650 zł. Bez daty ważności.",
+    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości. Za niewykorzystane sesje z pakietu też oddaję pieniądze.",
+    dlaKogo: "Zaczynasz od zera albo chcesz asekuracji przy cięższych seriach.",
   },
   {
-    kiedy: "W dniu treningu, 60 minut",
-    co: "Sesja przez kamerę",
-    opis: "Połącz się pięć minut wcześniej, ustawiamy telefon razem. Tego samego dnia dostajesz notatkę i nagrania.",
+    nr: "2",
+    tryb: "Online",
+    nazwa: "Trening przez kamerę",
+    kto: "Trenujesz w domu albo na swojej siłowni i nikt nie widzi Twoich serii",
+    cena: "100 zł",
+    cenaDopisek: "60 minut na żywo",
+    href: TRASY.online,
+    cta: "Zobacz trening online",
+    gdzie: "W domu albo na Twojej siłowni, w całej Polsce. Wystarczy telefon na statywie.",
+    technika: "Widzę serię na żywo i mówię w trakcie, co zmienić.",
+    dalej: "3 treningi za 260 zł, 5 treningów za 400 zł.",
+    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości.",
+    dlaKogo: "Nie mieszkasz w Łodzi albo masz już swoją siłownię i swój plan.",
   },
-  ...(pakiet
-    ? [
-        {
-          kiedy: "Po trzecim treningu",
-          co: "Nagranie pierwsze obok trzeciego",
-          opis: "Porównujemy nagrania i notatki z pierwszego i trzeciego treningu. Jeśli coś stoi, mówię dokładnie co i dlaczego.",
-        },
-      ]
-    : []),
+  {
+    nr: "3",
+    tryb: "Samodzielnie",
+    nazwa: "Plan i prowadzenie",
+    kto: "Chcesz trenować sam, ale z planem pod swój prawdziwy tydzień",
+    cena: "od 99 zł",
+    cenaDopisek: "e-book, plan albo prowadzenie",
+    href: TRASY.plan,
+    cta: "Zobacz trzy poziomy",
+    gdzie: "Gdziekolwiek trenujesz. Plan w panelu i wideo do każdego ćwiczenia.",
+    technika: "W planie ćwiczysz sam, według kryterium. W prowadzeniu analizuję Twoje nagrania dwa razy w miesiącu.",
+    dalej: "E-book 99 zł, plan na 12 tygodni 249 zł, prowadzenie 349 zł miesięcznie.",
+    ryzyko: "14 dni na odstąpienie, dopóki nie dostaniesz planu. Prowadzenie bez umowy, kończysz z końcem miesiąca.",
+    dlaKogo: "Wiesz, jak wykonać ćwiczenia, ale żaden plan nie przetrwał Twojego zwykłego tygodnia.",
+  },
 ];
 
-const PRZYGOTUJ_STACJONARNY = [
-  "Wygodny strój i buty z płaską podeszwą",
-  "Woda i mały ręcznik",
-  "Zalecenia od fizjoterapeuty, jeśli je masz",
-  "Dziesięć minut zapasu na wejście i przebranie się",
+const TASMA = [
+  "Kryterium progresji zamiast „słuchaj ciała”",
+  "Zapis obciążeń po każdej sesji",
+  "Odpisuję w 24 h w dni robocze",
+  "Trening na sali w Łodzi",
+  "Trening przez kamerę w całej Polsce",
+  "Plan pod liczbę dni, które naprawdę masz",
+  "Bez liczenia każdej kalorii",
+  "Płatność BLIK-iem, kartą albo Przelewy24",
 ];
 
-const PRZYGOTUJ_ONLINE = [
-  "Telefon na statywie albo stabilnie oparty, z boku pod kątem 45 stopni",
-  "Jedna słuchawka w uchu, żeby słyszeć korektę w trakcie serii",
-  "Dwa metry wolnej podłogi albo miejsce na swojej siłowni",
-  "Naładowany telefon albo ładowarka w zasięgu kabla",
+const CYKL = [
+  { kiedy: "Poniedziałek", co: "Nowy plan z internetu, cztery treningi w tygodniu" },
+  { kiedy: "Tydzień 2", co: "Robisz trzy z czterech, bo tyle masz czasu" },
+  { kiedy: "Tydzień 5", co: "Ciężary stoją i nie wiesz, dlaczego" },
+  { kiedy: "Znowu poniedziałek", co: "Zaczynasz od nowa i obwiniasz siebie" },
 ];
 
-const STACJONARNY = { href: "/trening-stacjonarny", nazwa: "Trening personalny w Łodzi" };
-const ONLINE = { href: "/coaching-online", nazwa: "Trening online przez kamerę" };
-const PLANY = { href: "/produkty", nazwa: "Plany treningowe" };
+/* Historie: te same co na /trening-stacjonarny. Widoczne lokalnie, na
+   produkcji dopiero po zgodzie na piśmie. Gdy obie osoby potwierdzą,
+   ustaw POKAZ_HISTORIE = true (i zdejmij flagę na podstronach). */
+const POKAZ_HISTORIE = process.env.NODE_ENV !== "production";
 
-const BRAK_TERMINU = "Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję całą kwotę.";
-const ZWROT_30 = "Zwrot w ciągu 30 dni: odpisujesz jednym zdaniem na mail z potwierdzeniem, a materiały możesz zatrzymać.";
-
-const stac = (pakiet: boolean): PoZakupie => ({
-  trening: true,
-  gwarancja: pakiet
-    ? `Po trzeciej sesji kładziemy kartę pierwszą obok trzeciej i mówię wprost, co idzie, a co stoi. ${BRAK_TERMINU}`
-    : `Po sesji mówię wprost, ile sesji potrzebujesz. Jeśli wystarczy ta jedna, usłyszysz to ode mnie. ${BRAK_TERMINU}`,
-  pomiar: "Karta obciążeń z każdej sesji zostaje u Ciebie.",
-  kroki: krokiStacjonarne(pakiet),
-  przygotuj: PRZYGOTUJ_STACJONARNY,
-  strona: STACJONARNY,
-});
-
-const onl = (pakiet: boolean): PoZakupie => ({
-  trening: true,
-  gwarancja: pakiet
-    ? `Po trzecim treningu kładziemy nagranie pierwsze obok trzeciego i mówię wprost, co idzie, a co stoi. ${BRAK_TERMINU}`
-    : `Po treningu mówię wprost, ile treningów potrzebujesz. Jeśli wystarczy ten jeden, usłyszysz to ode mnie. ${BRAK_TERMINU}`,
-  pomiar: "Notatka i nagrania z każdego treningu zostają u Ciebie.",
-  kroki: krokiOnline(pakiet),
-  przygotuj: PRZYGOTUJ_ONLINE,
-  strona: ONLINE,
-});
-
-const PO_ZAKUPIE: Record<IdProduktu, PoZakupie> = {
-  "stacjonarny-1": stac(false),
-  "stacjonarny-3": stac(true),
-  "stacjonarny-5": stac(true),
-  "online-1": onl(false),
-  "online-3": onl(true),
-  "online-5": onl(true),
-  ebook: {
-    trening: false,
-    gwarancja: `${ZWROT_30} Jeśli w tym czasie przejdziesz wyżej, cenę e-booka odliczam w całości.`,
-    kroki: [
-      PLATNOSC_ZROBIONA,
-      {
-        kiedy: "W ciągu kilku minut",
-        co: "Mail z linkiem do panelu",
-        opis: "E-book, wideo do ćwiczeń i arkusz progresji. Link działa bezterminowo, także na telefonie.",
-      },
-      {
-        kiedy: "Przez 30 dni",
-        co: "Cena e-booka wraca przy przejściu wyżej",
-        opis: "Jeśli w tym czasie kupisz plan indywidualny albo prowadzenie, odliczam 99 zł w całości.",
-      },
-    ],
-    przygotuj: [
-      "Zacznij od rozdziału o budowie tygodnia, zanim otworzysz ćwiczenia",
-      "Skopiuj arkusz progresji do swojego Dysku albo wydrukuj go",
-      "Wpisz ciężary już z pierwszego treningu, żeby było z czym porównać",
-    ],
-    strona: PLANY,
-  },
-  plan: {
-    trening: false,
-    gwarancja: `Plan gotowy w 72 godziny, z nagraniem, w którym tłumaczę każdą decyzję. ${ZWROT_30}`,
-    pomiar: "Wpisuj ciężary do arkusza od pierwszego tygodnia.",
-    kroki: [
-      PLATNOSC_ZROBIONA,
-      ANKIETA_TERAZ,
-      telefon("Kilka minut rozmowy o ankiecie, żeby plan nie opierał się na domysłach."),
-      {
-        kiedy: "Do 72 godzin",
-        co: "Plan i nagranie w panelu",
-        opis: "Plan na 12 tygodni, wideo do ćwiczeń i pięciominutowe nagranie, w którym tłumaczę każdą decyzję.",
-      },
-      {
-        kiedy: "Pierwszy tydzień",
-        co: "Pierwszy wpis w arkuszu",
-        opis: "Ciężary z pierwszego tygodnia to punkt odniesienia. Bez nich nie ma czego porównać.",
-      },
-      {
-        kiedy: "Po 12 tygodniach",
-        co: "Porównanie w arkuszu",
-        opis: "Pierwszy tydzień obok dwunastego: widać, co poszło w górę, a co stoi.",
-      },
-    ],
-    przygotuj: [
-      "Zaplanuj w kalendarzu dni treningowe na najbliższy tydzień",
-      "Obejrzyj nagranie z omówieniem planu, zanim zaczniesz",
-      "Wpisuj ciężary do arkusza od pierwszego treningu",
-    ],
-    strona: PLANY,
-  },
-  prowadzenie: {
-    trening: false,
-    gwarancja: `Check-in co 7 dni z moją odpowiedzią, nie automatem. Płacisz miesiąc do miesiąca i rezygnujesz kiedy chcesz. ${ZWROT_30}`,
-    pomiar: "Wpisuj ciężary do arkusza, na nich opiera się każda korekta planu.",
-    kroki: [
-      PLATNOSC_ZROBIONA,
-      ANKIETA_TERAZ,
-      telefon("Ustalamy termin rozmowy diagnostycznej i dopytuję o ankietę."),
-      {
-        kiedy: "Do 72 godzin",
-        co: "Plan w panelu",
-        opis: "Plan na pierwszy miesiąc, wideo do ćwiczeń i nagranie z omówieniem.",
-      },
-      {
-        kiedy: "Co 7 dni",
-        co: "Check-in i korekta",
-        opis: "Krótki raport z tygodnia. Odpisuję osobiście i poprawiam plan w trakcie, nie na koniec miesiąca.",
-      },
-    ],
-    przygotuj: [
-      "Zanotuj ciężary z ostatniego treningu, jeśli trenujesz",
-      "Nagraj z boku jedną serię przysiadu albo martwego ciągu, przyda się w rozmowie",
-      "Wybierz stały dzień tygodnia na check-in",
-    ],
-    strona: PLANY,
-  },
+const CASE_STUDIES = {
+  heading: "Dwie osoby, dwa różne punkty startu",
+  lead: "Punkt startu, co dokładnie zmieniliśmy i co pokazały karty obciążeń. Bez zdjęć sylwetki przed i po, same liczby, które da się sprawdzić.",
+  note: "Historie publikowane za zgodą tych osób. Liczby pochodzą z ich kart obciążeń.",
+  items: [
+    {
+      kto: "Marysia, 50 lat",
+      kontekst: "redukcja, siedząca praca · trening na sali",
+      tytul: "Od zera ruchu do czterech treningów w tygodniu i planów startowych",
+      liczby: [
+        { label: "Martwy ciąg", przed: "0 kg", po: "105 kg" },
+        { label: "Przysiad", przed: "4 kg", po: "100 kg" },
+        { label: "Treningi w tygodniu", przed: "0", po: "4" },
+      ],
+      start: "Siedzący tryb życia, zero regularnego ruchu i brak wiedzy o tym, jak jedzenie wpływa na samopoczucie i siłę.",
+      zmiana: "Najpierw nauka ruchu i czucia własnego ciała, potem stała rutyna treningowa. Do tego kilka prostych zasad jedzenia, które pasują do zwykłego tygodnia, a nie wywracają go do góry nogami.",
+      wynik: "Lepsza sylwetka i mobilność, ból zniknął z codziennego życia, a w planach są pierwsze zawody.",
+      cytat: "Polubiłam siłownię.",
+      czas: "[3 sesje regularnie · 8 tygodni]",
+      ...blok(Z.przypadek1),
+    },
+    {
+      kto: "Jarosław, 20 lat",
+      kontekst: "rok treningu, zablokowany na 100 kg · plan i prowadzenie online",
+      tytul: "Z setki, na której utknął, do 140 kg na ławce w rok",
+      liczby: [
+        { label: "Wyciskanie na ławce", przed: "100 kg", po: "140 kg" },
+        { label: "Treningi w tygodniu", przed: "5", po: "3" },
+      ],
+      start: "Rok na siłowni i pięć treningów w tygodniu według planów, które sam sobie układał i zmieniał co kilka tygodni. Na 100 kg na ławce się zatrzymał i dalej nie szło.",
+      zmiana: "Ułożyłem mu indywidualny plan i prowadziłem go na odległość. Nagrywał swoje serie i podsyłał mi filmiki, a ja poprawiałem mu technikę wyciskania i pokazywałem, jak trenować poprawnie. Każda poprawka szła od razu do kolejnego treningu.",
+      wynik: "Rok po tym, jak utknął na setce, wyciska 140 kg, trenując trzy razy w tygodniu zamiast pięciu. Na każdym treningu wie, co robi i po co.",
+      cytat: "Myślałem, że setka to mój sufit, a ja po prostu sam sobie źle układałem plany.",
+      czas: "[plan indywidualny + prowadzenie przez filmiki · 12 miesięcy]",
+      ...blok(Z.przypadek2),
+    },
+  ],
 };
 
-/* ─────────────────────────────────────────────────────── STAN PŁATNOŚCI */
+/* Kto prowadzi: to samo bio co na podstronach. */
+const TEAM = {
+  heading: "Kto prowadzi",
+  name: "Maksymilian Lehman",
+  role: "Trener personalny · Just GYM, Piotrkowska 157A, Łódź i online",
+  paragraphs: [
+    "Pracuję z ludźmi o różnym poziomie zaawansowania i w bardzo różnym wieku. Prowadzę zarówno treningi pod cele sportowe, jak i treningi prozdrowotne. Nie boję się pracy z osobami po kontuzjach i wiem, kiedy trzeba skorzystać z pomocy fizjoterapeuty albo ortopedy.",
+    "Pierwszy raz przyszedłem na siłownię 9 lat temu. Zaczynałem od pustej sztangi i nie potrafiłem podciągnąć się na drążku. Próbowałem treningu kulturystycznego i kalisteniki, aż odkryłem trójbój siłowy. Największą motywacją okazały się dla mnie wyniki w przysiadzie, wyciskaniu i martwym ciągu.",
+    "Jestem pasjonatem i zawodnikiem trójboju siłowego, ale na co dzień pracuję z lekarzami, informatykami, sportowcami, kobietami po ciąży i osobami, które dopiero zaczynają.",
+  ],
+};
 
-type Stan = "oplacone" | "w-toku" | "niepotwierdzone";
+const PYTANIA = [
+  {
+    p: "Nigdy nie byłem na siłowni. Od czego zacząć?",
+    o: "Od treningu na sali, jeśli jesteś w Łodzi. Przy pierwszych ciężarach najwięcej daje ktoś, kto stoi obok i asekuruje. Jeśli jesteś poza Łodzią, trening przez kamerę też zadziała: telefon stoi z boku, a ja mówię w trakcie serii, co poprawić.",
+  },
+  {
+    p: "Jak płacę i kiedy ustalamy termin?",
+    o: "Płacisz online BLIK-iem, kartą albo Przelewy24, bez wybierania godziny. Zaraz potem dostajesz maila z krótką ankietą, a w ciągu 24 h w dni robocze odzywam się i ustalamy termin. Jeśli w 14 dni nie znajdziemy wspólnej godziny, oddaję całą kwotę. E-book dostajesz od razu po płatności.",
+  },
+  {
+    p: "Nie mam czasu trenować cztery razy w tygodniu.",
+    o: "Nie musisz. Plan zaczyna się od liczby dni, które realnie masz, a nie od idealnego tygodnia. Do każdego treningu w planie jest też wersja na 25 minut.",
+  },
+  {
+    p: "Kupiłem już kilka planów i żadnego nie skończyłem.",
+    o: "Tamte zakładały tydzień, którego nie masz. Ten zaczyna się od pytania, w którym momencie wcześniej odpadałeś, i ma gotowy protokół na chorobę, wyjazd i opuszczone treningi.",
+  },
+  {
+    p: "Nie chcę zrobić się „za duża” od ciężarów.",
+    o: "Od kilku treningów siłowych w tygodniu nie urośniesz przypadkiem. Ciężar dobieramy pod Twój cel, a nie pod rekord.",
+  },
+  {
+    p: "Czy będę musiał liczyć każdą kalorię?",
+    o: "Nie. W planie dostajesz kartę talerza i zasady, które działają bez wagi kuchennej, aplikacji i kurczaka z ryżem przez cały tydzień.",
+  },
+  {
+    p: "Czy mogę się rozmyślić?",
+    o: "Tak, w ciągu 14 dni od zakupu, dopóki usługa nie została wykonana: wystarczy odpisać na maila z potwierdzeniem. Za niewykorzystane sesje z pakietu oddaję pieniądze. Wyjątek to e-book: po otrzymaniu dostępu nie da się go zwrócić, bo materiały są już u Ciebie. Szczegóły w regulaminie.",
+  },
+];
 
-async function sprawdzPlatnosc(sp: SP): Promise<{ stan: Stan; id?: string; numer?: string; demo: boolean }> {
-  const sesja = typeof sp.session_id === "string" ? sp.session_id : undefined;
-
-  if (sesja && stripe) {
-    try {
-      const s = await stripe.checkout.sessions.retrieve(sesja);
-      const stan: Stan =
-        s.payment_status === "paid" || s.payment_status === "no_payment_required"
-          ? "oplacone"
-          : s.status === "complete"
-            ? "w-toku"
-            : "niepotwierdzone";
-      return { stan, id: s.metadata?.produkt, numer: s.client_reference_id ?? undefined, demo: false };
-    } catch {
-      return { stan: "niepotwierdzone", demo: false };
-    }
-  }
-
-  if (trybPokazowy && sp.demo === "1") {
-    return { stan: "oplacone", id: typeof sp.produkt === "string" ? sp.produkt : undefined, numer: "MT-DEMO", demo: true };
-  }
-
-  return { stan: "niepotwierdzone", demo: false };
+function Strzalka() {
+  return (
+    <svg className="h-strzalka" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+      <path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+    </svg>
+  );
 }
 
-/* ─────────────────────────────────────────────────────── STRONA */
-
-type SP = Record<string, string | string[] | undefined>;
-
-export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
-  const sp = await searchParams;
-  const { stan, id, numer, demo } = await sprawdzPlatnosc(sp);
-  const katalog = stan === "niepotwierdzone" ? undefined : znajdzProdukt(id);
-  const produkt = katalog ? { ...PO_ZAKUPIE[katalog.id], nazwa: katalog.nazwa, telefon: katalog.telefon } : undefined;
-  const kroki = produkt
-    ? produkt.kroki.map((k) => (stan === "w-toku" && k === PLATNOSC_ZROBIONA ? PLATNOSC_W_TOKU : k))
-    : [];
-  const pierwszyOtwarty = kroki.findIndex((k) => !k.zrobione);
-  const ankieta = katalog && katalog.rodzaj !== "ebook" && numer ? linkDoAnkiety(numer) : undefined;
+export default function Page() {
+  const konkursTrwa = Date.now() < KONKURS.koniec.getTime();
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="zm">
-        <header className="zm-gora">
-          <div className="zm-gora-wnetrze">
-            <span className="zm-marka">Maks Treningi</span>
-            {produkt && (
-              <Link href={produkt.strona.href} className="zm-wstecz">
-                Wróć do strony: {produkt.strona.nazwa}
-              </Link>
-            )}
-          </div>
-          <ol className="zm-postep" aria-label="Etapy zamówienia">
-            <li className={stan === "oplacone" ? "zm-etap zm-etap-zrobiony" : "zm-etap zm-etap-aktywny"}>Płatność</li>
-            <li
-              className={stan === "oplacone" ? "zm-etap zm-etap-aktywny" : "zm-etap"}
-              aria-current={stan === "oplacone" ? "step" : undefined}
-            >
-              Ankieta
-            </li>
-            <li className="zm-etap">Termin</li>
-          </ol>
-        </header>
+      <style>{CSS}</style>
+      <Header cta="Wybierz, jak trenujesz" ctaHref="#wybor" />
 
-        <main className="zm-wnetrze">
-          {demo && (
-            <p className="zm-demo">
-              Tryb pokazowy: brak klucza Stripe, więc zakup przeszedł tu bez zapłaty. Na produkcji ta ścieżka jest
-              wyłączona.
-            </p>
-          )}
+      <main className="h">
+        {konkursTrwa && (
+          <a className="h-konkurs" href={TRASY.konkurs}>
+            <span className="h-konkurs-znak" aria-hidden="true" />
+            <span>
+              Konkurs: trzy treningi na sali o wartości {KONKURS.wartosc}. Zgłoszenia do{" "}
+              {dzienPL(KONKURS.koniec)}.
+            </span>
+            <span className="h-konkurs-link">Weź udział</span>
+          </a>
+        )}
 
-          {!produkt ? (
-            /* niepotwierdzone */
-            <>
-              <div className="zm-naglowek">
-                <h1>Nie widzę jeszcze potwierdzenia płatności</h1>
-                <p>
-                  Jeśli płatność przeszła, mail z potwierdzeniem przyjdzie w ciągu kilku minut. Jeśli nie przyjdzie
-                  w ciągu godziny albo coś poszło nie tak, zadzwoń: <a href={TELEFON_HREF}>{TELEFON}</a>. Pieniądze nie
-                  przepadną.
-                </p>
+        {/* ── HERO ─────────────────────────────────────────────── */}
+        <section className="h-hero h-siatka" aria-labelledby="h-tytul">
+          <div className="h-w h-hero-uklad">
+            <div className="h-hero-tekst">
+              <p className="h-eyebrow">Trener personalny w Łodzi i online</p>
+              <h1 id="h-tytul" className="h-tytul">
+                Przestań zgadywać, czy Twój trening coś daje
+              </h1>
+              <p className="h-lead">
+                Ćwiczysz regularnie, a ciało praktycznie się nie zmienia? Zwykle nie chodzi o silną wolę.
+                Chodzi o plan, którego nikt nie dopasował do Twojego tygodnia, i o serie, których nikt
+                nigdy nie widział.
+              </p>
+              <ul className="h-hero-fakty">
+                <li>Kryterium, kiedy dołożyć ciężar</li>
+                <li>Zapis, który zostaje u Ciebie</li>
+                <li>Odpisuję w 24 h w dni robocze</li>
+              </ul>
+            </div>
+
+            <nav id="wybor" className="h-trasa h-ramka" aria-labelledby="h-trasa-tytul">
+              <div className="h-trasa-gora">
+                <p id="h-trasa-tytul" className="h-trasa-tytul">Który opis pasuje do Ciebie?</p>
+                <p className="h-trasa-sub">Trzy trasy, jedna metodyka. Wybierz swoją.</p>
               </div>
-            </>
-          ) : (
-            <>
-              {/* 1 · potwierdzenie */}
-              <div className="zm-naglowek zm-potwierdzenie">
-                <span className="zm-znak" aria-hidden="true" />
-                <div>
-                  <h1>{stan === "w-toku" ? "Dziękuję, czekamy jeszcze na bank" : "Dziękuję, zamówienie przyjęte"}</h1>
-                  <p>
-                    {stan === "w-toku"
-                      ? `${produkt.nazwa}. Bank jeszcze potwierdza płatność. Gdy dojdzie, przyjdzie mail, a niżej masz wszystko, co dzieje się dalej.`
-                      : `${produkt.nazwa}. Potwierdzenie przychodzi na Twój e-mail, a niżej masz wszystko, co dzieje się dalej.`}
-                  </p>
-                  {numer && (
-                    <p className="zm-numer">
-                      Numer zamówienia: <strong>{numer}</strong>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* 1b · ankieta po płatności (poza e-bookiem) */}
-              {ankieta && (
-                <section className="zm-telefon" aria-labelledby="ankieta">
-                  <div>
-                    <h2 id="ankieta">Teraz ankieta, 3 minuty</h2>
-                    <p>
-                      Dzięki niej wiem, z czym przychodzisz i jak się z Tobą kontaktować. Ten sam link masz w mailu,
-                      więc możesz wypełnić ją też później.
-                    </p>
-                  </div>
-                  <a href={ankieta} className="zm-przycisk zm-przycisk-waski">
-                    Wypełnij ankietę
-                  </a>
-                </section>
-              )}
-
-              {/* 2 · telefon w 24 h */}
-              {produkt.telefon && (
-                <section className="zm-telefon" aria-labelledby="telefon">
-                  <div>
-                    <h2 id="telefon">Zadzwonię do Ciebie w ciągu 24 godzin</h2>
-                    <p>
-                      W dni robocze, z numeru <strong>{TELEFON}</strong>. Zapisz go teraz w kontaktach, żeby nie
-                      odrzucić połączenia od nieznanego numeru. Jeśli nie odbierzesz, napiszę SMS-a i zadzwonię jeszcze
-                      raz.
-                    </p>
-                  </div>
-                  <a href={VCARD} download="maks-treningi.vcf" className="zm-przycisk zm-przycisk-waski">
-                    Zapisz numer w kontaktach
-                  </a>
-                </section>
-              )}
-
-              {/* 3 · cały proces */}
-              <div className="zm-uklad">
-                <div>
-                  <section className="zm-blok" aria-labelledby="proces">
-                    <h2 id="proces">Cały proces, krok po kroku</h2>
-                    <p className="zm-podtytul">
-                      {stan === "w-toku"
-                        ? "Gdy bank potwierdzi płatność, dalej nic nie musisz robić, dopóki się nie odezwę."
-                        : produkt.trening || produkt.telefon
-                          ? "Płatność masz za sobą. Wypełnij jeszcze ankietę, a potem nic nie musisz robić, dopóki się nie odezwę."
-                          : "Płatność masz za sobą. Dalej nic nie musisz robić."}
-                    </p>
-                    <ol className="zm-os">
-                      {kroki.map((k, i) => (
-                        <li
-                          key={k.co}
-                          className={
-                            k.zrobione ? "zm-krok zm-krok-zrobiony" : i === pierwszyOtwarty ? "zm-krok zm-krok-teraz" : "zm-krok"
-                          }
-                        >
-                          <span className="zm-kiedy">{k.kiedy}</span>
-                          <span className="zm-co">{k.co}</span>
-                          <p className="zm-opis">{k.opis}</p>
-                        </li>
-                      ))}
-                    </ol>
-                  </section>
-
-                  <section className="zm-blok" aria-labelledby="przygotuj">
-                    <h2 id="przygotuj">{produkt.trening ? "Na pierwszy trening" : "Na początek"}</h2>
-                    <ul className="zm-lista-jasna" style={{ marginTop: 16 }}>
-                      {produkt.przygotuj.map((p) => (
-                        <li key={p}>{p}</li>
-                      ))}
-                    </ul>
-                  </section>
-                </div>
-
-                <aside className="zm-boczna">
-                  <section className="zm-podsumowanie" aria-labelledby="zamowione">
-                    <h2 id="zamowione">Zamówione</h2>
-                    <p className="zm-nazwa">{produkt.nazwa}</p>
-                    <p className="zm-gwarancja" style={{ marginTop: 16 }}>
-                      <strong>Moja gwarancja</strong>
-                      {produkt.gwarancja}
-                    </p>
-                    <p className="zm-metody">
-                      {produkt.telefon
-                        ? "Coś się nie zgadza albo chcesz zmienić termin? Zadzwoń albo napisz SMS-a z numerem zamówienia."
-                        : "Link nie przyszedł w ciągu godziny? Zadzwoń albo napisz SMS-a z numerem zamówienia."}
-                    </p>
-                    <a href={TELEFON_HREF} className="zm-przycisk">
-                      Zadzwoń: {TELEFON}
+              <ul className="h-trasa-lista">
+                {WARIANTY.map((w, i) => (
+                  <li key={w.href} style={{ "--i": i } as React.CSSProperties}>
+                    <a className="h-cel" href={w.href}>
+                      <span className="h-nr" aria-hidden="true">{w.nr}</span>
+                      <span className="h-cel-tresc">
+                        <span className="h-cel-kto">{w.kto}</span>
+                        <span className="h-cel-nazwa">{w.nazwa}</span>
+                      </span>
+                      <span className="h-cel-cena">{w.cena}</span>
+                      <Strzalka />
                     </a>
-                  </section>
-                </aside>
-              </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="h-trasa-nie">
+                Żaden nie pasuje? Zadzwoń albo napisz SMS:{" "}
+                <a href={TELEFON_HREF}>{TELEFON}</a>. Powiem, co wybrać, także wtedy, gdy wystarczy
+                najtańsza opcja.
+              </p>
+            </nav>
+          </div>
+        </section>
 
-              {/* 4 · ostateczne przypomnienie */}
-              <section className="zm-koniec" aria-labelledby="koniec">
-                <h2 id="koniec">Zanim zamkniesz tę stronę</h2>
-                <ol className="zm-trzy">
-                  {produkt.telefon ? (
-                    <li>
-                      <strong>Odbierz telefon.</strong> Dzwonię w ciągu 24 h w dni robocze z numeru {TELEFON}. To od
-                      tej rozmowy zależy termin.
-                    </li>
-                  ) : (
-                    <li>
-                      <strong>Sprawdź skrzynkę.</strong> Link do e-booka przychodzi w ciągu kilku minut, czasem do
-                      folderu Oferty albo Spam.
-                    </li>
-                  )}
-                  <li>
-                    <strong>{produkt.telefon ? "Sprawdź skrzynkę." : "Zapisz arkusz."}</strong>{" "}
-                    {produkt.telefon
-                      ? "Potwierdzenie z numerem zamówienia już tam jest albo zaraz przyjdzie, czasem do folderu Oferty albo Spam."
-                      : "Skopiuj arkusz progresji do siebie i wpisuj ciężary od pierwszego treningu."}
+        {/* ── TAŚMA ────────────────────────────────────────────── */}
+        <div className="h-tasma" aria-label="Najważniejsze fakty">
+          <div className="h-tasma-tor">
+            {[0, 1].map((kopia) => (
+              <ul key={kopia} className="h-tasma-lista" aria-hidden={kopia === 1 || undefined}>
+                {TASMA.map((t) => <li key={t}>{t}</li>)}
+              </ul>
+            ))}
+          </div>
+        </div>
+
+        {/* ── DIAGNOZA ─────────────────────────────────────────── */}
+        <section className="h-diagnoza" aria-labelledby="h-diag">
+          <div className="h-w h-diag-uklad">
+            <div>
+              <p className="h-eyebrow h-eyebrow-ciemny">Dlaczego dotąd nie działało</p>
+              <h2 id="h-diag" className="h-h2 h-h2-duzy">To nie Ty zawiodłeś. Zawiodło dopasowanie.</h2>
+              <p className="h-diag-tekst">
+                Oglądasz film o przysiadzie, ale nie widzisz, że przy ósmym powtórzeniu kolano ucieka Ci
+                do środka. Nikt nigdy nie sprawdził ani Twojego tygodnia, ani Twojej serii. A to da się
+                naprawić.
+              </p>
+            </div>
+
+            <div className="h-cykl" role="img" aria-label="Cykl: nowy plan w poniedziałek, po dwóch tygodniach trzy treningi z czterech, po pięciu tygodniach ciężary stoją, znowu poniedziałek i start od nowa.">
+              <p className="h-cykl-tytul">Znasz ten cykl?</p>
+              <ol className="h-cykl-lista" aria-hidden="true">
+                {CYKL.map((k, i) => (
+                  <li key={k.kiedy} className={i === CYKL.length - 1 ? "h-cykl-ostatni" : undefined}>
+                    <span className="h-cykl-kiedy">{k.kiedy}</span>
+                    <span className="h-cykl-co">{k.co}</span>
                   </li>
-                  <li>
-                    {produkt.pomiar ? (
-                      <>
-                        <strong>Zapisuj ciężary.</strong> {produkt.pomiar} Bez zapisu nie ma czego porównać.
-                      </>
-                    ) : (
-                      <>
-                        <strong>Masz pytanie?</strong> Dzwoń albo pisz na {TELEFON}. Odpisuję w 24 h w dni robocze.
-                      </>
-                    )}
-                  </li>
-                </ol>
-                <p className="zm-koniec-link">
-                  <Link href={produkt.strona.href}>Wróć do strony: {produkt.strona.nazwa}</Link>
+                ))}
+              </ol>
+              <p className="h-cykl-wniosek">
+                Brakuje nie silnej woli, tylko planu pod Twój tydzień i kogoś, kto widzi serię.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── ZASADA PRACY (BENTO) ─────────────────────────────── */}
+        <section className="h-metoda" aria-labelledby="h-met">
+          <div className="h-w">
+            <div className="h-naglowek-sekcji">
+              <p className="h-eyebrow h-eyebrow-ciemny">Jedna metodyka</p>
+              <h2 id="h-met" className="h-h2">Trzy sposoby, ta sama zasada pracy</h2>
+            </div>
+
+            <div className="h-bento">
+              <article className="h-kafel h-kafel-ciemny h-siatka h-kafel-duzy">
+                <div className="h-kafel-tekst">
+                  <h3 className="h-h3">Kryterium zamiast przeczucia</h3>
+                  <p>
+                    Wiesz, co musi się wydarzyć w tym tygodniu, żeby w następnym dołożyć ciężar, a kiedy
+                    zostać przy tym samym. Bez „słuchaj swojego ciała”.
+                  </p>
+                </div>
+                <div className="h-decyzja" aria-hidden="true">
+                  <div className="h-decyzja-pytanie">
+                    Wszystkie trzy serie po 8 powtórzeń czysto?
+                    <span>sprawdzasz to na ostatniej serii</span>
+                  </div>
+                  <div className="h-decyzja-galezie">
+                    <div className="h-decyzja-tak">
+                      <span className="h-decyzja-etykieta">Tak</span>
+                      <strong>+2,5 kg</strong>
+                      <span>w kolejnym tygodniu</span>
+                    </div>
+                    <div className="h-decyzja-nie">
+                      <span className="h-decyzja-etykieta">Nie</span>
+                      <strong>ten sam ciężar</strong>
+                      <span>powtarzasz tydzień</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article className="h-kafel">
+                <h3 className="h-h3">Zapis, który zostaje u Ciebie</h3>
+                <p>
+                  Karta obciążeń, notatka po sesji albo arkusz progresji. Po dwóch miesiącach sprawdzasz,
+                  co poszło w górę, zamiast wierzyć, że coś się zmieniło.
                 </p>
-              </section>
-            </>
-          )}
-        </main>
-      </div>
+                <div className="h-karta-mini" aria-hidden="true">
+                  <div className="h-karta-mini-gora"><span>Przykład zapisu</span><span>Przysiad</span></div>
+                  {[["Tydz. 1", "40 kg", 40], ["Tydz. 3", "45 kg", 62], ["Tydz. 5", "50 kg", 84]].map(([t, kg, w]) => (
+                    <div key={t as string} className="h-karta-mini-wiersz">
+                      <span>{t}</span>
+                      <span className="h-pasek"><span style={{ width: `${w}%` }} /></span>
+                      <span className="h-kg">{kg}</span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="h-kafel">
+                <h3 className="h-h3">Celem jest, żebyś umiał sam</h3>
+                <p>
+                  Nie sprzedaję zależności od trenera. Pracujemy tak długo, aż wiesz, co robisz i
+                  dlaczego, a potem trenujesz bez asysty.
+                </p>
+                <div className="h-samodzielnie" aria-hidden="true">
+                  <div className="h-kwadraty">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <span key={i} className={i < 3 ? "h-kw-pelny" : "h-kw-pusty"} />
+                    ))}
+                  </div>
+                  <div className="h-kwadraty-opis"><span>ze mną</span><span>sam, z kartą i zasadą</span></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* ── PORÓWNANIE ───────────────────────────────────────── */}
+        <section className="h-porownanie" id="porownanie" aria-labelledby="h-por">
+          <div className="h-w">
+            <div className="h-naglowek-sekcji h-naglowek-rzad">
+              <div>
+                <p className="h-eyebrow h-eyebrow-ciemny">Porównanie</p>
+                <h2 id="h-por" className="h-h2">Porównaj i wybierz</h2>
+              </div>
+              <p className="h-podtytul">
+                Każdy wariant zaczyna się od tego samego pytania: ile realnie masz czasu i gdzie
+                trenujesz.
+              </p>
+            </div>
+
+            <div className="h-karty">
+              {WARIANTY.map((w) => (
+                <article key={w.href} className="h-karta" aria-labelledby={`k-${w.nr}`}>
+                  <div className="h-karta-gora">
+                    <span className="h-nr" aria-hidden="true">{w.nr}</span>
+                    <span className="h-karta-tryb">{w.tryb}</span>
+                  </div>
+                  <h3 id={`k-${w.nr}`} className="h-karta-nazwa">{w.nazwa}</h3>
+                  <p className="h-karta-cena">
+                    {w.cena}
+                    <span>{w.cenaDopisek}</span>
+                  </p>
+                  <dl className="h-dl">
+                    <div><dt>Gdzie</dt><dd>{w.gdzie}</dd></div>
+                    <div><dt>Kto patrzy na technikę</dt><dd>{w.technika}</dd></div>
+                    <div><dt>Pakiety</dt><dd>{w.dalej}</dd></div>
+                    <div className="h-dl-ryzyko"><dt>Jeśli nie wyjdzie</dt><dd>{w.ryzyko}</dd></div>
+                    <div><dt>Dla kogo</dt><dd>{w.dlaKogo}</dd></div>
+                  </dl>
+                  <a className="h-btn h-btn-ciemny" href={w.href}>{w.cta}</a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── HISTORIE: ten sam komponent co na podstronach ───── */}
+        {POKAZ_HISTORIE && (
+          <CaseStudies {...CASE_STUDIES} cta="Porównaj warianty" ctaHref="#porownanie" />
+        )}
+
+        {/* ── TRENER: ten sam komponent co na podstronach ──────── */}
+        <Team {...TEAM} {...kadr(Z.team)} cta="Porównaj warianty" ctaHref="#porownanie" odstepGora />
+
+        {/* ── PYTANIA ──────────────────────────────────────────── */}
+        <section className="h-faq" aria-labelledby="h-pyt">
+          <div className="h-w h-faq-uklad">
+            <div className="h-faq-bok">
+              <h2 id="h-pyt" className="h-h2">Zanim wybierzesz</h2>
+              <p className="h-faq-nie">Nie ma Twojego pytania?</p>
+              <a className="h-faq-tel" href={TELEFON_HREF}>{TELEFON}</a>
+              <p className="h-drobne">Odpisuję w 24 h w dni robocze.</p>
+            </div>
+            <div className="h-faq-lista">
+              {PYTANIA.map((q, i) => (
+                <details key={q.p} className="h-pytanie" open={i === 0}>
+                  <summary>
+                    {q.p}
+                    <span className="h-plus" aria-hidden="true" />
+                  </summary>
+                  <p>{q.o}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FINAŁ ────────────────────────────────────────────── */}
+        <section className="h-final h-siatka" aria-labelledby="h-fin">
+          <div className="h-w">
+            <div className="h-final-karta h-ramka">
+              <p className="h-eyebrow">Zanim zaczniesz kolejny poniedziałek</p>
+              <h2 id="h-fin" className="h-h2 h-h2-duzy">Od czego zaczynasz?</h2>
+              <div className="h-final-przyciski">
+                {WARIANTY.map((w) => (
+                  <a key={w.href} className="h-final-opcja" href={w.href}>
+                    <span className="h-nr" aria-hidden="true">{w.nr}</span>
+                    <span className="h-final-nazwa">{w.nazwa}</span>
+                    <span className="h-final-cena">{w.cena}</span>
+                    <Strzalka />
+                  </a>
+                ))}
+              </div>
+              <p className="h-final-tel">
+                Nie wiesz? Zadzwoń: <a href={TELEFON_HREF}>{TELEFON}</a>. Jeśli wystarczy Ci najtańsza
+                opcja, powiem to.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
       <Footer />
     </>
   );
 }
 
-/* ─────────────────────────────────────────────────────── CSS
-   Ten sam co w app/zamowienie/page.tsx, plus trzy bloki tej strony:
-   .zm-telefon, .zm-krok-zrobiony i .zm-koniec. Zmieniasz kolory tam,
-   zmień też tutaj. */
-
 const CSS = `
-.zm{--grafit:#14181d;--limonka:#d2f34c;--mgla:#edeff2;--szary:#5f6672;--linia:#d6dae0;--bialy:#fff;background:var(--mgla);color:var(--grafit);font-family:inherit;min-height:100vh}
-.zm *{box-sizing:border-box}
-.zm-gora{background:var(--grafit);color:var(--bialy)}
-.zm-gora-wnetrze{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.zm-marka{font-weight:700;font-size:1.05rem}
-.zm-wstecz{color:#c9ced6;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
-.zm-wstecz:hover{color:var(--bialy)}
-.zm-postep{max-width:1120px;margin:0 auto;padding:0 24px 22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none}
-.zm-etap{border-top:3px solid #3a414b;padding-top:10px;font-size:.85rem;color:#9aa1ac}
-.zm-etap-aktywny{border-top-color:var(--limonka);color:var(--bialy);font-weight:600}
-.zm-etap-zrobiony{border-top-color:var(--limonka);color:#c9ced6}
-.zm-wnetrze{max-width:1120px;margin:0 auto;padding:40px 24px 72px}
-.zm-naglowek{max-width:44rem;margin-bottom:28px}
-.zm-naglowek h1{font-size:clamp(1.75rem,1.2rem + 2.2vw,2.6rem);line-height:1.12;letter-spacing:-.01em;margin:0 0 12px}
-.zm-naglowek p{font-size:1.05rem;line-height:1.55;color:var(--szary);margin:0}
-.zm-naglowek a{color:var(--grafit);font-weight:700;white-space:nowrap}
-.zm-telefon{background:var(--grafit);color:var(--bialy);border-radius:14px;padding:26px 24px;margin:0 0 32px;display:grid;gap:18px;border-left:6px solid var(--limonka)}
-@media (min-width:760px){.zm-telefon{grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:30px 32px;gap:32px}}
-.zm-telefon h2{font-size:clamp(1.3rem,1.1rem + 1vw,1.75rem);line-height:1.2;margin:0 0 8px}
-.zm-telefon p{margin:0;color:#c9ced6;line-height:1.55;max-width:40rem}
-.zm-telefon strong{color:var(--bialy);white-space:nowrap}
-.zm-uklad{display:grid;gap:32px}
-@media (min-width:960px){.zm-uklad{grid-template-columns:minmax(0,1.618fr) minmax(0,1fr);align-items:start;gap:40px}.zm-boczna{position:sticky;top:24px}}
-.zm-blok{background:var(--bialy);border-radius:14px;padding:28px 24px}
-.zm-blok+.zm-blok{margin-top:20px}
-@media (min-width:640px){.zm-blok{padding:32px}}
-.zm-blok h2{font-size:1.3rem;line-height:1.25;margin:0 0 6px}
-.zm-podtytul{color:var(--szary);line-height:1.5;margin:0 0 24px;max-width:38rem}
-.zm-os{list-style:none;margin:0;padding:0;counter-reset:krok}
-.zm-krok{position:relative;padding:0 0 22px 40px;counter-increment:krok}
-.zm-krok:last-child{padding-bottom:0}
-.zm-krok::before{content:counter(krok);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--grafit);color:var(--limonka);font-size:.8rem;font-weight:700;display:grid;place-items:center}
-.zm-krok::after{content:"";position:absolute;left:12px;top:30px;bottom:4px;width:2px;background:var(--linia)}
-.zm-krok:last-child::after{display:none}
-.zm-krok-teraz::before{background:var(--limonka);color:var(--grafit)}
-.zm-krok-zrobiony::before{content:"✓";background:var(--mgla);color:var(--szary)}
-.zm-krok-zrobiony .zm-kiedy,.zm-krok-zrobiony .zm-co{color:var(--szary)}
-.zm-kiedy{display:block;font-weight:700;font-size:.95rem;margin-bottom:2px}
-.zm-co{display:block;font-size:.95rem;margin-bottom:4px}
-.zm-opis{margin:0;color:var(--szary);font-size:.93rem;line-height:1.5;max-width:36rem}
-.zm-podsumowanie{background:var(--grafit);color:var(--bialy);border-radius:14px;padding:28px 24px}
-.zm-podsumowanie h2{font-size:1rem;font-weight:600;color:#c9ced6;margin:0 0 14px}
-.zm-nazwa{font-size:1.4rem;font-weight:700;line-height:1.2;margin:0 0 6px}
-.zm-lista-jasna{list-style:none;padding:0;margin:0;display:grid;gap:10px}
-.zm-lista-jasna li{position:relative;padding-left:24px;line-height:1.5}
-.zm-lista-jasna li::before{content:"";position:absolute;left:3px;top:.5em;width:9px;height:5px;border-left:2px solid var(--grafit);border-bottom:2px solid var(--grafit);transform:rotate(-45deg)}
-.zm-gwarancja{border:1.5px solid var(--limonka);border-radius:10px;padding:14px 16px;margin:0 0 20px;font-size:.92rem;line-height:1.5}
-.zm-gwarancja strong{display:block;color:var(--limonka);margin-bottom:2px}
-.zm-metody{font-size:.85rem;color:#c9ced6;line-height:1.5;margin:0 0 18px}
-.zm-przycisk{font:inherit;font-weight:700;font-size:1.05rem;width:100%;border:0;border-radius:12px;padding:16px 20px;background:var(--limonka);color:var(--grafit);cursor:pointer;text-align:center;text-decoration:none;display:inline-block}
-.zm-przycisk:hover{background:#c3e53a}
-.zm-przycisk:focus-visible{outline:3px solid var(--bialy);outline-offset:3px}
-.zm-przycisk-waski{width:auto;white-space:nowrap}
-@media (max-width:759px){.zm-przycisk-waski{width:100%;white-space:normal}}
-.zm-koniec{margin-top:40px;background:var(--bialy);border-radius:14px;padding:28px 24px;border-top:6px solid var(--limonka)}
-@media (min-width:640px){.zm-koniec{padding:32px}}
-.zm-koniec h2{font-size:1.3rem;margin:0 0 18px}
-.zm-trzy{margin:0;padding:0;list-style:none;display:grid;gap:16px;counter-reset:trzy}
-@media (min-width:860px){.zm-trzy{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}}
-.zm-trzy li{counter-increment:trzy;line-height:1.5;color:var(--szary);font-size:.95rem}
-.zm-trzy li::before{content:counter(trzy);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--grafit);color:var(--limonka);font-weight:700;font-size:.85rem;margin-bottom:10px}
-.zm-trzy strong{display:block;color:var(--grafit);font-size:1rem;margin-bottom:2px}
-.zm-koniec-link{margin:22px 0 0;font-size:.9rem}
-.zm-koniec-link a{color:var(--grafit);font-weight:600}
-.zm-potwierdzenie{display:flex;gap:16px;align-items:flex-start}
-.zm-znak{flex:none;width:52px;height:52px;border-radius:50%;background:var(--limonka);display:grid;place-items:center}
-.zm-znak::before{content:"";width:20px;height:10px;border-left:3.5px solid var(--grafit);border-bottom:3.5px solid var(--grafit);transform:translateY(-3px) rotate(-45deg)}
-.zm-numer strong{white-space:nowrap}
-.zm-numer{display:inline-block;margin-top:14px;background:var(--bialy);border-radius:8px;padding:8px 12px;font-size:.92rem}
-.zm-demo{background:#fff7d6;border-radius:10px;padding:12px 14px;font-size:.88rem;line-height:1.5;margin:0 0 24px}
-@media (prefers-reduced-motion:no-preference){.zm-przycisk{transition:background-color .12s ease}}
+.h{--g:#111820;--g2:#1A222C;--s:#D6FF3F;--s2:#C6F020;--m:#EDEFF2;--sl:#5F6A77;--l:#D8DDE3;--jas:#AAB3BE;color:var(--g);background:#fff}
+.h *,.h *::before,.h *::after{box-sizing:border-box}
+.h a{color:inherit}
+.h-w{max-width:75rem;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
+.h p{line-height:1.6}
+.h-drobne{margin:.75rem 0 0;font-size:.85rem;color:var(--sl)}
+
+/* motywy wspólne */
+.h-siatka{background-color:var(--g);background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:72px 72px;background-position:-1px -1px}
+.h-ramka{--r:22px;background-image:
+  linear-gradient(var(--s),var(--s)),linear-gradient(var(--s),var(--s)),
+  linear-gradient(var(--s),var(--s)),linear-gradient(var(--s),var(--s)),
+  linear-gradient(var(--s),var(--s)),linear-gradient(var(--s),var(--s)),
+  linear-gradient(var(--s),var(--s)),linear-gradient(var(--s),var(--s));
+  background-repeat:no-repeat;
+  background-size:var(--r) 2px,2px var(--r),var(--r) 2px,2px var(--r),var(--r) 2px,2px var(--r),var(--r) 2px,2px var(--r);
+  background-position:0 0,0 0,100% 0,100% 0,0 100%,0 100%,100% 100%,100% 100%}
+.h-eyebrow{margin:0 0 1.1rem;color:var(--s);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.h-eyebrow-ciemny{color:var(--sl)}
+.h-nr{display:inline-grid;place-items:center;width:1.75rem;height:1.75rem;flex:none;background:var(--s);color:var(--g);font-size:.8rem;font-weight:800}
+.h-h2{margin:0;font-size:clamp(2rem,4.2vw,3.1rem);line-height:1.02;letter-spacing:-.035em;font-weight:800}
+.h-h2-duzy{font-size:clamp(2.3rem,5.4vw,4rem)}
+.h-h3{margin:0 0 .6rem;font-size:1.3rem;line-height:1.2;letter-spacing:-.015em;font-weight:800}
+.h-naglowek-sekcji{margin-bottom:clamp(2rem,4vw,3rem);max-width:44rem}
+.h-naglowek-rzad{max-width:none;display:grid;gap:1rem 3rem;align-items:end}
+@media(min-width:56rem){.h-naglowek-rzad{grid-template-columns:1fr minmax(0,24rem)}}
+.h-podtytul{margin:0;color:var(--sl);font-size:1.05rem}
+.h-strzalka{flex:none;transition:transform .2s}
+
+/* przyciski */
+.h-btn{display:flex;justify-content:center;align-items:center;gap:.6rem;min-height:3.25rem;padding:.9rem 1.3rem;background:var(--s);color:var(--g)!important;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;text-align:center;transition:background .15s}
+.h-btn:hover{background:var(--s2)}
+.h-btn-ciemny{background:var(--g);color:#fff!important}
+.h-btn-ciemny:hover{background:#26303B}
+.h a:focus-visible,.h summary:focus-visible{outline:3px solid var(--s);outline-offset:3px}
+.h-porownanie a:focus-visible,.h-faq a:focus-visible,.h-faq summary:focus-visible,.h-trener a:focus-visible,.h-diagnoza a:focus-visible{outline-color:var(--g)}
+
+/* pasek konkursu */
+.h-konkurs{display:flex;flex-wrap:wrap;gap:.4rem 1rem;justify-content:center;align-items:center;padding:.75rem clamp(1rem,4vw,2.5rem);background:var(--s);color:var(--g);text-decoration:none;font-size:.9rem;font-weight:600;text-align:center}
+.h-konkurs-znak{width:8px;height:8px;background:var(--g);animation:h-puls 1.6s ease-in-out infinite}
+.h-konkurs-link{font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.h-konkurs:hover .h-konkurs-link{text-decoration-thickness:2px}
+.h-konkurs:focus-visible{outline:3px solid var(--g)!important;outline-offset:-5px!important}
+@keyframes h-puls{50%{opacity:.25}}
+
+/* hero */
+.h-hero{color:#fff;padding:clamp(3.25rem,8vw,6.5rem) 0 clamp(3.5rem,8vw,6.5rem)}
+.h-hero-uklad{display:grid;gap:3rem;align-items:center}
+@media(min-width:64rem){.h-hero-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:5rem}}
+.h-tytul{margin:0 0 1.5rem;font-size:clamp(2.7rem,6.8vw,5.25rem);line-height:.98;letter-spacing:-.045em;font-weight:800;text-wrap:balance}
+.h-lead{margin:0 0 2rem;max-width:34rem;font-size:1.15rem;color:#C9D0D8}
+.h-hero-fakty{list-style:none;margin:0;padding:1.5rem 0 0;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-wrap:wrap;gap:.75rem 1.75rem;font-size:.92rem;color:#DDE2E8}
+.h-hero-fakty li{display:flex;align-items:center;gap:.6rem}
+.h-hero-fakty li::before{content:"";width:7px;height:7px;background:var(--s)}
+
+.h-trasa{padding:clamp(1.4rem,3vw,2rem);background-color:rgba(17,24,32,.72);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(2px)}
+.h-trasa-gora{margin-bottom:1.25rem}
+.h-trasa-tytul{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:-.01em}
+.h-trasa-sub{margin:.2rem 0 0;font-size:.9rem;color:var(--jas)}
+.h-trasa-lista{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.h-trasa-lista li{animation:h-wjazd .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(.15s + var(--i) * .09s)}
+@keyframes h-wjazd{from{opacity:0;transform:translateY(10px)}}
+.h-cel{display:grid;grid-template-columns:auto 1fr auto auto;gap:.9rem;align-items:center;padding:1rem;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);text-decoration:none;transition:background .15s,border-color .15s}
+.h-cel:hover{background:rgba(214,255,63,.07);border-color:rgba(214,255,63,.55)}
+.h-cel:hover .h-strzalka,.h-final-opcja:hover .h-strzalka{transform:translateX(3px)}
+.h-cel .h-nr{align-self:start;margin-top:.1rem}
+.h-cel-tresc{display:grid;gap:.25rem;min-width:0}
+.h-cel-kto{color:var(--jas);font-size:.88rem;line-height:1.4}
+.h-cel-nazwa{font-weight:800;font-size:1.1rem;line-height:1.2}
+.h-cel-cena{color:var(--s);font-weight:800;font-size:1.05rem;white-space:nowrap}
+.h-cel .h-strzalka{color:var(--s)}
+@media(max-width:32rem){.h-cel{grid-template-columns:auto 1fr;row-gap:.5rem}.h-cel-cena{grid-column:2}.h-cel .h-strzalka{display:none}.h-konkurs-znak{display:none}}
+.h-trasa-nie{margin:1.25rem 0 0;font-size:.88rem;color:var(--jas)}
+.h-trasa-nie a{color:#fff;font-weight:700;text-underline-offset:3px}
+
+/* taśma */
+.h-tasma{overflow:hidden;background:#fff;border-bottom:1px solid var(--l);padding:.9rem 0}
+.h-tasma-tor{display:flex;width:max-content;animation:h-tasma 45s linear infinite}
+.h-tasma:hover .h-tasma-tor{animation-play-state:paused}
+.h-tasma-lista{display:flex;list-style:none;margin:0;padding:0}
+.h-tasma-lista li{display:flex;align-items:center;gap:1.4rem;padding-right:1.4rem;white-space:nowrap;font-size:.85rem;color:var(--sl)}
+.h-tasma-lista li::after{content:"";width:5px;height:5px;background:var(--s);outline:1px solid var(--g)}
+@keyframes h-tasma{to{transform:translateX(-50%)}}
+
+/* diagnoza */
+.h-diagnoza{padding:clamp(4rem,9vw,7rem) 0}
+.h-diag-uklad{display:grid;gap:3rem;align-items:center}
+@media(min-width:62rem){.h-diag-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:5rem}}
+.h-diag-tekst{margin:1.5rem 0 0;max-width:34rem;font-size:1.15rem;color:#3B4550}
+.h-cykl{background:var(--m);padding:clamp(1.5rem,3vw,2.25rem)}
+.h-cykl-tytul{margin:0 0 1.25rem;font-weight:800;font-size:1.05rem}
+.h-cykl-lista{list-style:none;margin:0;padding:0 0 0 1.75rem;position:relative}
+.h-cykl-lista::before{content:"";position:absolute;left:6px;top:.5rem;bottom:.9rem;border-left:2px dashed #B8C0CA}
+.h-cykl-lista li{position:relative;display:grid;gap:.15rem;padding-bottom:1.1rem}
+.h-cykl-lista li::before{content:"";position:absolute;left:-1.75rem;top:.35rem;width:14px;height:14px;background:#fff;border:2px solid var(--g)}
+.h-cykl-kiedy{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sl)}
+.h-cykl-co{font-weight:600}
+.h-cykl-ostatni::before{background:var(--g)!important}
+.h-cykl-ostatni .h-cykl-kiedy::after{content:" ↺";color:var(--g)}
+.h-cykl-wniosek{margin:.5rem 0 0;padding:1rem 1.1rem;background:var(--g);color:#fff;font-weight:700;line-height:1.45;border-left:4px solid var(--s)}
+
+/* bento */
+.h-metoda{background:var(--m);padding:clamp(4rem,9vw,7rem) 0}
+.h-bento{display:grid;gap:1rem}
+@media(min-width:56rem){.h-bento{grid-template-columns:1.25fr 1fr;grid-template-rows:auto auto}.h-kafel-duzy{grid-row:span 2}}
+.h-kafel{background-color:#fff;padding:clamp(1.5rem,3vw,2.25rem);display:flex;flex-direction:column}
+.h-kafel p{margin:0;color:var(--sl)}
+.h-kafel.h-kafel-ciemny{background-color:var(--g);color:#fff;justify-content:space-between;gap:2rem}
+.h-kafel-ciemny p{color:#C9D0D8}
+.h-kafel-duzy .h-h3{font-size:clamp(1.5rem,2.6vw,2rem)}
+
+.h-decyzja{display:grid;gap:0;font-size:.9rem}
+.h-decyzja-pytanie{position:relative;justify-self:center;text-align:center;padding:1rem 1.25rem;background:#fff;color:var(--g);font-weight:800;max-width:22rem;line-height:1.35}
+.h-decyzja-pytanie span{display:block;margin-top:.2rem;font-weight:500;font-size:.8rem;color:var(--sl)}
+.h-decyzja-galezie{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding-top:2.25rem}
+.h-decyzja-galezie::before{content:"";position:absolute;top:0;left:25%;right:25%;height:1.25rem;border:2px solid rgba(255,255,255,.35);border-bottom:0}
+.h-decyzja-galezie::after{content:"";position:absolute;top:-1px;left:50%;height:0;border-left:0}
+.h-decyzja-tak,.h-decyzja-nie{display:grid;gap:.15rem;justify-items:center;text-align:center;padding:1rem .75rem}
+.h-decyzja-tak{background:var(--s);color:var(--g)}
+.h-decyzja-nie{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff}
+.h-decyzja-etykieta{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.h-decyzja-tak strong,.h-decyzja-nie strong{font-size:1.35rem;letter-spacing:-.02em;line-height:1.15}
+.h-decyzja-tak span:last-child,.h-decyzja-nie span:last-child{font-size:.8rem}
+
+.h-karta-mini{margin-top:1.5rem;border:1px solid var(--l);font-size:.85rem}
+.h-karta-mini-gora{display:flex;justify-content:space-between;padding:.6rem .8rem;background:var(--g);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.h-karta-mini-gora span:last-child{color:var(--s)}
+.h-karta-mini-wiersz{display:grid;grid-template-columns:4rem 1fr 3.5rem;gap:.75rem;align-items:center;padding:.6rem .8rem;border-top:1px solid var(--l);font-variant-numeric:tabular-nums}
+.h-karta-mini-wiersz span:first-child{color:var(--sl)}
+.h-pasek{height:8px;background:var(--m)}
+.h-pasek span{display:block;height:100%;background:var(--g)}
+.h-karta-mini-wiersz:last-child .h-pasek span{background:var(--s);outline:1px solid var(--g)}
+.h-kg{font-weight:800;text-align:right}
+
+.h-samodzielnie{margin-top:1.5rem}
+.h-kwadraty{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.h-kwadraty span{aspect-ratio:1}
+.h-kw-pelny{background:var(--g)}
+.h-kw-pusty{background:var(--s);opacity:.9}
+.h-kwadraty-opis{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.8rem;color:var(--sl);font-weight:600}
+
+/* porównanie */
+.h-porownanie{padding:clamp(4rem,9vw,7rem) 0}
+.h-karty{display:grid;gap:1rem}
+@media(min-width:64rem){.h-karty{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.h-karta{display:flex;flex-direction:column;border:1px solid var(--l);padding:clamp(1.4rem,3vw,1.9rem);transition:border-color .15s,box-shadow .15s}
+.h-karta:hover{border-color:var(--g);box-shadow:0 24px 48px -32px rgba(17,24,32,.45)}
+.h-karta-gora{display:flex;align-items:center;gap:.7rem;margin-bottom:1.25rem}
+.h-karta-tryb{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sl)}
+.h-karta-nazwa{margin:0;font-size:1.35rem;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+.h-karta-cena{margin:.8rem 0 1.4rem;font-size:2.8rem;font-weight:800;letter-spacing:-.045em;line-height:1}
+.h-karta-cena span{display:block;margin-top:.4rem;font-size:.8rem;font-weight:600;letter-spacing:0;color:var(--sl)}
+.h-dl{margin:0 0 1.5rem;flex:1}
+.h-dl div{padding:.85rem 0;border-top:1px solid var(--l)}
+.h-dl dt{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sl);margin-bottom:.3rem}
+.h-dl dd{margin:0;line-height:1.5;font-size:.95rem}
+.h-dl-ryzyko dd{padding-left:.75rem;border-left:3px solid var(--s);font-weight:600}
+
+/* pytania */
+.h-faq{padding:0 0 clamp(4rem,9vw,7rem)}
+.h-faq-uklad{display:grid;gap:2.5rem}
+@media(min-width:56rem){.h-faq-uklad{grid-template-columns:minmax(0,20rem) minmax(0,1fr);gap:5rem}.h-faq-bok{position:sticky;top:2rem;align-self:start}}
+.h-faq-nie{margin:2rem 0 .3rem;padding-top:1.5rem;border-top:1px solid var(--l);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sl)}
+.h-faq-tel{font-size:1.9rem;font-weight:800;letter-spacing:-.03em;text-decoration:none}
+.h-pytanie{border-top:1px solid var(--l)}
+.h-pytanie:last-child{border-bottom:1px solid var(--l)}
+.h-pytanie summary{display:flex;justify-content:space-between;align-items:center;gap:1.5rem;cursor:pointer;padding:1.25rem 0;font-weight:700;font-size:1.05rem;list-style:none}
+.h-pytanie summary::-webkit-details-marker{display:none}
+.h-plus{position:relative;flex:none;width:1.6rem;height:1.6rem;border:1px solid var(--l);transition:background .15s,border-color .15s}
+.h-plus::before,.h-plus::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:2px;background:var(--g);transform:translate(-50%,-50%)}
+.h-plus::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .2s}
+.h-pytanie[open] .h-plus{background:var(--s);border-color:var(--s)}
+.h-pytanie[open] .h-plus::after{transform:translate(-50%,-50%) rotate(0)}
+.h-pytanie p{margin:0 0 1.4rem;max-width:40rem;color:var(--sl)}
+
+/* finał */
+.h-final{color:#fff;padding:clamp(4rem,9vw,7rem) 0}
+.h-final-karta{max-width:52rem;margin:0 auto;padding:clamp(2rem,5vw,3.5rem);text-align:center;background-color:rgba(17,24,32,.8)}
+.h-final-przyciski{display:grid;gap:.6rem;margin:2rem 0 1.5rem;text-align:left}
+.h .h-final-opcja{color:var(--g)}
+.h-final-opcja{display:grid;grid-template-columns:auto 1fr auto auto;gap:1rem;align-items:center;padding:1rem 1.1rem;background:var(--s);color:var(--g);text-decoration:none;font-weight:800;transition:background .15s}
+.h-final-opcja:hover{background:var(--s2)}
+.h-final-opcja .h-nr{background:var(--g);color:var(--s)}
+.h-final-nazwa{font-size:1.05rem}
+.h-final-cena{white-space:nowrap}
+.h-final-opcja:focus-visible{outline-color:#fff!important}
+.h-final-tel{margin:0;color:var(--jas)}
+.h-final-tel a{color:#fff;font-weight:700;text-underline-offset:3px}
+
+@media(prefers-reduced-motion:reduce){
+  .h *{animation:none!important;transition:none!important}
+  .h-tasma-tor{width:auto}
+  .h-tasma-lista{flex-wrap:wrap;justify-content:center;row-gap:.5rem;padding:0 1rem}
+  .h-tasma-lista[aria-hidden]{display:none}
+}
 `;
