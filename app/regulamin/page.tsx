@@ -211,11 +211,11 @@ const PARAGRAFY: Paragraf[] = [
       "Niezależnie od uprawnień ustawowych Usługodawca zobowiązuje się, że:",
       {
         lista: [
-          "zwraca pieniądze za niewykorzystane Sesje z Pakietu na prośbę Klienta zgłoszoną w okresie ważności Pakietu. Kwotę zwrotu oblicza się tak jak w § 9 ust. 4;",
           "zwraca całość ceny, jeśli w ciągu 14 dni od zakupu nie ustalono terminu pierwszej Sesji z przyczyn leżących po stronie Usługodawcy (§ 5 ust. 3);",
           "odlicza całą cenę E-booka od ceny Planu indywidualnego albo pierwszego miesiąca Prowadzenia, jeśli Klient kupi je w ciągu 30 dni od zakupu E-booka i zgłosi to e-mailem przed zakupem. Odliczenie jest rabatem, a nie zwrotem płatności za E-book.",
         ],
       },
+      "Poza przypadkami opisanymi w ust. 1 oraz prawem odstąpienia od umowy (§ 9) cena niewykorzystanych Sesji z Pakietu nie podlega zwrotowi.",
       "Zobowiązania jakościowe opisane na Stronie w sekcji „Moja gwarancja” (m.in. pełna uwaga przez całą Sesję, pisemna karta lub notatka po Sesji) nie są gwarancją efektu treningowego. Efekt zależy także od regularności, regeneracji i odżywiania Klienta, na które Usługodawca nie ma wpływu.",
     ],
   },

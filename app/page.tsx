@@ -74,7 +74,7 @@ const WARIANTY: Wariant[] = [
     gdzie: "Just GYM, Piotrkowska 157A. Wejście na salę płatne osobno (karnet Just GYM).",
     technika: "Stoję obok i poprawiam w tej samej serii, także dłonią.",
     dalej: "3 sesje za 420 zł, 5 sesji za 650 zł. Bez daty ważności.",
-    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości. Za niewykorzystane sesje z pakietu też oddaję pieniądze.",
+    ryzyko: "Brak wspólnego terminu w 14 dni = zwrot całości.",
     dlaKogo: "Zaczynasz od zera albo chcesz asekuracji przy cięższych seriach.",
   },
   {
@@ -116,7 +116,6 @@ const TASMA = [
   "Trening na sali w Łodzi",
   "Trening przez kamerę w całej Polsce",
   "Plan pod liczbę dni, które naprawdę masz",
-  "Bez liczenia każdej kalorii",
   "Płatność BLIK-iem, kartą albo Przelewy24",
 ];
 
@@ -189,7 +188,7 @@ const PYTANIA = [
   },
   {
     p: "Jak płacę i kiedy ustalamy termin?",
-    o: "Płacisz online BLIK-iem, kartą albo Przelewy24, bez wybierania godziny. Zaraz potem dostajesz maila z krótką ankietą, a w ciągu 24 h w dni robocze odzywam się i ustalamy termin. Jeśli w 14 dni nie znajdziemy wspólnej godziny, oddaję całą kwotę. E-book dostajesz od razu po płatności.",
+    o: "Płacisz online BLIK-iem, kartą albo Przelewy24, bez wybierania godziny. Zaraz potem dostajesz maila z krótką ankietą, a w ciągu 24 h w dni robocze dzwonię albo piszę SMS-a z kilkoma wolnymi okienkami i ustalamy termin. Jeśli w 14 dni nie znajdziemy wspólnej godziny, oddaję całą kwotę. E-book dostajesz od razu po płatności.",
   },
   {
     p: "Nie mam czasu trenować cztery razy w tygodniu.",
@@ -204,12 +203,12 @@ const PYTANIA = [
     o: "Od kilku treningów siłowych w tygodniu nie urośniesz przypadkiem. Ciężar dobieramy pod Twój cel, a nie pod rekord.",
   },
   {
-    p: "Czy będę musiał liczyć każdą kalorię?",
-    o: "Nie. W planie dostajesz kartę talerza i zasady, które działają bez wagi kuchennej, aplikacji i kurczaka z ryżem przez cały tydzień.",
+    p: "Czy muszę liczyć kalorie?",
+    o: "Nie musisz, ale polecam. Liczenie kalorii bardzo ułatwia sprawę: widzisz czarno na białym, ile naprawdę jesz, zamiast zgadywać, dlaczego waga stoi. Spróbuj przez tydzień: wpisuj wszystko do aplikacji, np. Fitatu albo MyFitnessPal. Po tygodniu wiesz o swoim jedzeniu więcej niż po roku zgadywania, a potem sam decydujesz, czy liczysz dalej. Nie jestem dietetykiem i nie układam jadłospisów leczniczych: jeśli Twój przypadek tego wymaga, powiem wprost.",
   },
   {
     p: "Czy mogę się rozmyślić?",
-    o: "Tak, w ciągu 14 dni od zakupu, dopóki usługa nie została wykonana: wystarczy odpisać na maila z potwierdzeniem. Za niewykorzystane sesje z pakietu oddaję pieniądze. Wyjątek to e-book: po otrzymaniu dostępu nie da się go zwrócić, bo materiały są już u Ciebie. Szczegóły w regulaminie.",
+    o: "Tak, w ciągu 14 dni od zakupu, dopóki usługa nie została wykonana: wystarczy odpisać na maila z potwierdzeniem. Niewykorzystane sesje z pakietu nie podlegają zwrotowi. Wyjątek to e-book: po otrzymaniu dostępu nie da się go zwrócić, bo materiały są już u Ciebie. Szczegóły w regulaminie.",
   },
 ];
 

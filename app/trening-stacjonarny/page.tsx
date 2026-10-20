@@ -73,7 +73,7 @@ export const metadata: Metadata = {
      tylko zabezpieczenie płacenia z góry. Usługi, która się nie odbyła,
      i tak trzeba zwrócić, więc ta obietnica nic nie kosztuje, a zdejmuje
      największy strach przed kliknięciem „Kup".
-   · Zwrot za niewykorzystane sesje z pakietu, z tego samego powodu.
+   · Niewykorzystane sesje z pakietu nie są zwracane (poza ustawowym odstąpieniem w 14 dni).
    · Jedna strona, jeden cel: brak linków do innych podstron.
    · Trenujemy wyłącznie w Just GYM, ul. Piotrkowska 157A.
 
@@ -158,12 +158,11 @@ const HERO = {
 
 const ICON_STRIP = [
   "Płatność online, termin ustalamy w 24 h",
-  "Telefon, SMS albo e-mail: wybierasz w ankiecie",
+  "Termin ustalamy telefonicznie albo SMS-em",
   "Sesje jeden na jeden",
   "Korekta techniki na żywo",
   "Zapis obciążeń po każdej sesji",
   "Pakiety bez daty ważności",
-  "Bez liczenia kalorii",
   "Just GYM, Piotrkowska 157A, przy Stajni Jednorożców",
 ];
 
@@ -335,19 +334,18 @@ const ZAKUP = {
       title: "Wypełniasz ankietę",
       body: "Kontuzje, staż, cel, kiedy możesz trenować i jak mam się kontaktować.",
       details: [
-        "Wolisz bez rozmowy? Zaznacz tylko SMS albo tylko e-mail",
+        "Wolisz bez rozmowy? Zaznacz w ankiecie, że wolisz SMS-y",
         "Nie zdążysz? Zapytam przy pierwszym kontakcie",
       ],
     },
     {
       meta: "Do 24 h w dni robocze",
       icon: "termin" as const,
-      title: "Odzywam się i ustalamy termin",
-      body: "Proponuję 2–3 wolne godziny, Ty wybierasz jedną. Potwierdzenie z adresem dostajesz SMS-em i mailem.",
+      title: "Dzwonię albo piszę SMS-a z terminami",
+      body: "Zwykle dzwonię, żeby szybko ustalić godzinę. Jeśli się nie dodzwonię, wysyłam SMS-a z kilkoma wolnymi okienkami. Potwierdzenie terminu z adresem przychodzi SMS-em.",
       details: [
-        `Telefon: dzwonię z numeru ${TELEFON} w godzinach z ankiety`,
-        "SMS: jeśli nie odbierzesz, propozycja terminów przychodzi od razu",
-        "E-mail: to samo na piśmie, żeby nic nie zginęło",
+        `Dzwonię z numeru ${TELEFON}, w godzinach z ankiety. Zapisz go, żeby nie odrzucić połączenia`,
+        "Nie odbierzesz albo wolisz bez rozmowy? Dostajesz SMS-a z 2–3 wolnymi okienkami i odpisujesz, które pasuje",
         "Brak terminu w 14 dni = zwrot całości",
       ],
     },
@@ -457,8 +455,7 @@ const CENNIK = {
   trust: [
     "Brak terminu w 14 dni — pełny zwrot",
     "Pakiety bez daty ważności",
-    "Zwrot za niewykorzystane sesje",
-    "Faktura na życzenie",
+    "Rachunek na życzenie",
   ],
 };
 
@@ -540,7 +537,7 @@ const FAQ = [
   },
   {
     q: "Płacę z góry. Jak ustalamy termin?",
-    a: `Po płatności w ciągu minuty dostajesz maila z potwierdzeniem i linkiem do krótkiej ankiety. W ankiecie wybierasz, jak mam się kontaktować (telefon, tylko SMS albo tylko e-mail) i o której. W ciągu 24 h w dni robocze dzwonię z numeru ${TELEFON}. Jeśli nie odbierzesz, dostajesz SMS i maila z dwiema, trzema wolnymi godzinami. Wybierasz jedną, a potwierdzenie z adresem przychodzi SMS-em i mailem. Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję całą kwotę. A jeśli do 24 h nic nie przyjdzie, zadzwoń: to znaczy, że coś zgubiło się po mojej stronie.`,
+    a: `Po płatności w ciągu minuty dostajesz maila z potwierdzeniem i linkiem do krótkiej ankiety. W ankiecie zaznaczasz, czy wolisz rozmowę, czy SMS-y, i o której mogę się odezwać. W ciągu 24 h w dni robocze dzwonię z numeru ${TELEFON}. Jeśli się nie dodzwonię, dostajesz SMS-a z dwoma, trzema wolnymi okienkami. Odpisujesz, które pasuje, a potwierdzenie z adresem przychodzi SMS-em. Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję całą kwotę. A jeśli do 24 h nic nie przyjdzie, zadzwoń: to znaczy, że coś zgubiło się po mojej stronie.`,
   },
   {
     q: "A jeśli po tych sesjach nic się nie zmieni?",
@@ -552,7 +549,7 @@ const FAQ = [
   },
   {
     q: "Ile kosztuje sesja?",
-    a: "Pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). Ceny nie obejmują wejścia na salę: karnet albo jednorazowe wejście kupujesz w Just GYM. Pakiety nie mają daty ważności, a za niewykorzystane sesje zwracam pieniądze.",
+    a: "Pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). Ceny nie obejmują wejścia na salę: karnet albo jednorazowe wejście kupujesz w Just GYM. Pakiety nie mają daty ważności. Niewykorzystane sesje nie podlegają zwrotowi.",
   },
   {
     q: "Dlaczego pakiety są tak małe? Wszędzie sprzedają po dziesięć sesji.",
@@ -575,8 +572,8 @@ const FAQ = [
     a: "Nie zbudujesz przypadkiem sylwetki kulturystki — to wymaga lat pracy i jedzenia ustawionego pod ten jeden cel. Trening siłowy przy Twoim normalnym jedzeniu zwykle sprawia, że obwody się zmniejszają, a ciało robi się jędrniejsze, nie większe. Jeśli mimo to chcesz mniej pracy nad konkretną partią, wystarczy to powiedzieć na pierwszej sesji.",
   },
   {
-    q: "Czy będę musiał liczyć każdą kalorię i jeść kurczaka z ryżem?",
-    a: "Nie. Nie jestem dietetykiem i nie układam jadłospisów — od tego jest osoba z odpowiednim wykształceniem i mogę taką polecić. Na treningach dostajesz kilka prostych zasad, które działają bez wagi kuchennej i bez aplikacji: co dołożyć, żeby mieć siłę na sesję, i co zmienić w tym, co już jesz. Jeśli w Twoim przypadku samo to nie wystarczy, powiem wprost, zamiast udawać, że wystarczy.",
+    q: "Czy muszę liczyć kalorie?",
+    a: "Nie musisz, ale polecam. Liczenie kalorii bardzo ułatwia sprawę: widzisz czarno na białym, ile naprawdę jesz, zamiast zgadywać, dlaczego waga stoi. Spróbuj przez tydzień: wpisuj wszystko do aplikacji, np. Fitatu albo MyFitnessPal. Po tygodniu wiesz o swoim jedzeniu więcej niż po roku zgadywania, a potem sam decydujesz, czy liczysz dalej. Nie jestem dietetykiem i nie układam jadłospisów leczniczych: jeśli Twój przypadek tego wymaga, powiem wprost.",
   },
   {
     q: "Mam kontuzję, bóle pleców albo siedzącą pracę.",
@@ -592,7 +589,7 @@ const FAQ = [
   },
   {
     q: "Czy pakiet się przeterminuje, jeśli zrobię przerwę?",
-    a: "Nie. Sesje z pakietu wykorzystujesz w swoim tempie, bez daty ważności. Jeśli wypadnie Ci miesiąc, wracasz do tej samej puli. Jeśli zdecydujesz, że kończysz, zwracam pieniądze za sesje, które się nie odbyły.",
+    a: "Nie. Sesje z pakietu wykorzystujesz w swoim tempie, bez daty ważności. Jeśli wypadnie Ci miesiąc, wracasz do tej samej puli. Pieniędzy za niewykorzystane sesje nie zwracam, ale sesje czekają na Ciebie bez terminu.",
   },
   {
     q: "Dla kogo to nie jest?",

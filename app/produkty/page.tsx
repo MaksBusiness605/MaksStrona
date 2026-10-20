@@ -112,7 +112,6 @@ const ICON_STRIP = [
   "Plan pod Twój sprzęt i grafik",
   "Wideo do każdego ćwiczenia",
   "Kryterium progresji, nie „słuchaj ciała”",
-  "Bez liczenia kalorii",
   "Wersja awaryjna na 25 minut",
   "Płatność BLIK-iem, kartą albo Przelewy24",
   "Działa na telefonie",
@@ -250,7 +249,7 @@ const DIFFERENTIATORS = {
     },
     {
       title: "Jedzenie bez liczenia",
-      body: "Karta talerza i zasady, które działają bez wagi kuchennej, aplikacji i kurczaka z ryżem przez tydzień.",
+      body: "Karta talerza i proste zasady jedzenia, które da się utrzymać na co dzień, także w zabiegany tydzień.",
     },
     {
       title: "Aktualizacje bez dopłat",
@@ -328,7 +327,7 @@ const CENNIK = {
       includes: [
         "Jak zbudować tydzień pod liczbę dni, którą realnie masz",
         "Technika sześciu ruchów bazowych z wideo i listą błędów",
-        "Karta talerza i porcje mierzone dłonią, bez liczenia kalorii",
+        "Karta talerza i porcje mierzone dłonią",
       ],
       outcome: "Wiesz, według jakiej zasady układać tydzień i kiedy dokładać ciężar.",
       href: KOSZYK.ebook,
@@ -380,7 +379,7 @@ const CENNIK = {
   trust: [
     "Płatność BLIK-iem, kartą albo Przelewy24",
     "Prowadzenie bez umowy na czas określony",
-    "Faktura na firmę albo osobę prywatną",
+    "Rachunek na życzenie",
   ],
 };
 
@@ -418,11 +417,15 @@ const FAQ = [
   },
   {
     q: "Co dokładnie dostaję po zakupie?",
-    a: "Przy e-booku mail z linkiem do panelu od razu po płatności. Przy planie i prowadzeniu zaraz po płatności ankieta, a plan w ciągu 72 godzin od jej wypełnienia, razem z nagraniem, w którym tłumaczę każdą decyzję. W panelu jest plan, arkusz progresji i wideo do ćwiczeń. Dostęp jest bezterminowy i działa na telefonie.",
+    a: "Przy e-booku mail z linkiem do pobrania PDF od razu po płatności. Przy planie i prowadzeniu zaraz po płatności ankieta, a plan w ciągu 72 godzin od jej wypełnienia, razem z nagraniem, w którym tłumaczę każdą decyzję. Plan zostaje u Ciebie na stałe i działa na telefonie.",
   },
   {
     q: "Czy prowadzenie to abonament? Jak zrezygnować?",
     a: "Płacisz miesiąc do miesiąca i rezygnujesz, kiedy chcesz: współpraca kończy się z ostatnim dniem opłaconego okresu, bez kar i bez wypowiedzenia. Plan, nagrania i arkusz zostają u Ciebie. Nie zadzwonię z ofertą zniżki, żeby Cię zatrzymać.",
+  },
+  {
+    q: "Jak się kontaktujemy w prowadzeniu?",
+    a: "Platformę ustalamy razem. Najczęściej to Messenger, WhatsApp albo Discord, zależnie od tego, czego używasz na co dzień. Tam co tydzień sprawdzamy postępy i poprawiamy plan, i tam piszesz, gdy masz pytanie.",
   },
   {
     q: "Czy potrzebuję siłowni?",
@@ -430,7 +433,7 @@ const FAQ = [
   },
   {
     q: "Czy muszę liczyć kalorie?",
-    a: "Nie. Dostajesz kartę talerza, porcje mierzone dłonią i gotowe zestawy z listą zakupów. Bez wagi kuchennej, bez aplikacji i bez tygodnia na kurczaku z ryżem. Nie jestem dietetykiem i nie układam jadłospisów leczniczych: jeśli Twój przypadek tego wymaga, powiem wprost.",
+    a: "Nie musisz, ale polecam. Liczenie kalorii bardzo ułatwia sprawę: widzisz czarno na białym, ile naprawdę jesz, zamiast zgadywać, dlaczego waga stoi. Spróbuj przez tydzień: wpisuj wszystko do aplikacji, np. Fitatu albo MyFitnessPal. Po tygodniu wiesz o swoim jedzeniu więcej niż po roku zgadywania, a potem sam decydujesz, czy liczysz dalej. Nie jestem dietetykiem i nie układam jadłospisów leczniczych: jeśli Twój przypadek tego wymaga, powiem wprost.",
   },
   {
     q: "Mam kontuzję albo siedzącą pracę.",
@@ -449,12 +452,8 @@ const FAQ = [
     a: "Tak, dopóki usługa nie została wykonana: masz na to 14 dni od zakupu. Wystarczy odpisać na maila z potwierdzeniem. Przy planie liczy się moment, w którym dostajesz gotowy plan, a przy prowadzeniu płacisz tylko za dni, które już minęły. E-booka nie da się zwrócić po otrzymaniu dostępu, bo materiały są już u Ciebie. Szczegóły w regulaminie, § 9.",
   },
   {
-    q: "Czy dostanę fakturę?",
-    a: "Tak, na firmę albo osobę prywatną. Napisz w odpowiedzi na mail z potwierdzeniem dane do faktury, a wyślę ją w ciągu kilku dni.",
-  },
-  {
-    q: "Dla kogo to nie jest?",
-    a: "Jeśli trenujesz od lat, technikę masz poukładaną i szukasz wyłącznie rozpiski, e-book Ci wystarczy, a wyższe poziomy będą zbędnym kosztem. Jeśli szukasz planu na pięć kilogramów w dwa tygodnie, nie napiszę takiego i nie będę udawać, że się da.",
+    q: "Czy dostanę rachunek?",
+    a: "Tak. Prowadzę działalność nierejestrowaną i nie jestem płatnikiem VAT, więc wystawiam rachunek, a nie fakturę VAT. Napisz w odpowiedzi na mail z potwierdzeniem, a wyślę go w ciągu kilku dni.",
   },
 ];
 

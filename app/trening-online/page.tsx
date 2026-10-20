@@ -67,7 +67,7 @@ export const metadata: Metadata = {
    · Brak terminu w 14 dni = zwrot. To zabezpieczenie płacenia z góry,
      nie gwarancja zadowolenia: treningu, który się nie odbył, i tak
      nie można zatrzymać.
-   · Zwrot za niewykorzystane sesje z pakietu, z tego samego powodu.
+   · Niewykorzystane sesje z pakietu nie są zwracane (poza ustawowym odstąpieniem w 14 dni).
    · <Lokalizacja> w trybie `silownie` z regulaminami sieci.
 
    ZANIM OPUBLIKUJESZ, sprawdź:
@@ -95,7 +95,7 @@ export const metadata: Metadata = {
 const POKAZ_PLACEHOLDERY = process.env.NODE_ENV !== "production";
 
 const CTA = "Kup pierwszy trening za 100 zł";
-const TELEFON = "537 483 233";
+const TELEFON = "666 222 699";
 
 /* Linki do płatności Stripe. Identyfikatory produktów i ceny są
    w app/lib/produkty.ts. Zmieniasz cenę tam, potem w tekstach tutaj. */
@@ -134,7 +134,7 @@ const HERO = {
 
 const ICON_STRIP = [
   "Termin ustalamy w 24 h po zakupie",
-  "Telefon, SMS albo e-mail: wybierasz w ankiecie",
+  "Trening na komunikatorze: Messenger, WhatsApp albo Discord",
   "Korekta techniki na żywo, w trakcie serii",
   "Notatka i nagrania zostają u Ciebie",
   "W domu albo na Twojej siłowni",
@@ -306,18 +306,17 @@ const ZAKUP = {
       body: "Gdzie trenujesz, jaki masz sprzęt, kontuzje, cel i jak mam się kontaktować.",
       details: [
         "Trenujesz na siłowni? Sprawdzę jej regulamin przed sesją",
-        "Wolisz bez rozmowy? Zaznacz tylko SMS albo tylko e-mail",
+        "Wolisz bez rozmowy? Zaznacz w ankiecie, że wolisz SMS-y",
       ],
     },
     {
       meta: "Do 24 h w dni robocze",
       icon: "termin" as const,
-      title: "Odzywam się i ustalamy termin",
-      body: "Proponuję 2–3 wolne godziny, Ty wybierasz jedną. Potwierdzenie z linkiem do rozmowy dostajesz SMS-em i mailem.",
+      title: "Dzwonię albo piszę SMS-a z terminami",
+      body: "Zwykle dzwonię, żeby szybko ustalić godzinę i komunikator: Messenger, WhatsApp albo Discord. Jeśli się nie dodzwonię, wysyłam SMS-a z kilkoma wolnymi okienkami.",
       details: [
-        `Telefon: dzwonię z numeru ${TELEFON} w godzinach z ankiety`,
-        "SMS: jeśli nie odbierzesz, propozycja terminów przychodzi od razu",
-        "E-mail: to samo na piśmie, żeby nic nie zginęło",
+        `Dzwonię z numeru ${TELEFON}, w godzinach z ankiety. Zapisz go, żeby nie odrzucić połączenia`,
+        "Nie odbierzesz albo wolisz bez rozmowy? Dostajesz SMS-a z 2–3 wolnymi okienkami i odpisujesz, które pasuje",
         "Brak terminu w 14 dni = zwrot całości",
       ],
     },
@@ -460,7 +459,6 @@ const CENNIK = {
   ],
   trust: [
     "Brak terminu w 14 dni — pełny zwrot",
-    "Zwrot za niewykorzystane sesje",
     "Bez abonamentu i bez umowy",
   ],
 };
@@ -492,16 +490,15 @@ const FAQ = [
   },
   {
     q: "Płacę z góry. Jak ustalamy termin?",
-    a: `Po płatności od razu dostajesz maila z potwierdzeniem i linkiem do krótkiej ankiety. W ankiecie wybierasz, jak mam się kontaktować (telefon, tylko SMS albo tylko e-mail) i o której. W ciągu 24 h w dni robocze dzwonię z numeru ${TELEFON}. Jeśli nie odbierzesz, dostajesz SMS i maila z dwiema, trzema wolnymi godzinami. Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję całą kwotę. A jeśli do 24 h nic nie przyjdzie, zadzwoń: to znaczy, że coś zgubiło się po mojej stronie.`,
+    a: `Po płatności od razu dostajesz maila z potwierdzeniem i linkiem do krótkiej ankiety. W ankiecie zaznaczasz, czy wolisz rozmowę, czy SMS-y, i o której mogę się odezwać. W ciągu 24 h w dni robocze dzwonię z numeru ${TELEFON}. Jeśli się nie dodzwonię, dostajesz SMS-a z dwoma, trzema wolnymi okienkami i odpisujesz, które pasuje. Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, oddaję całą kwotę. A jeśli do 24 h nic nie przyjdzie, zadzwoń: to znaczy, że coś zgubiło się po mojej stronie.`,
   },
   {
     q: "Czy mogę trenować online na swojej siłowni?",
     a: "Zwykle tak. Regulaminy dużych sieci, w tym Zdrofit, CityFit, McFit i Just GYM, pozwalają nagrywać własny trening, o ile nikt inny nie jest rozpoznawalny w kadrze i nic nie jest publikowane w celach komercyjnych. Część małych klubów zakazuje każdego nagrywania, dlatego pytam w ankiecie, gdzie trenujesz, i czytam regulamin Twojego klubu przed pierwszą sesją.",
   },
   {
-    // TODO: dopasuj do narzędzia, którego używasz.
     q: "Czym prowadzimy rozmowę? Muszę coś instalować?",
-    a: "Link do rozmowy wideo dostajesz w potwierdzeniu terminu, SMS-em i mailem. Otwierasz go na telefonie, bez zakładania konta. Przyda się statyw albo cokolwiek, o co oprzesz telefon z boku, i słuchawki.",
+    a: "Platformę ustalamy razem. Najczęściej to Messenger, WhatsApp albo Discord, zależnie od tego, czego używasz na co dzień, więc zwykle nie musisz instalować nic nowego. Tam odbywa się trening wideo i tam piszesz, gdy masz pytanie. Przyda się statyw albo cokolwiek, o co oprzesz telefon z boku, i słuchawki.",
   },
   {
     q: "Kupiłem już plan i go nie dokończyłem. Czemu tym razem ma być inaczej?",
@@ -517,7 +514,7 @@ const FAQ = [
   },
   {
     q: "Ile to kosztuje?",
-    a: "Pojedynczy trening 100 zł, pakiet trzech 260 zł (87 zł za trening), pakiet pięciu 400 zł (80 zł za trening). Bez abonamentu i bez umowy. Za niewykorzystane sesje z pakietu zwracam pieniądze.",
+    a: "Pojedynczy trening 100 zł, pakiet trzech 260 zł (87 zł za trening), pakiet pięciu 400 zł (80 zł za trening). Bez abonamentu i bez umowy. Niewykorzystane sesje z pakietu nie podlegają zwrotowi.",
   },
   {
     q: "Znajdę darmowe treningi na YouTube. Po co mam płacić?",
@@ -532,8 +529,8 @@ const FAQ = [
     a: "Możemy zacząć w domu i przenieść się na siłownię dopiero wtedy, kiedy będziesz wiedzieć, po co tam wchodzisz i co robisz w jakiej kolejności. Przy treningu przez kamerę nikt poza mną Cię nie widzi.",
   },
   {
-    q: "Czy będę musiał liczyć każdą kalorię?",
-    a: "Nie. Sesja jest o technice i ciężarze. Jeśli zapytasz, podpowiem kilka prostych zasad, które działają bez wagi kuchennej, ale nie układam jadłospisów.",
+    q: "Czy muszę liczyć kalorie?",
+    a: "Nie musisz, ale polecam. Liczenie kalorii bardzo ułatwia sprawę: widzisz czarno na białym, ile naprawdę jesz, zamiast zgadywać, dlaczego waga stoi. Spróbuj przez tydzień: wpisuj wszystko do aplikacji, np. Fitatu albo MyFitnessPal. Po tygodniu wiesz o swoim jedzeniu więcej niż po roku zgadywania, a potem sam decydujesz, czy liczysz dalej. Nie jestem dietetykiem i nie układam jadłospisów leczniczych: jeśli Twój przypadek tego wymaga, powiem wprost.",
   },
   {
     q: "Nie chcę zrobić się „za duża” od ciężarów.",

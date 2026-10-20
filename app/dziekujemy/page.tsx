@@ -96,8 +96,8 @@ const PLATNOSC_W_TOKU: Krok = {
 
 const telefon = (opis: string): Krok => ({
   kiedy: "W ciągu 24 h w dni robocze",
-  co: "Telefon ode mnie",
-  opis: `Dzwonię z numeru ${TELEFON}. ${opis} Jeśli nie odbierzesz, piszę SMS-a i dzwonię jeszcze raz.`,
+  co: "Telefon albo SMS ode mnie",
+  opis: `Dzwonię z numeru ${TELEFON}. ${opis} Jeśli się nie dodzwonię, piszę SMS-a z 2–3 wolnymi okienkami, a Ty odpisujesz, które pasuje.`,
 });
 
 const krokiStacjonarne = (pakiet: boolean): Krok[] => [
@@ -106,7 +106,7 @@ const krokiStacjonarne = (pakiet: boolean): Krok[] => [
   telefon("Ustalamy termin pierwszej sesji i dopytuję o to, co jest w ankiecie."),
   {
     kiedy: "Zaraz po rozmowie",
-    co: "SMS i mail z terminem i dojściem",
+    co: "SMS z terminem i dojściem",
     opis: "Just GYM, ul. Piotrkowska 157A, budynek HiPiotrkowska, przy Stajni Jednorożców.",
   },
   {
@@ -131,8 +131,8 @@ const krokiOnline = (pakiet: boolean): Krok[] => [
   telefon("Ustalamy termin i sprawdzamy, czy u Ciebie na siłowni albo w domu da się ustawić telefon z boku."),
   {
     kiedy: "Zaraz po rozmowie",
-    co: "SMS i mail z linkiem do rozmowy",
-    opis: "Link działa w przeglądarce telefonu, bez zakładania konta.",
+    co: "SMS z terminem",
+    opis: "Trening prowadzimy na komunikatorze, który wolisz: Messenger, WhatsApp albo Discord. Ustalamy to przy pierwszym kontakcie.",
   },
   {
     kiedy: "W dniu treningu, 60 minut",

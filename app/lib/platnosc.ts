@@ -23,6 +23,11 @@ import { noweZamowienie, TELEFON, znajdzProdukt, type Produkt } from "./produkty
       Imię i telefon lądują w metadanych płatności, e-mail od razu
       wypełnia się na stronie Stripe.
 
+   KODY PROMOCYJNE: na stronie płatności Stripe jest pole „Dodaj kod
+   promocyjny” (allow_promotion_codes). Kody z konkursu tworzy skrypt
+   scripts/kody-konkurs.mjs: każdy działa raz, odejmuje 140 zł i działa
+   tylko przy zamówieniu od 420 zł (pakiet 3 albo 5 sesji na sali).
+
    Metody płatności (BLIK, karta, Przelewy24, Google Pay, Apple Pay)
    włączasz w panelu Stripe: Settings → Payments → Payment methods.
    Kod ich nie wymienia, Stripe pokazuje te, które pasują do PLN i Polski.
@@ -104,6 +109,8 @@ async function utworzPlatnosc(req: Request, dane: Dane) {
 
   const wspolne: Stripe.Checkout.SessionCreateParams = {
     locale: "pl",
+    /* Pole „Dodaj kod promocyjny” na stronie płatności (kody z konkursu). */
+    allow_promotion_codes: true,
     client_reference_id: numer,
     metadata,
     customer_email: dane.email,

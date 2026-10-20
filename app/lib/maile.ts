@@ -64,8 +64,8 @@ function krokAnkieta(numer: string): Krok {
 }
 
 const KROK_TELEFON: Krok = {
-  tytul: "Odezwę się w ciągu 24 godzin",
-  opis: `W dni robocze, tak jak zaznaczysz w ankiecie. Dzwonię z numeru ${TELEFON}: zapisz go, żeby nie odrzucić połączenia. Jeśli nie odbierzesz, napiszę SMS-a.`,
+  tytul: "Zadzwonię albo napiszę SMS-a w ciągu 24 godzin",
+  opis: `W dni robocze, w godzinach z ankiety. Dzwonię z numeru ${TELEFON}: zapisz go, żeby nie odrzucić połączenia. Jeśli się nie dodzwonię, wyślę SMS-a z 2–3 wolnymi okienkami, a Ty odpiszesz, które pasuje.`,
 };
 
 /** Data zakupu po polsku, strefa Warszawy, np. „19.10.2026, 14:05”. */
@@ -74,7 +74,7 @@ const dataZakupu = () =>
 
 /** Obietnica kontaktu: przy usługach telefon w 24 h, przy e-booku odpowiedź na maila. */
 const KONTAKT_24H = (p: Produkt) =>
-  p.telefon ? "Odezwę się w ciągu 24 godzin (dni robocze)" : "Na pytania odpowiadam w ciągu 24 godzin";
+  p.telefon ? "W ciągu 24 godzin (dni robocze) zadzwonię albo napiszę SMS-a z terminami" : "Na pytania odpowiadam w ciągu 24 godzin";
 
 const ZAMOWIENIE = (p: Produkt, numer: string, kwota: string) => [
   { etykieta: "Produkt", wartosc: p.nazwa },
@@ -111,7 +111,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       return {
         zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Do zobaczenia na sali.`,
-        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
+        wstep: `Płatność przyjęta. W ciągu 24 godzin (dni robocze) zadzwonię z numeru ${TELEFON} albo napiszę SMS-a z wolnymi terminami. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -119,7 +119,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
           KROK_TELEFON,
           {
             tytul: "Pierwsza sesja",
-            opis: "Ustalimy termin, a potwierdzenie z adresem przyjdzie SMS-em i mailem.",
+            opis: "Ustalimy termin, a potwierdzenie z adresem przyjdzie SMS-em.",
           },
         ],
         wskazowki: {
@@ -137,7 +137,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       return {
         zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Zaczynamy.`,
-        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
+        wstep: `Płatność przyjęta. W ciągu 24 godzin (dni robocze) zadzwonię z numeru ${TELEFON} albo napiszę SMS-a z wolnymi terminami. Poniżej masz wszystko, co wydarzy się do pierwszego treningu.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -145,7 +145,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
           KROK_TELEFON,
           {
             tytul: "Pierwszy trening",
-            opis: "Ustalimy termin, a link do rozmowy wideo przyjdzie SMS-em i mailem. Otwierasz go na telefonie.",
+            opis: "Ustalimy termin i komunikator, który wolisz: Messenger, WhatsApp albo Discord. Potwierdzenie terminu przyjdzie SMS-em.",
           },
         ],
         wskazowki: {
@@ -178,7 +178,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       return {
         zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Rozpisuję Twój plan.`,
-        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Tak wygląda droga do planu na 12 tygodni.`,
+        wstep: `Płatność przyjęta. W ciągu 24 godzin (dni robocze) zadzwonię z numeru ${TELEFON} albo napiszę SMS-a z wolnymi terminami. Tak wygląda droga do planu na 12 tygodni.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -198,7 +198,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       return {
         zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Od teraz jestem w Twoim narożniku.`,
-        wstep: `Płatność przyjęta. Odezwę się w ciągu 24 godzin (dni robocze) z numeru ${TELEFON}. Tak wygląda pierwszy tydzień prowadzenia.`,
+        wstep: `Płatność przyjęta. W ciągu 24 godzin (dni robocze) zadzwonię z numeru ${TELEFON} albo napiszę SMS-a z wolnymi terminami. Tak wygląda pierwszy tydzień prowadzenia.`,
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
@@ -338,10 +338,10 @@ export function smsDoKlienta(p: Produkt, numer: string, imie: string, kwota: str
   const ankieta = link ? ` Ankieta (3 min): ${link}` : " Link do ankiety jest w mailu.";
 
   return najkrotszaMieszczaca([
-    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} Odezwę się w ciągu 24 h (dni robocze) z nr ${tel}. Pytania: ${FIRMA.email}`,
-    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} Odezwę się w ciągu 24 h (dni robocze) z nr ${tel}.`,
-    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mailKrotko}.${ankieta} Odezwę się w 24 h z nr ${tel}.`,
-    `Dziękuję za zakup (${numer}, ${cena}). ${mailKrotko}. Odezwę się w 24 h z nr ${tel}.`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} W 24 h (dni robocze) zadzwonię z nr ${tel} albo napiszę SMS z terminami. Pytania: ${FIRMA.email}`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} W 24 h (dni robocze) zadzwonię z nr ${tel} albo napiszę SMS z terminami.`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mailKrotko}.${ankieta} W 24 h zadzwonię z nr ${tel} albo napiszę SMS.`,
+    `Dziękuję za zakup (${numer}, ${cena}). ${mailKrotko}. W 24 h zadzwonię z nr ${tel} albo napiszę SMS.`,
   ], LIMIT_SMS_2);
 }
 
