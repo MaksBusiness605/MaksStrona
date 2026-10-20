@@ -265,7 +265,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Dane osobowe",
     tresc: [
-      "Administratorem danych osobowych Klientów jest Usługodawca. Zasady przetwarzania danych, w tym danych o zdrowiu z Ankiety, oraz informacje o plikach cookies, Google Analytics, Meta Pixel i Conversions API opisuje Polityka prywatności dostępna pod adresem /polityka-prywatnosci.",
+      "Administratorem danych osobowych Klientów jest Usługodawca. Zasady przetwarzania danych, w tym danych o zdrowiu z Ankiety, opisuje Polityka prywatności dostępna pod adresem /polityka-prywatnosci, a pliki cookies (Google Analytics, Meta Pixel) Polityka cookies pod adresem /polityka-cookies.",
     ],
   },
   {

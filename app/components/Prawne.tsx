@@ -115,15 +115,12 @@ export function StronaPrawna({
     <>
       <header className="border-b border-mgla bg-white">
         <div className={`${WRAP} flex items-center justify-between gap-4 py-4`}>
-          <div className="flex items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className="inline-flex h-6 w-6 items-center justify-center bg-grafit font-display text-[11px] font-bold text-sygnal"
-            >
-              ↑
-            </span>
+          {/* Logo i nazwa prowadzą na stronę główną. */}
+          <a href="/" aria-label={`${FIRMA.marka}, strona główna`} className={`flex items-center gap-2.5 ${FOCUS}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-znak.svg" alt="" width={32} height={32} className="h-8 w-8" />
             <span className="font-display text-[0.9375rem] font-extrabold tracking-tight">{FIRMA.marka}</span>
-          </div>
+          </a>
           <a href={FIRMA.telefonHref} className={`text-sm font-semibold underline underline-offset-4 ${FOCUS}`}>
             {FIRMA.telefon}
           </a>

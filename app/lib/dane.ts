@@ -7,8 +7,8 @@
    Lepiej nie pokazać nic niż pokazać „0 lata" albo „[X] z [Y]".
    ═══════════════════════════════════════════════════════════════════════ */
 
-export const TELEFON = "537 483 233";
-export const TELEFON_HREF = "tel:+48537483233";
+export const TELEFON = "666 222 699";
+export const TELEFON_HREF = "tel:+48666222699";
 
 export const TRENER = {
   imie: "Maks", // TODO: pełne imię i nazwisko, jeśli chcesz je pokazywać

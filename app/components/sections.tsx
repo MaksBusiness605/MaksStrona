@@ -332,13 +332,13 @@ export function Header({
       <div
         className={`${WRAP} flex items-center justify-between gap-3 py-3.5 sm:gap-4 sm:py-4`}
       >
-        {/* Logo bez linku: kliknięcie nie wyprowadza ze strony. */}
-        <div className="flex shrink-0 items-center gap-2.5">
+        {/* Logo i nazwa prowadzą na stronę główną. */}
+        <a href="/" aria-label="Maks Treningi, strona główna" className={`flex shrink-0 items-center gap-2.5 ${FOCUS}`}>
           <Logo className="h-8 w-8 sm:h-9 sm:w-9" />
           <span className="font-display text-[0.9375rem] font-extrabold tracking-tight sm:text-base">
             Maks Treningi
           </span>
-        </div>
+        </a>
 
         <div className="flex min-w-0 items-center gap-3 sm:gap-5">
           {/* Na telefonie numer zwija się do ikony: miejsce idzie na CTA. */}
@@ -3626,7 +3626,7 @@ export function IconStrip({
    Dwa rzędy:
    1. logo i trzy linki prawne: regulamin, polityka prywatności
       i ustawienia cookies,
-   2. dane sprzedawcy wymagane przepisami (nazwa, adres, NIP, kontakt).
+   2. dane sprzedawcy wymagane przepisami (nazwa, adres, kontakt).
       Dane biorą się z app/tresc/firma.ts.
 
    „Ustawienia cookies" to przycisk, nie link: wysyła zdarzenie
@@ -3643,13 +3643,11 @@ export function Footer() {
   const linki = [
     { href: "/regulamin", label: "Regulamin" },
     { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
+    { href: "/polityka-cookies", label: "Polityka cookies" },
   ];
 
-  const daneFirmy = [
-    FIRMA.nazwa,
-    FIRMA.adres,
-    `NIP ${FIRMA.nip}`,
-  ];
+  /* Działalność nierejestrowana: bez NIP. */
+  const daneFirmy = [FIRMA.nazwa, FIRMA.adres].filter(Boolean);
 
   return (
     <footer className="border-t border-stal/15 bg-mgla">

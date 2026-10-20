@@ -1,8 +1,8 @@
-// PLIK: app/polityka-prywatnosci/page.tsx · STRONA /polityka-prywatnosci · RODO, cookies, GA4, Meta Pixel i Conversions API
+// PLIK: app/polityka-prywatnosci/page.tsx · STRONA /polityka-prywatnosci · RODO: jakie dane, po co, komu (cookies: /polityka-cookies)
 
 import type { Metadata } from "next";
 import { StronaPrawna, type Paragraf } from "@/app/components/Prawne";
-import { FIRMA } from "@/app/tresc/firma";
+import { FIRMA, daneSprzedawcy } from "@/app/tresc/firma";
 
 export const metadata: Metadata = {
   title: `Polityka prywatności · ${FIRMA.marka}`,
@@ -13,10 +13,13 @@ export const metadata: Metadata = {
    POLITYKA PRYWATNOŚCI · tutaj edytujesz treść
 
    OPISUJE NARZĘDZIA, KTÓRYCH UŻYWASZ ALBO PLANUJESZ UŻYWAĆ
-   Stripe, Resend (maile), SMSAPI (SMS), Vercel (hosting), Google
-   Analytics 4, Meta Pixel, Meta Conversions API, formularze i ankietę.
-   Przestajesz używać narzędzia albo dodajesz nowe: zmień § 4, § 6
-   i datę w app/tresc/firma.ts.
+   Stripe, Resend (maile), Twilio (SMS), Vercel (hosting, Web Analytics,
+   Speed Insights), Google Analytics 4, Meta Pixel, Meta Conversions
+   API, Tally (ankieta), Gmail, komunikatory do prowadzenia online.
+   Cookies są opisane osobno: app/polityka-cookies/page.tsx.
+   Przestajesz używać narzędzia albo dodajesz nowe: zmień tabelę w § 3
+   i § 4 (tu) oraz tabelę w polityce cookies, a potem datę w
+   app/tresc/firma.ts (DATA_DOKUMENTOW).
 
    TRZY RZECZY, BEZ KTÓRYCH TA POLITYKA NIE BĘDZIE PRAWDZIWA
    1. BANER COOKIES. GA4 i Meta Pixel mogą się uruchomić dopiero po
@@ -37,7 +40,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Kto przetwarza Twoje dane",
     tresc: [
-      `Administratorem Twoich danych osobowych jest ${F.nazwa}, ${F.adres}, NIP ${F.nip} („Administrator”, „my”).`,
+      `Administratorem Twoich danych osobowych jest ${daneSprzedawcy()} („Administrator”, „my”).`,
       `We wszystkich sprawach dotyczących danych osobowych napisz na ${F.email} albo zadzwoń: ${F.telefon}. Nie wyznaczyliśmy inspektora ochrony danych.`,
     ],
   },
@@ -48,7 +51,7 @@ const PARAGRAFY: Paragraf[] = [
         lista: [
           "Od Ciebie: gdy kupujesz usługę, wypełniasz formularz na stronie albo Ankietę, piszesz do nas, dzwonisz lub wysyłasz SMS.",
           "Od operatora płatności Stripe: informację o płatności (kwota, status, metoda), bez pełnych danych karty.",
-          "Automatycznie z Twojej przeglądarki: przez pliki cookies i podobne technologie (§ 6), wyłącznie w zakresie, na który się zgodzisz, z wyjątkiem plików niezbędnych do działania strony.",
+          "Automatycznie z Twojej przeglądarki: przez pliki cookies i podobne technologie (§ 6 i Polityka cookies), wyłącznie w zakresie, na który się zgodzisz, z wyjątkiem plików niezbędnych do działania strony.",
         ],
       },
     ],
@@ -79,8 +82,8 @@ const PARAGRAFY: Paragraf[] = [
               "przez czas współpracy",
             ],
             [
-              "Płatności, faktury, księgowość",
-              "dane transakcji, dane do faktury",
+              "Płatności, rachunki, księgowość",
+              "dane transakcji, dane do rachunku",
               "art. 6 ust. 1 lit. c: obowiązek prawny (przepisy podatkowe i rachunkowe)",
               "5 lat od końca roku podatkowego, w którym była płatność",
             ],
@@ -95,6 +98,18 @@ const PARAGRAFY: Paragraf[] = [
               "imię, e-mail, telefon",
               "art. 6 ust. 1 lit. a: zgoda, wymagana także przez Prawo komunikacji elektronicznej",
               "do wycofania zgody; bez zgody nie wysyłamy",
+            ],
+            [
+              "Anonimowe statystyki odwiedzin i szybkości strony (Vercel Web Analytics, Vercel Speed Insights), bez plików cookies",
+              "odwiedzona podstrona, skąd przyszedłeś, kraj i miasto, typ urządzenia, system, przeglądarka, czas ładowania strony; bez adresu IP i bez identyfikatora, który pozwalałby Cię rozpoznać",
+              "art. 6 ust. 1 lit. f: prawnie uzasadniony interes (sprawdzanie, czy strona działa i jak szybko się ładuje)",
+              "tylko jako dane zbiorcze; jednorazowy skrót wizyty Vercel kasuje po 24 godzinach",
+            ],
+            [
+              "Treningi online i prowadzenie: rozmowy wideo i wiadomości przez wybrany komunikator (Messenger, WhatsApp albo Discord)",
+              "imię, nazwa konta lub numer telefonu w komunikatorze, treść wiadomości, obraz i dźwięk podczas rozmowy, przesłane nagrania",
+              "art. 6 ust. 1 lit. b: umowa",
+              "przez czas współpracy; wiadomości w komunikatorze możesz usunąć w każdej chwili",
             ],
             [
               "Statystyki strony (Google Analytics 4)",
@@ -139,16 +154,16 @@ const PARAGRAFY: Paragraf[] = [
           wiersze: [
             ["Stripe Payments Europe, Limited", "obsługa płatności i subskrypcji", "Irlandia"],
             ["Resend (resend.com)", "wysyłka e-maili z potwierdzeniami", "USA"],
-            ["LINK Mobility Poland sp. z o.o. (SMSAPI)", "wysyłka SMS-ów", "Polska"],
-            ["Vercel Inc.", "hosting strony i serwera obsługującego zamówienia", "USA"],
+            ["Twilio Inc.", "wysyłka SMS-ów", "USA"],
+            ["Vercel Inc.", "hosting strony i serwera obsługującego zamówienia, anonimowe statystyki bez cookies (Web Analytics, Speed Insights)", "USA"],
             ["Google Ireland Limited", "Google Analytics 4 (po zgodzie)", "Irlandia"],
             ["Meta Platforms Ireland Limited", "Meta Pixel i Conversions API (po zgodzie)", "Irlandia"],
-            ["[dostawca formularza Ankiety, np. Tally / Google]", "obsługa Ankiety i formularzy", "[kraj]"],
-            ["[dostawca poczty e-mail i domeny]", "skrzynka pocztowa, korespondencja", "[kraj]"],
-            ["[biuro rachunkowe]", "księgowość i faktury", "Polska"],
+            ["Tally BV (tally.so)", "obsługa Ankiety po zakupie", "Belgia"],
+            ["Google Ireland Limited (Gmail)", "skrzynka pocztowa, korespondencja z Tobą", "Irlandia"],
           ],
         },
       },
+      "Komunikator do treningów online i prowadzenia wybierasz sam: Messenger lub WhatsApp (Meta Platforms Ireland Limited, Irlandia) albo Discord (Discord Netherlands BV, Holandia). Ich dostawcy przetwarzają dane jako odrębni administratorzy, na zasadach z ich własnych polityk prywatności, które zaakceptowałeś, zakładając konto.",
       "Dane mogą otrzymać także organy publiczne, jeśli wymaga tego prawo.",
       "Przy Meta Pixel jesteśmy współadministratorem z Meta Platforms Ireland Limited w zakresie zbierania danych na stronie i przekazywania ich do Meta. Za dalsze przetwarzanie danych przez Meta odpowiada Meta. Szczegóły: facebook.com/privacy/policy.",
     ],
@@ -156,35 +171,14 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Przekazywanie danych poza Europejski Obszar Gospodarczy",
     tresc: [
-      "Część dostawców (Resend, Vercel, a także Google i Meta w ramach ich grup) może przetwarzać dane w USA. Odbywa się to na podstawie decyzji Komisji Europejskiej stwierdzającej odpowiedni stopień ochrony (EU-US Data Privacy Framework), jeśli dany dostawca jest w nim certyfikowany, albo na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję. Kopię zabezpieczeń możesz otrzymać, pisząc do nas.",
+      "Część dostawców (Resend, Twilio, Vercel, a także Google, Meta i Discord w ramach ich grup) może przetwarzać dane w USA. Odbywa się to na podstawie decyzji Komisji Europejskiej stwierdzającej odpowiedni stopień ochrony (EU-US Data Privacy Framework), jeśli dany dostawca jest w nim certyfikowany, albo na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję. Kopię zabezpieczeń możesz otrzymać, pisząc do nas.",
     ],
   },
   {
-    tytul: "Pliki cookies i podobne technologie",
+    tytul: "Pliki cookies",
     tresc: [
-      "Cookies to małe pliki zapisywane przez stronę w Twojej przeglądarce. Podobnie działają piksele i identyfikatory zapisywane w pamięci przeglądarki.",
-      {
-        lista: [
-          "Niezbędne: zapamiętują Twój wybór w banerze cookies i zapewniają bezpieczeństwo. Działają bez zgody.",
-          "Analityczne (Google Analytics 4): pokazują, jak korzystasz ze strony. Tylko po zgodzie.",
-          "Marketingowe (Meta Pixel): pozwalają mierzyć skuteczność reklam i pokazywać reklamy osobom zainteresowanym. Tylko po zgodzie.",
-        ],
-      },
-      "Do czasu wyrażenia zgody nie uruchamiamy narzędzi analitycznych ani marketingowych. Zgodę możesz w każdej chwili zmienić albo wycofać przez link „Ustawienia cookies” w stopce strony. Wycofanie zgody nie wpływa na zgodność z prawem przetwarzania, którego dokonano przed jej wycofaniem.",
-      {
-        tabela: {
-          naglowki: ["Plik", "Dostawca", "Cel", "Ważność"],
-          wiersze: [
-            ["[nazwa pliku zgody]", "my", "zapamiętanie wyboru w banerze cookies", "12 miesięcy"],
-            ["_ga", "Google", "rozróżnianie użytkowników w statystykach", "do 2 lat"],
-            ["_ga_[ID]", "Google", "utrzymanie stanu sesji w statystykach", "do 2 lat"],
-            ["_fbp", "Meta", "rozpoznanie przeglądarki na potrzeby reklam", "90 dni"],
-            ["_fbc", "Meta", "zapisanie kliknięcia w reklamę Meta", "90 dni"],
-          ],
-        },
-      },
-      "Strona płatności działa w domenie Stripe (checkout.stripe.com) i używa własnych plików niezbędnych do bezpiecznej płatności i ochrony przed oszustwami, opisanych w polityce prywatności Stripe.",
-      "Pliki cookies możesz też usuwać i blokować w ustawieniach przeglądarki. Zablokowanie plików niezbędnych może utrudnić korzystanie ze strony.",
+      "Strona używa plików cookies niezbędnych do działania oraz, wyłącznie po Twojej zgodzie, plików analitycznych (Google Analytics 4) i marketingowych (Meta Pixel). Statystyki Vercel działają bez plików cookies.",
+      "Pełną listę plików, ich cel i czas przechowywania, a także sposób zmiany lub wycofania zgody opisuje osobny dokument: Polityka cookies, dostępna pod adresem /polityka-cookies.",
     ],
   },
   {
