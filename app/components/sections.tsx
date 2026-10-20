@@ -3654,12 +3654,13 @@ export function Footer() {
       <div className={`${WRAP} pb-28 pt-10 md:pb-10`}>
         {/* Rząd 1: marka i linki prawne */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2.5">
+          {/* Logo i nazwa prowadzą na stronę główną. */}
+          <a href="/" aria-label={`${FIRMA.marka}, strona główna`} className={`flex items-center gap-2.5 self-start ${FOCUS}`}>
             <Logo className="h-8 w-8" />
             <span className="font-display text-sm font-extrabold tracking-tight">
               {FIRMA.marka}
             </span>
-          </div>
+          </a>
 
           <nav aria-label="Dokumenty">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
