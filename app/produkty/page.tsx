@@ -421,7 +421,7 @@ const FAQ = [
   },
   {
     q: "Czy prowadzenie to abonament? Jak zrezygnować?",
-    a: "Płacisz miesiąc do miesiąca i rezygnujesz, kiedy chcesz: współpraca kończy się z ostatnim dniem opłaconego okresu, bez kar i bez wypowiedzenia. Plan, nagrania i arkusz zostają u Ciebie. Nie zadzwonię z ofertą zniżki, żeby Cię zatrzymać.",
+    a: "Płacisz miesiąc do miesiąca i rezygnujesz, kiedy chcesz: wystarczy SMS, telefon albo mail. Współpraca kończy się z ostatnim dniem opłaconego okresu, bez kar i bez wypowiedzenia. Plan, nagrania i arkusz zostają u Ciebie. Nie zadzwonię z ofertą zniżki, żeby Cię zatrzymać.",
   },
   {
     q: "Jak się kontaktujemy w prowadzeniu?",
@@ -490,7 +490,7 @@ const ZOBOWIAZANIA = {
       ikona: "tarcza" as const,
       kiedy: "W każdym miesiącu",
       tytul: "Prowadzenie bez umowy i bez kar",
-      opis: "Rezygnujesz jednym kliknięciem, płatności stają od razu.",
+      opis: "Rezygnujesz SMS-em, telefonem albo mailem. Kolejna płatność już nie przejdzie.",
     },
   ],
   note: "Od 99 zł. Cenę e-booka odliczam w całości, gdy w 30 dni przejdziesz wyżej.",

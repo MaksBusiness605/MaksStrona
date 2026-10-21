@@ -172,9 +172,6 @@ const BRAK_TERMINU = "Jeśli w ciągu 14 dni nie znajdziemy wspólnego terminu, 
 /** Zgodnie z regulaminem, § 9. */
 const ODSTAPIENIE = "Do czasu wykonania usługi możesz odstąpić od umowy w ciągu 14 dni: wystarczy odpisać na mail z potwierdzeniem.";
 
-/** Rezygnacja z prowadzenia: link do panelu klienta Stripe, jeśli jest. */
-const PORTAL = process.env.CUSTOMER_PORTAL_URL;
-
 const stac = (pakiet: boolean): PoZakupie => ({
   trening: true,
   gwarancja: pakiet
@@ -260,7 +257,7 @@ const PO_ZAKUPIE: Record<IdProduktu, PoZakupie> = {
   },
   prowadzenie: {
     trening: false,
-    gwarancja: `Check-in co 7 dni z moją odpowiedzią, nie automatem. Płacisz miesiąc do miesiąca i rezygnujesz kiedy chcesz${PORTAL ? " w panelu klienta (link w mailu)" : ", odpisując na mail z potwierdzeniem"}. Kolejne płatności stają od razu.`,
+    gwarancja: `Check-in co 7 dni z moją odpowiedzią, nie automatem. Płacisz miesiąc do miesiąca i rezygnujesz kiedy chcesz: SMS-em, telefonicznie (${TELEFON}) albo mailem. Kolejne płatności zatrzymuję, a prowadzenie trwa do końca opłaconego miesiąca.`,
     pomiar: "Wpisuj ciężary do arkusza, na nich opiera się każda korekta planu.",
     kroki: [
       PLATNOSC_ZROBIONA,

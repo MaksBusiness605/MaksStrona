@@ -156,7 +156,8 @@ const PARAGRAFY: Paragraf[] = [
       {
         lista: [
           "Prowadzenie jest opłacane z góry za kolejne okresy miesięczne. Płatność za następny miesiąc jest pobierana automatycznie w dniu odpowiadającym dniu pierwszego zakupu, tą samą metodą płatności.",
-          "Klient może zrezygnować w każdej chwili, bez podawania przyczyny i bez kosztów, przez panel klienta Stripe (link w e-mailu z potwierdzeniem) albo e-mailem do Usługodawcy. Rezygnacja zatrzymuje kolejne płatności, a Prowadzenie trwa do końca opłaconego miesiąca.",
+          `Klient może zrezygnować w każdej chwili, bez podawania przyczyny i bez kosztów: SMS-em lub telefonicznie pod numerem ${FIRMA.telefon} albo e-mailem na adres ${FIRMA.email}. Rezygnacja zatrzymuje kolejne płatności, a Prowadzenie trwa do końca opłaconego miesiąca.`,
+          "Rezygnacja zgłoszona najpóźniej w dniu poprzedzającym datę odnowienia zatrzymuje kolejną płatność. Jeśli mimo to płatność zostanie pobrana, Usługodawca zwraca ją w całości w ciągu 14 dni.",
           "Za miesiąc, który już się rozpoczął, nie przysługuje zwrot, z zastrzeżeniem prawa odstąpienia od umowy opisanego w § 9.",
           "Przed zmianą ceny Prowadzenia Usługodawca informuje Klienta e-mailem co najmniej 14 dni wcześniej. Klient, który nie akceptuje nowej ceny, może zrezygnować przed jej wejściem w życie.",
         ],

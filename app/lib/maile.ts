@@ -194,7 +194,6 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
       };
 
     case "prowadzenie": {
-      const portal = process.env.CUSTOMER_PORTAL_URL;
       return {
         zajawka: "Płatność przyjęta. Kontakt w 24 h, a pierwszy krok to ankieta (3 min).",
         naglowek: `${dzieki} Od teraz jestem w Twoim narożniku.`,
@@ -212,12 +211,9 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
         ],
         gwarancje: [
           "Płatność odnawia się automatycznie co miesiąc.",
-          portal
-            ? "Rezygnacja w każdej chwili, bez kar: logujesz się adresem e-mail z zakupu. Kolejne płatności stają od razu, a prowadzenie trwa do końca opłaconego miesiąca."
-            : "Rezygnacja w każdej chwili, bez kar: odpisz na tego maila. Kolejne płatności stają od razu, a prowadzenie trwa do końca opłaconego miesiąca.",
+          `Rezygnacja w każdej chwili, bez kar: napisz SMS-a, zadzwoń (${TELEFON}) albo odpisz na tego maila. Kolejne płatności zatrzymuję, a prowadzenie trwa do końca opłaconego miesiąca.`,
           ODSTAPIENIE,
         ],
-        ...(portal ? { linkDodatkowy: { etykieta: "Zarządzaj prowadzeniem", url: portal } } : {}),
       };
     }
   }
@@ -258,6 +254,8 @@ type DaneDoTrenera = {
   telefon: string;
   kwota: string;
   panel: string;
+  /** Rabat z kodu promocyjnego (np. z konkursu), jeśli był. */
+  rabat?: string;
 };
 
 /* Mail na Twój adres służbowy (MAIL_TRENERA w .env.local). Dane klienta
@@ -273,6 +271,7 @@ export function mailDoTrenera(p: Produkt, d: DaneDoTrenera): string {
     `Produkt:         ${p.nazwa}`,
     `Kwota:           ${d.kwota}${p.cykliczny ? " miesięcznie" : ""}`,
     `Numer:           ${d.numer}`,
+    ...(d.rabat ? [`Rabat z kodu:    ${d.rabat} (kod promocyjny, np. z konkursu)`] : []),
     "",
     p.telefon
       ? `Obietnica na stronie: telefon w ciągu 24 h w dni robocze. ${BRAK_TERMINU}`
