@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe, trybPokazowy } from "./klient";
 import { noweZamowienie, TELEFON, znajdzProdukt, type Produkt } from "./produkty";
+import { czytajZgode } from "./sledzenie";
 
 /* ═══════════════════════════════════════════════════════════════════════
    TWORZENIE PŁATNOŚCI · logika dla /api/stripe/platnosc
@@ -97,10 +98,29 @@ async function utworzPlatnosc(req: Request, dane: Dane) {
 
   const numer = noweZamowienie();
 
+  /* Zgoda z banera cookies i dane dla Meta Conversions API. Zapisujemy
+     je tylko przy zgodzie na marketing: wtedy po zakupie serwer może
+     wysłać zakup do Mety (app/lib/meta-capi.ts). Bez zgody nic z tego
+     nie trafia do metadanych. */
+  const ciasteczka = req.headers.get("cookie");
+  const zgoda = czytajZgode(ciasteczka);
+  const ciastko = (nazwa: string) =>
+    ciasteczka?.split(/;\s*/).find((c) => c.startsWith(`${nazwa}=`))?.slice(nazwa.length + 1);
+  const meta = zgoda?.m
+    ? {
+        zgoda_m: "1",
+        fbp: ciastko("_fbp"),
+        fbc: ciastko("_fbc"),
+        ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+        ua: req.headers.get("user-agent")?.slice(0, 400),
+        url: req.headers.get("referer")?.split("?")[0]?.slice(0, 400),
+      }
+    : {};
+
   /* Stripe nie przyjmuje pustych wartości w metadanych, więc puste pola
      odpadają. Limit to 500 znaków na wartość. */
   const metadata: Record<string, string> = Object.fromEntries(
-    Object.entries({ produkt: p.id, numer, imie: dane.imie, telefon: dane.telefon }).filter(
+    Object.entries({ produkt: p.id, numer, imie: dane.imie, telefon: dane.telefon, ...meta }).filter(
       (e): e is [string, string] => typeof e[1] === "string" && e[1].length > 0,
     ),
   );

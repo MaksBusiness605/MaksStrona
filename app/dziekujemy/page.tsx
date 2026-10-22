@@ -6,6 +6,7 @@ import { TELEFON, TELEFON_HREF, znajdzProdukt, type IdProduktu } from "@/app/lib
 import { stripe, trybPokazowy } from "@/app/lib/klient";
 import { linkDoAnkiety } from "@/app/lib/maile";
 import { linkDoEbooka, maEbooka } from "@/app/lib/ebook";
+import { ZdarzenieZakupu } from "@/app/components/ZdarzenieZakupu";
 
 /* ═══════════════════════════════════════════════════════════════════════
    /dziekujemy?session_id=<id sesji Stripe> · W JEDNYM PLIKU
@@ -287,7 +288,7 @@ const PO_ZAKUPIE: Record<IdProduktu, PoZakupie> = {
 
 type Stan = "oplacone" | "w-toku" | "niepotwierdzone";
 
-async function sprawdzPlatnosc(sp: SP): Promise<{ stan: Stan; id?: string; numer?: string; demo: boolean }> {
+async function sprawdzPlatnosc(sp: SP): Promise<{ stan: Stan; id?: string; numer?: string; kwota?: number; demo: boolean }> {
   const sesja = typeof sp.session_id === "string" ? sp.session_id : undefined;
 
   if (sesja && stripe) {
@@ -299,7 +300,7 @@ async function sprawdzPlatnosc(sp: SP): Promise<{ stan: Stan; id?: string; numer
           : s.status === "complete"
             ? "w-toku"
             : "niepotwierdzone";
-      return { stan, id: s.metadata?.produkt, numer: s.client_reference_id ?? undefined, demo: false };
+      return { stan, id: s.metadata?.produkt, numer: s.client_reference_id ?? undefined, kwota: (s.amount_total ?? 0) / 100, demo: false };
     } catch {
       return { stan: "niepotwierdzone", demo: false };
     }
@@ -318,7 +319,7 @@ type SP = Record<string, string | string[] | undefined>;
 
 export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const { stan, id, numer, demo } = await sprawdzPlatnosc(sp);
+  const { stan, id, numer, kwota, demo } = await sprawdzPlatnosc(sp);
   const katalog = stan === "niepotwierdzone" ? undefined : znajdzProdukt(id);
   const produkt = katalog ? { ...PO_ZAKUPIE[katalog.id], nazwa: katalog.nazwa, telefon: katalog.telefon } : undefined;
   const kroki = produkt
@@ -334,6 +335,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      {/* Zakup do GA4 i Meta Pixel (tylko przy zgodzie z banera). */}
+      {stan === "oplacone" && !demo && sesja && katalog && (
+        <ZdarzenieZakupu id={sesja} numer={numer} wartosc={kwota ?? 0} produkt={katalog.id} nazwa={katalog.nazwa} />
+      )}
       <div className="zm">
         <header className="zm-gora">
           <div className="zm-gora-wnetrze">

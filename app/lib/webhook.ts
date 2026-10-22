@@ -7,6 +7,7 @@ import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
 import { linkDoEbooka, maEbooka } from "./ebook";
 import { FIRMA } from "@/app/tresc/firma";
 import { wyslijSms } from "./wyslij-sms";
+import { zakupDoMety } from "./meta-capi";
 import { cena, znajdzProdukt } from "./produkty";
 import { wyslijMail } from "./wyslij-mail";
 
@@ -192,6 +193,10 @@ async function potwierdz(s: Stripe.Checkout.Session) {
   if (smsTrenera) {
     await krok("sms_trener", () => wyslijSms(smsTrenera, smsDoTrenera(p, k.imieNazwisko, k.telefon, kwota, k.numer, k.email ?? "")));
   }
+
+  /* 4 · Meta Conversions API, tylko przy zgodzie na marketing. Błąd nie
+     zatrzymuje reszty i nie każe Stripe'owi ponawiać zdarzenia. */
+  await zakupDoMety(s, p.nazwa).catch((e) => console.error("[meta-capi]", e));
 
   await zapiszKroki(s, zrobione).catch((e) => console.error("[stripe/webhook] zapis metadanych:", e));
 

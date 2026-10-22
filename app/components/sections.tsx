@@ -3643,7 +3643,7 @@ export function IconStrip({
    Na telefonie dolny margines robi miejsce pod przyklejony pasek CTA.
    ─────────────────────────────────────────────────────────────────────── */
 
-const POKAZ_USTAWIENIA_COOKIES = false;
+const POKAZ_USTAWIENIA_COOKIES = true;
 
 export function Footer() {
   const linki = [

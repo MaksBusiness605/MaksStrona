@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
+import { Zgody } from "@/app/components/Zgody";
+import { Statystyki } from "@/app/components/Statystyki";
 
 const archivo = Archivo({
   subsets: ["latin", "latin-ext"],
@@ -26,7 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl" className={`${archivo.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>{children}
+        <Zgody />
+<Statystyki />
+      </body>
     </html>
   );
 }

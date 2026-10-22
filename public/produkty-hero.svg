@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 786 1000" width="786" height="1000" role="img" aria-labelledby="t">
+  <title id="t">Indywidualny plan treningowy na telefonie: tydzień 3, ćwiczenia z ciężarami i postępem</title>
+  <rect width="786" height="1000" fill="#EDEFF2"/>
+  <!-- kartka z zapisem ciężarów, za telefonem -->
+  <g transform="rotate(-7 230 560)">
+    <rect x="96" y="300" width="300" height="420" rx="6" fill="#FFFFFF" stroke="#D3D8DE" stroke-width="2"/>
+    <g stroke="#D3D8DE" stroke-width="2">
+      <path d="M126 380H366"/><path d="M126 440H366"/><path d="M126 500H366"/><path d="M126 560H366"/><path d="M126 620H366"/>
+    </g>
+    <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#5F6A77">
+      <text x="126" y="368">40 kg</text><text x="126" y="428">42,5 kg</text><text x="126" y="488">45 kg</text><text x="126" y="548">47,5 kg</text>
+    </g>
+  </g>
+  <!-- telefon -->
+  <rect x="300" y="140" width="360" height="720" rx="48" fill="#111820"/>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <text x="340" y="230" font-size="20" font-weight="700" fill="#B4BCC6">TYDZIEŃ 3 · DZIEŃ A</text>
+    <text x="340" y="276" font-size="32" font-weight="800" fill="#FFFFFF">Twój plan</text>
+    <!-- wiersze ćwiczeń -->
+    <g>
+      <rect x="340" y="318" width="280" height="96" rx="14" fill="#1E2833"/>
+      <rect x="360" y="346" width="40" height="40" rx="8" fill="#D6FF3F"/>
+      <path d="M369 366l8 8 15-16" stroke="#111820" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="418" y="360" font-size="22" font-weight="700" fill="#FFFFFF">Przysiad</text>
+      <text x="418" y="392" font-size="19" fill="#B4BCC6">3 × 6 · 45 kg</text>
+
+      <rect x="340" y="430" width="280" height="96" rx="14" fill="#1E2833"/>
+      <rect x="360" y="458" width="40" height="40" rx="8" fill="#D6FF3F"/>
+      <path d="M369 478l8 8 15-16" stroke="#111820" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="418" y="472" font-size="22" font-weight="700" fill="#FFFFFF">Wyciskanie</text>
+      <text x="418" y="504" font-size="19" fill="#B4BCC6">3 × 8 · 30 kg</text>
+
+      <rect x="340" y="542" width="280" height="96" rx="14" fill="#1E2833"/>
+      <rect x="360" y="570" width="40" height="40" rx="8" fill="none" stroke="#5F6A77" stroke-width="3"/>
+      <text x="418" y="584" font-size="22" font-weight="700" fill="#FFFFFF">Wiosłowanie</text>
+      <text x="418" y="616" font-size="19" fill="#B4BCC6">3 × 10 · 25 kg</text>
+    </g>
+    <!-- postęp -->
+    <text x="340" y="700" font-size="19" font-weight="700" fill="#B4BCC6">Postęp w przysiadzie</text>
+    <text x="620" y="700" text-anchor="end" font-size="19" font-weight="800" fill="#D6FF3F">+5 kg</text>
+    <rect x="340" y="716" width="280" height="14" rx="7" fill="#2C3743"/>
+    <rect x="340" y="716" width="196" height="14" rx="7" fill="#D6FF3F"/>
+  </g>
+</svg>
