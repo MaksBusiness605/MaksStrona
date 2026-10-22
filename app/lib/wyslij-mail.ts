@@ -3,7 +3,10 @@
 import { FIRMA } from "@/app/tresc/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════
-   WYSYŁKA MAILI przez Resend (resend.com)
+   WYSYŁKA MAILI · przez Resend
+
+   Zmienne: RESEND_API_KEY i MAIL_NADAWCA, wysyłka z adresu
+   w zweryfikowanej domenie, np. Maks Treningi <kontakt@trenerlodz.pl>.
 
    Treść piszesz zwykłym tekstem w app/lib/maile.ts. Ten plik robi z niej
    dwie wersje: tekstową (dla programów pocztowych bez HTML i dla filtrów
@@ -106,14 +109,15 @@ function wypelnione(s: string): boolean {
     wpisz w firma.ts nip: "" i ten fragment zniknie sam. */
 export function stopka(): string {
   const wiersz1 = [
-    wypelnione(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel,
+    `Sprzedawca: ${wypelnione(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel}`,
     wypelnione(FIRMA.adres) ? FIRMA.adres : "",
     wypelnione(FIRMA.nip) ? `NIP ${FIRMA.nip}` : "",
   ].filter(Boolean);
   const wiersz2 = [
-    wypelnione(FIRMA.telefon) ? `Telefon: ${FIRMA.telefon}` : "",
-    wypelnione(FIRMA.email) ? `E-mail: ${FIRMA.email}` : "",
-  ].filter(Boolean);
+    `Trener: ${FIRMA.trener.imie}`,
+    `Telefon: ${FIRMA.trener.telefon}`,
+    `E-mail: ${FIRMA.trener.email}`,
+  ];
   return [wiersz1, wiersz2]
     .filter((w) => w.length)
     .map((w) => w.map(esc).join(" &middot; "))
@@ -145,6 +149,7 @@ export function htmlMaila(temat: string, tresc: string): string {
 }
 
 export async function wyslijMail({ do: odbiorca, temat, tresc, html, odpowiedzDo }: Mail): Promise<void> {
+  /* Resend */
   const klucz = process.env.RESEND_API_KEY;
   const nadawca = process.env.MAIL_NADAWCA;
 
@@ -152,7 +157,6 @@ export async function wyslijMail({ do: odbiorca, temat, tresc, html, odpowiedzDo
     console.log(`[mail · nie wysłano, brak RESEND_API_KEY albo MAIL_NADAWCA]\nDo: ${odbiorca}\nTemat: ${temat}\n\n${tresc}`);
     return;
   }
-
   const odp = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${klucz}`, "Content-Type": "application/json" },

@@ -24,9 +24,9 @@ import { ZDJECIA, blok, kadr, zBlokami } from "@/app/tresc/zdjecia";
 const Z = ZDJECIA.produkty;
 
 export const metadata: Metadata = {
-  title: "Plan treningowy pod Ciebie: e-book, plan indywidualny, prowadzenie | Maks Treningi",
+  title: "Indywidualny plan treningowy pod Twój tydzień, 249 zł | Maks Treningi",
   description:
-    "E-book z zasadami, indywidualny plan treningowy albo prowadzenie miesięczne. Plan pisany pod Twój grafik, sprzęt i ograniczenia. Płatność BLIK-iem, kartą albo Przelewy24.",
+    "Plan na 12 tygodni pisany po ankiecie pod Twój grafik, sprzęt i ograniczenia, gotowy w 72 h. Do tego prowadzenie miesięczne albo e-book od 99 zł. Płatność BLIK-iem, kartą albo Przelewy24.",
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
 /* Historie (case study) widoczne wszędzie, także na produkcji. Ukryć: false. */
 const POKAZ_PLACEHOLDERY = true;
 
-const CTA = "Zobacz trzy poziomy";
+const CTA = "Zobacz plan za 249 zł";
 
 /** Cel przycisków nad cennikiem. <CennikWybor> renderuje id="oferty". */
 const CEL = "#oferty";
@@ -99,22 +99,23 @@ const HERO = {
   title: "Plan napisany pod Twój tydzień, nie pod idealny scenariusz",
   points: [
     "Progresja z kryterium: wiesz, kiedy dołożyć ciężar, a kiedy zostać",
-    "Wideo do ćwiczeń z Twojego planu, nie biblioteka stu ruchów",
+    "Ćwiczenia pod Twój sprzęt, każde z dwoma zamiennikami",
     "Wersja awaryjna treningu na dzień, w którym masz 25 minut",
   ],
-  reassurance: ["Od 99 zł", "BLIK, karta albo Przelewy24", "Materiały zostają u Ciebie"],
+  reassurance: ["Plan gotowy w 72 h", "BLIK, karta albo Przelewy24", "Wolisz układać sam? E-book od 99 zł"],
 };
 
 /* 2 · PASEK ─────────────────────────────────────────────────────────── */
 
 const ICON_STRIP = [
-  "E-book: dostęp od razu",
   "Plan pod Twój sprzęt i grafik",
-  "Wideo do każdego ćwiczenia",
+  "Plan gotowy w 72 h od ankiety",
+  "Technika ruchów ze zdjęciami w e-booku",
   "Kryterium progresji, nie „słuchaj ciała”",
   "Wersja awaryjna na 25 minut",
   "Płatność BLIK-iem, kartą albo Przelewy24",
   "Działa na telefonie",
+  "E-book: dostęp od razu",
 ];
 
 /* 3 · CASE STUDY ───────────────────────────────────────────────────────
@@ -285,8 +286,8 @@ const ZAKUP = {
       meta: "Do 72 godzin",
       icon: "karta" as const,
       title: "Dostajesz plan i nagranie",
-      body: "Plan w panelu, wideo do każdego ćwiczenia i pięć minut nagrania: dlaczego Twój plan wygląda właśnie tak.",
-      details: ["Mail z linkiem do panelu, działa na telefonie"],
+      body: "Plan rozpisany pod Ciebie i pięć minut nagrania: dlaczego Twój plan wygląda właśnie tak.",
+      details: ["Plan przychodzi mailem albo na komunikatorze, działa na telefonie"],
     },
     {
       meta: "Przez cały cykl",
@@ -307,7 +308,7 @@ const ZAKUP = {
 
 const CENNIK = {
   heading: "Trzy poziomy, jedna metodyka",
-  lead: "E-book daje zasady, plan przekłada je na Twój tydzień, prowadzenie dokłada kogoś, kto co tydzień patrzy. Cenę e-booka odliczam w całości, gdy w 30 dni przechodzisz wyżej.",
+  lead: "Najczęściej wybierany jest plan: zasady przełożone na Twój tydzień, sprzęt i ograniczenia. Prowadzenie dokłada kogoś, kto co tydzień patrzy. E-book to tańszy start, jeśli chcesz układać sam, a jego cenę odliczam w całości, gdy w 30 dni przechodzisz wyżej.",
   wyborLabel: "Który poziom?",
   wspolneLabel: "Na każdym poziomie",
   wspolne: [
@@ -326,7 +327,7 @@ const CENNIK = {
       note: "Jednorazowo · dostęp od razu",
       includes: [
         "Jak zbudować tydzień pod liczbę dni, którą realnie masz",
-        "Technika sześciu ruchów bazowych z wideo i listą błędów",
+        "Technika sześciu ruchów bazowych ze zdjęciami i listą błędów",
         "Karta talerza i porcje mierzone dłonią",
       ],
       outcome: "Wiesz, według jakiej zasady układać tydzień i kiedy dokładać ciężar.",
@@ -344,7 +345,7 @@ const CENNIK = {
       includes: [
         "Plan na 12 tygodni pod wyniki Twojej ankiety",
         "Nagranie „dlaczego Twój plan wygląda właśnie tak”, 5 minut",
-        "Wideo do ćwiczeń z planu, z dwoma zamiennikami",
+        "Dwa zamienniki każdego ćwiczenia, gdy sprzęt jest zajęty",
         "Wersja awaryjna każdego treningu na 25 minut",
         "Plan liczony wstecz od Twojej daty, jeśli masz coś w kalendarzu",
         "Wszystko z e-booka",
@@ -405,7 +406,7 @@ const TEAM = {
 const FAQ = [
   {
     q: "Który poziom wybrać?",
-    a: "Chcesz najpierw zrozumieć zasady i ułożyć trening samodzielnie: e-book. Masz za sobą gotowe plany i wiesz, że problem jest w dopasowaniu: plan indywidualny. Odpadasz nie z powodu planu, tylko dlatego, że nikt nie zauważa, kiedy przestajesz: prowadzenie. Nie wiesz? Zadzwoń albo opisz mi swój ostatni miesiąc. Powiem też wtedy, gdy wystarczy najtańszy.",
+    a: "Dla większości osób plan indywidualny: masz za sobą gotowe plany i problem był w dopasowaniu, a nie w wiedzy. Odpadasz nie z powodu planu, tylko dlatego, że nikt nie zauważa, kiedy przestajesz: prowadzenie. Chcesz najpierw zrozumieć zasady i układać trening sam: e-book. Nie wiesz? Zadzwoń albo opisz mi swój ostatni miesiąc. Powiem też wtedy, gdy wystarczy najtańszy.",
   },
   {
     q: "Po co płacić, skoro wszystko jest na YouTube?",
@@ -550,7 +551,7 @@ export default function Page() {
 
       <Footer />
 
-      <StickyCta label={CTA} href={CEL} note="Od 99 zł · BLIK, karta albo Przelewy24" />
+      <StickyCta label={CTA} href={CEL} note="Gotowy w 72 h · BLIK, karta albo Przelewy24" />
     </>
   );
 }

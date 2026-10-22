@@ -1,4 +1,4 @@
-    // PLIK: app/lib/szablon-potwierdzenia.ts · MAILE · wygląd maila z potwierdzeniem zakupu (HTML)
+// PLIK: app/lib/szablon-potwierdzenia.ts · MAILE · wygląd maila z potwierdzeniem zakupu (HTML)
 
 import { FIRMA } from "@/app/tresc/firma";
 import type { Krok, Potwierdzenie } from "./maile";
@@ -73,7 +73,7 @@ function kroki(lista: Krok[]): string {
 
 export function htmlPotwierdzenia(t: Potwierdzenie, temat: string): string {
   const numer = t.zamowienie.find((z) => z.etykieta === "Numer zamówienia")?.wartosc ?? "";
-  const telefonHref = FIRMA.telefonHref;
+  const telefonHref = FIRMA.trener.telefonHref;
 
   const wierszeZamowienia = t.zamowienie
     .map(
@@ -183,8 +183,8 @@ export function htmlPotwierdzenia(t: Potwierdzenie, temat: string): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${LINIA}"><tr><td style="padding-top:26px">
                 <p style="margin:0;font-family:${FONT};font-size:16px;font-weight:700;color:${KOLOR.grafit}">Masz pytanie?</p>
                 <p style="margin:6px 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:${KOLOR.stal}">Zadzwoń albo po prostu odpisz na tego maila. Odpowiadam osobiście.</p>
-                ${przycisk(`Zadzwoń: ${FIRMA.telefon}`, telefonHref, "obrys")}
-                <p style="margin:26px 0 0;font-family:${FONT};font-size:15px;line-height:1.5;color:${KOLOR.grafit}">Do usłyszenia,<br><strong>${esc(FIRMA.wlasciciel)}</strong><br><span style="font-size:13px;color:${KOLOR.stal}">trener personalny, ${esc(FIRMA.marka)}</span></p>
+                ${przycisk(`Zadzwoń: ${FIRMA.trener.telefon}`, telefonHref, "obrys")}
+                <p style="margin:26px 0 0;font-family:${FONT};font-size:15px;line-height:1.5;color:${KOLOR.grafit}">Do usłyszenia,<br><strong>${esc(FIRMA.trener.imie)}</strong><br><span style="font-size:13px;color:${KOLOR.stal}">trener personalny, ${esc(FIRMA.marka)}</span></p>
               </td></tr></table>
             </td></tr>
 

@@ -47,7 +47,8 @@ const PARAGRAFY: Paragraf[] = [
         lista: [
           `Regulamin określa zasady sprzedaży usług treningowych i treści cyfrowych przez stronę ${F.strona} („Strona”) oraz zasady korzystania ze Strony.`,
           `Usługodawcą i sprzedawcą jest ${daneSprzedawcy()} („Usługodawca”).`,
-          `Kontakt z Usługodawcą: e-mail ${F.email}, telefon ${F.telefon} (w dni robocze).`,
+          `Usługi w imieniu Usługodawcy prowadzi trener ${F.trener.imie} („Trener”). Za wykonanie usług wobec Klienta odpowiada Usługodawca.`,
+          `Kontakt z Usługodawcą: e-mail ${F.email}, telefon ${F.telefon}. W sprawach terminów i treningów: Trener, telefon ${F.trener.telefon}, e-mail ${F.trener.email} (w dni robocze).`,
           "Regulamin jest udostępniany nieodpłatnie na Stronie w sposób, który pozwala go pobrać, zapisać i wydrukować. Przed złożeniem zamówienia Klient zapoznaje się z Regulaminem i akceptuje go.",
           "Usługi są przeznaczone dla osób pełnoletnich. Osoba niepełnoletnia może skorzystać z usług wyłącznie za zgodą przedstawiciela ustawowego, który składa zamówienie w jej imieniu.",
         ],
@@ -70,7 +71,7 @@ const PARAGRAFY: Paragraf[] = [
           ["Pakiet", "Określona liczba Sesji kupiona w jednym zamówieniu (3 albo 5)."],
           ["Trening stacjonarny", `Sesja prowadzona osobiście w siłowni ${F.sala}.`],
           ["Trening online", "Sesja prowadzona na żywo przez połączenie wideo, w miejscu wybranym przez Klienta."],
-          ["E-book", "Treść cyfrowa (materiały, wideo, arkusz) udostępniana w formie elektronicznej, bez nośnika materialnego."],
+          ["E-book", "Treść cyfrowa w formie pliku PDF, udostępniana elektronicznie, bez nośnika materialnego."],
           ["Plan indywidualny", "Usługa przygotowania 12-tygodniowego planu treningowego na podstawie Ankiety, dostarczanego w formie elektronicznej."],
           ["Prowadzenie", "Usługa świadczona w okresach miesięcznych, obejmująca plan, cotygodniowe podsumowania i korekty, opisana na Stronie."],
           ["Ankieta", "Formularz, w którym Klient po zakupie podaje informacje potrzebne do realizacji usługi, w tym o stanie zdrowia, kontuzjach i dostępności."],
@@ -122,10 +123,10 @@ const PARAGRAFY: Paragraf[] = [
       {
         lista: [
           "Po zakupie Klient wypełnia Ankietę. Jeśli tego nie zrobi, Usługodawca zbierze potrzebne informacje przy pierwszym kontakcie.",
-          `W ciągu 24 godzin od zakupu, w Dni robocze, Usługodawca kontaktuje się z Klientem kanałem wskazanym w Ankiecie (telefon z numeru ${F.telefon}, SMS albo e-mail) i proponuje terminy pierwszej Sesji. Termin ustalają strony wspólnie.`,
+          `W ciągu 24 godzin od zakupu, w Dni robocze, Usługodawca kontaktuje się z Klientem kanałem wskazanym w Ankiecie (telefon z numeru ${F.trener.telefon}, SMS albo e-mail) i proponuje terminy pierwszej Sesji. Termin ustalają strony wspólnie.`,
           "Jeśli w ciągu 14 dni od zakupu strony nie ustalą terminu pierwszej Sesji z przyczyn leżących po stronie Usługodawcy, Klient otrzymuje zwrot całej zapłaconej kwoty.",
           `Treningi stacjonarne odbywają się wyłącznie w siłowni ${F.sala}. Klient przestrzega regulaminu tej siłowni.`,
-          "Do Treningu online Klient potrzebuje urządzenia z kamerą i mikrofonem, stabilnego połączenia z internetem i miejsca do ćwiczeń. Link do połączenia Klient otrzymuje w potwierdzeniu terminu. Jeśli Klient ćwiczy w siłowni, odpowiada za zgodność ćwiczenia przed kamerą z regulaminem tej siłowni. Usługodawca może pomóc to sprawdzić przed pierwszą Sesją.",
+          "Do Treningu online Klient potrzebuje urządzenia z kamerą i mikrofonem, stabilnego połączenia z internetem i miejsca do ćwiczeń. Komunikator do połączenia (Messenger, WhatsApp albo Discord) strony ustalają przy ustalaniu terminu. Jeśli Klient ćwiczy w siłowni, odpowiada za zgodność ćwiczenia przed kamerą z regulaminem tej siłowni. Usługodawca może pomóc to sprawdzić przed pierwszą Sesją.",
           "Usługodawca nie nagrywa Treningów online bez zgody Klienta. Nagrania przekazywane po Sesji służą wyłącznie Klientowi i nie są publikowane.",
           "Usługodawca może przerwać lub zmodyfikować ćwiczenie, jeśli uzna, że zagraża ono zdrowiu Klienta.",
         ],
@@ -156,7 +157,7 @@ const PARAGRAFY: Paragraf[] = [
       {
         lista: [
           "Prowadzenie jest opłacane z góry za kolejne okresy miesięczne. Płatność za następny miesiąc jest pobierana automatycznie w dniu odpowiadającym dniu pierwszego zakupu, tą samą metodą płatności.",
-          `Klient może zrezygnować w każdej chwili, bez podawania przyczyny i bez kosztów: SMS-em lub telefonicznie pod numerem ${FIRMA.telefon} albo e-mailem na adres ${FIRMA.email}. Rezygnacja zatrzymuje kolejne płatności, a Prowadzenie trwa do końca opłaconego miesiąca.`,
+          `Klient może zrezygnować w każdej chwili, bez podawania przyczyny i bez kosztów: SMS-em lub telefonicznie pod numerem ${FIRMA.trener.telefon} albo e-mailem na adres ${FIRMA.trener.email} lub ${FIRMA.email}. Rezygnacja zatrzymuje kolejne płatności, a Prowadzenie trwa do końca opłaconego miesiąca.`,
           "Rezygnacja zgłoszona najpóźniej w dniu poprzedzającym datę odnowienia zatrzymuje kolejną płatność. Jeśli mimo to płatność zostanie pobrana, Usługodawca zwraca ją w całości w ciągu 14 dni.",
           "Za miesiąc, który już się rozpoczął, nie przysługuje zwrot, z zastrzeżeniem prawa odstąpienia od umowy opisanego w § 9.",
           "Przed zmianą ceny Prowadzenia Usługodawca informuje Klienta e-mailem co najmniej 14 dni wcześniej. Klient, który nie akceptuje nowej ceny, może zrezygnować przed jej wejściem w życie.",
@@ -190,7 +191,7 @@ const PARAGRAFY: Paragraf[] = [
       {
         lista: [
           "Konsument i Przedsiębiorca na prawach konsumenta mogą odstąpić od umowy bez podawania przyczyny w terminie 14 dni od dnia jej zawarcia.",
-          `Aby odstąpić od umowy, wystarczy wysłać przed upływem terminu jednoznaczne oświadczenie, np. e-mailem na adres ${F.email}. Można skorzystać ze wzoru formularza zamieszczonego na końcu Regulaminu, ale nie jest to obowiązkowe. Usługodawca niezwłocznie potwierdza otrzymanie oświadczenia e-mailem.`,
+          `Aby odstąpić od umowy, wystarczy wysłać przed upływem terminu jednoznaczne oświadczenie, np. e-mailem na adres ${F.email} albo ${F.trener.email}. Można skorzystać ze wzoru formularza zamieszczonego na końcu Regulaminu, ale nie jest to obowiązkowe. Usługodawca niezwłocznie potwierdza otrzymanie oświadczenia e-mailem.`,
           "Usługodawca zwraca płatność w ciągu 14 dni od otrzymania oświadczenia, tą samą metodą płatności, której użył Klient, chyba że Klient zgodzi się na inną. Klient nie ponosi kosztów zwrotu.",
           "Jeśli Klient zażądał rozpoczęcia usługi przed upływem terminu na odstąpienie (§ 4 ust. 3) i część usługi została już wykonana, Klient płaci za usługi spełnione do chwili odstąpienia. Przy Pakiecie jest to cena Pakietu podzielona przez liczbę Sesji, pomnożona przez liczbę Sesji odbytych lub przepadłych zgodnie z § 6 ust. 3. Przy Prowadzeniu jest to część ceny proporcjonalna do liczby dni świadczenia.",
           "Prawo odstąpienia od umowy nie przysługuje:",
@@ -225,7 +226,7 @@ const PARAGRAFY: Paragraf[] = [
     tresc: [
       {
         lista: [
-          `Reklamację można złożyć e-mailem na adres ${F.email} albo pisemnie na adres ${F.adres}.`,
+          `Reklamację można złożyć e-mailem na adres ${F.email} albo ${F.trener.email}${F.adres ? `, albo pisemnie na adres ${F.adres}` : ""}.`,
           "W reklamacji warto podać imię i nazwisko, numer zamówienia, opis problemu i oczekiwany sposób jego rozwiązania. Ułatwia to rozpatrzenie, ale nie jest warunkiem przyjęcia reklamacji.",
           "Usługodawca odpowiada na reklamację w ciągu 14 dni od jej otrzymania, e-mailem albo w inny sposób wskazany przez Klienta. Brak odpowiedzi w tym terminie oznacza uznanie reklamacji.",
           "Jeśli usługa, E-book albo Plan indywidualny są niezgodne z umową, Konsument i Przedsiębiorca na prawach konsumenta mogą żądać doprowadzenia ich do zgodności z umową, a gdy to niemożliwe albo nie nastąpi w rozsądnym czasie, obniżenia ceny albo odstąpienia od umowy, na zasadach ustawy o prawach konsumenta.",
@@ -316,7 +317,7 @@ function WzorOdstapienia() {
 
       <div className="mt-6 space-y-4 bg-mgla p-6 font-mono text-[0.875rem] leading-[1.75] text-grafit sm:p-8">
         <p>
-          Adresat: {FIRMA.nazwa}, {FIRMA.adres}, e-mail: {FIRMA.email}
+          Adresat: {[FIRMA.nazwa, FIRMA.adres, `e-mail: ${FIRMA.email}`].filter(Boolean).join(", ")}
         </p>
         <p>
           Ja/My(*) niniejszym informuję/informujemy(*) o moim/naszym(*) odstąpieniu od umowy o świadczenie następującej

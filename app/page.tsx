@@ -97,13 +97,13 @@ const WARIANTY: Wariant[] = [
     tryb: "Samodzielnie",
     nazwa: "Plan i prowadzenie",
     kto: "Chcesz trenować sam, ale z planem pod swój prawdziwy tydzień",
-    cena: "od 99 zł",
-    cenaDopisek: "e-book, plan albo prowadzenie",
+    cena: "249 zł",
+    cenaDopisek: "plan na 12 tygodni, e-book od 99 zł",
     href: TRASY.plan,
-    cta: "Zobacz trzy poziomy",
-    gdzie: "Gdziekolwiek trenujesz. Plan w panelu i wideo do każdego ćwiczenia.",
+    cta: "Zobacz plan",
+    gdzie: "Gdziekolwiek trenujesz. Plan mailem i na telefonie, z nagraniem omówienia.",
     technika: "W planie ćwiczysz sam, według kryterium. W prowadzeniu analizuję Twoje nagrania dwa razy w miesiącu.",
-    dalej: "E-book 99 zł, plan na 12 tygodni 249 zł, prowadzenie 349 zł miesięcznie.",
+    dalej: "Plan na 12 tygodni 249 zł, prowadzenie 349 zł miesięcznie, e-book 99 zł.",
     ryzyko: "14 dni na odstąpienie, dopóki nie dostaniesz planu. Prowadzenie bez umowy, kończysz z końcem miesiąca.",
     dlaKogo: "Wiesz, jak wykonać ćwiczenia, ale żaden plan nie przetrwał Twojego zwykłego tygodnia.",
   },
@@ -233,7 +233,7 @@ export default function Page() {
           <a className="h-konkurs" href={TRASY.konkurs}>
             <span className="h-konkurs-znak" aria-hidden="true" />
             <span>
-              Konkurs: trzy treningi na sali o wartości {KONKURS.wartosc}. Zgłoszenia do{" "}
+              Konkurs: wygraj trzy treningi na sali o wartości {KONKURS.wartosc}. Zgłoszenia do{" "}
               {dzienPL(KONKURS.koniec)}.
             </span>
             <span className="h-konkurs-link">Weź udział</span>
@@ -508,7 +508,7 @@ export default function Page() {
 const CSS = `
 .h{--g:#111820;--g2:#1A222C;--s:#D6FF3F;--s2:#C6F020;--m:#EDEFF2;--sl:#5F6A77;--l:#D8DDE3;--jas:#AAB3BE;color:var(--g);background:#fff}
 .h *,.h *::before,.h *::after{box-sizing:border-box}
-.h a{color:inherit}
+:where(.h) a{color:inherit}
 .h-w{max-width:75rem;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
 .h p{line-height:1.6}
 .h-drobne{margin:.75rem 0 0;font-size:.85rem;color:var(--sl)}

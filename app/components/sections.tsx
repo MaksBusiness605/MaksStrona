@@ -1515,11 +1515,17 @@ export function Stats({
   ctaHref?: string;
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const [progress, setProgress] = useState(0);
+  /* Startujemy od 1: serwer, Google i podglądy linków (Messenger,
+     Facebook) widzą prawdziwe liczby, a nie „0”. Animacja od zera rusza
+     dopiero w przeglądarce, zanim sekcja wjedzie na ekran. */
+  const [progress, setProgress] = useState(1);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (el.getBoundingClientRect().top < window.innerHeight) return;
+    setProgress(0);
 
     let raf = 0;
     const io = new IntersectionObserver(
@@ -3647,7 +3653,7 @@ export function Footer() {
   ];
 
   /* Działalność nierejestrowana: bez NIP. */
-  const daneFirmy = [FIRMA.nazwa, FIRMA.adres].filter(Boolean);
+  const daneFirmy = [`Sprzedawca: ${FIRMA.nazwa}`, FIRMA.adres, `Trener: ${FIRMA.trener.imie}`].filter(Boolean);
 
   return (
     <footer className="border-t border-stal/15 bg-mgla">
@@ -3701,11 +3707,11 @@ export function Footer() {
           </p>
 
           <p className="flex flex-wrap gap-x-5 gap-y-1">
-            <a href={`mailto:${FIRMA.email}`} className={`hover:text-grafit ${FOCUS}`}>
-              {FIRMA.email}
+            <a href={`mailto:${FIRMA.trener.email}`} className={`hover:text-grafit ${FOCUS}`}>
+              {FIRMA.trener.email}
             </a>
-            <a href={FIRMA.telefonHref} className={`tnum hover:text-grafit ${FOCUS}`}>
-              {FIRMA.telefon}
+            <a href={FIRMA.trener.telefonHref} className={`tnum hover:text-grafit ${FOCUS}`}>
+              {FIRMA.trener.telefon}
             </a>
             <span>© {new Date().getFullYear()} {FIRMA.marka}</span>
           </p>

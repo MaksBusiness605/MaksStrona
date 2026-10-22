@@ -121,8 +121,8 @@ export function StronaPrawna({
             <img src="/logo-znak.svg" alt="" width={32} height={32} className="h-8 w-8" />
             <span className="font-display text-[0.9375rem] font-extrabold tracking-tight">{FIRMA.marka}</span>
           </a>
-          <a href={FIRMA.telefonHref} className={`text-sm font-semibold underline underline-offset-4 ${FOCUS}`}>
-            {FIRMA.telefon}
+          <a href={FIRMA.trener.telefonHref} className={`text-sm font-semibold underline underline-offset-4 ${FOCUS}`}>
+            {FIRMA.trener.telefon}
           </a>
         </div>
       </header>

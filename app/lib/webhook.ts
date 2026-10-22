@@ -4,7 +4,7 @@ import type Stripe from "stripe";
 import { stripe } from "./klient";
 import { mailDoKlienta, mailDoTrenera, mailNieudana, potwierdzenie, smsDoKlienta, smsDoTrenera, smsNieudana } from "./maile";
 import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
-import { linkDoEbooka, maEbooka } from "../lib/ebook";
+import { linkDoEbooka, maEbooka } from "./ebook";
 import { FIRMA } from "@/app/tresc/firma";
 import { wyslijSms } from "./wyslij-sms";
 import { cena, znajdzProdukt } from "./produkty";
@@ -51,10 +51,11 @@ export async function obsluzWebhook(req: Request) {
     switch (zdarzenie.type) {
       /* BLIK i karta są opłacone od razu. Przelewy24 może przyjść
          z opóźnieniem: wtedy completed ma status "unpaid", a pieniądze
-         potwierdza async_payment_succeeded. */
+         potwierdza async_payment_succeeded. Kod nagrody (0 zł) kończy się
+         statusem "no_payment_required". */
       case "checkout.session.completed": {
         const s = zdarzenie.data.object;
-        if (s.payment_status === "paid") await potwierdz(s);
+        if (s.payment_status === "paid" || s.payment_status === "no_payment_required") await potwierdz(s);
         break;
       }
       case "checkout.session.async_payment_succeeded":
@@ -152,7 +153,7 @@ async function potwierdz(s: Stripe.Checkout.Session) {
 
   /* 1 · Ty dostajesz informację pierwszy: to od niej zależy telefon w 24 h. */
   /* Powiadomienie o zamówieniu: wyłącznie na adres z app/tresc/firma.ts. */
-  const trener = FIRMA.email;
+  const trener = FIRMA.trener.email;
   if (trener) {
     const platnosc = celMetadanych(s);
     const panel = `https://dashboard.stripe.com/${s.livemode ? "" : "test/"}${
@@ -161,8 +162,8 @@ async function potwierdz(s: Stripe.Checkout.Session) {
     await krok("mail_trener", () =>
       wyslijMail({
         do: trener,
-        temat: `Nowe zamówienie: ${k.imieNazwisko || "klient"} · ${p.nazwa} · ${kwota}`,
-        tresc: mailDoTrenera(p, { ...k, kwota, panel }),
+        temat: `${s.total_details?.amount_discount ? "Zamówienie z kodem" : "Nowe zamówienie"}: ${k.imieNazwisko || "klient"} · ${p.nazwa} · ${kwota}`,
+        tresc: mailDoTrenera(p, { ...k, kwota, panel, rabat: s.total_details?.amount_discount ? cena(s.total_details.amount_discount) : undefined }),
         odpowiedzDo: k.email,
       }),
     );
@@ -179,7 +180,7 @@ async function potwierdz(s: Stripe.Checkout.Session) {
         temat,
         tresc: mailDoKlienta(p, k.numer, kwota, k.imie, ebook),
         html: htmlPotwierdzenia(potwierdzenie(p, k.numer, kwota, k.imie, ebook), temat),
-        odpowiedzDo: FIRMA.email,
+        odpowiedzDo: FIRMA.trener.email,
       }),
     );
   }

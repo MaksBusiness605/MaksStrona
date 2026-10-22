@@ -1,4 +1,4 @@
-// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.email (firma.ts)
+// STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.trener.email (firma.ts)
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Footer, Header } from "@/app/components/sections";
@@ -9,7 +9,7 @@ import { FIRMA } from "@/app/tresc/firma";
 export const metadata: Metadata = {
   title: "Konkurs: wygraj 3 treningi personalne w Just GYM Łódź | Maks Treningi",
   description:
-    "Napisz w dwóch zdaniach, co chcesz poprawić w treningu, i wygraj trzy sesje jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Wartość 420 zł. Bez losowania.",
+    "Napisz w dwóch zdaniach, co chcesz poprawić w treningu, i wygraj trzy darmowe sesje jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Wartość 420 zł. Bez losowania.",
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -34,6 +34,17 @@ export const metadata: Metadata = {
    3. DLA_WSZYSTKICH: jeśli chcesz dać coś każdemu uczestnikowi (np. niższą
       cenę pierwszej sesji), wpisz to tutaj i w regulaminie. null = ukryte.
    ═══════════════════════════════════════════════════════════════════════ */
+
+/* NAGRODY
+   · Strona ogłasza jedną nagrodę główną: 3 darmowe sesje (420 zł) dla
+     najlepszej odpowiedzi. Musisz ją naprawdę przyznać jednej osobie:
+     ogłoszenie nagrody, której nikt nie dostaje, to wprowadzanie w błąd.
+   · Dodatkowo, bez zapowiadania na stronie: pozostałe konkretne
+     odpowiedzi dostają SMS-em „wyróżnienie”, czyli jednorazowy kod
+     −140 zł na pakiet 3 sesji (pierwszy trening gratis, za dwa 280 zł).
+     Kody: scripts/kody-konkurs.mjs. To bonus ponad obietnicę, więc
+     nikt nie traci. Wpisz go też do regulaminu konkursu jako możliwe
+     wyróżnienia, bez podawania szczegółów. */
 
 /** Pole z firma.ts jest uzupełnione, gdy nie ma w nim „[…]”. */
 const jest = (s: string) => Boolean(s.trim()) && !s.includes("[");
@@ -96,7 +107,7 @@ async function wyslij(f: FormData) {
   /* 1 · Mail do Ciebie. */
   let mailOk = false;
   /* Zgłoszenia idą wyłącznie na adres z app/tresc/firma.ts. */
-  const trener = FIRMA.email;
+  const trener = FIRMA.trener.email;
   if (trener) {
     try {
       await wyslijMail({
@@ -174,10 +185,10 @@ export default async function Page({
             <h1 id="k-tytul" className="k-tytul">Wygraj trzy treningi jeden na jeden</h1>
             <p className="k-lead">
               Napisz w dwóch, trzech zdaniach, co chcesz poprawić w swoim treningu. Najbardziej konkretna
-              odpowiedź wygrywa trzy sesje ze mną na sali.
+              odpowiedź wygrywa trzy darmowe sesje ze mną na sali.
             </p>
             <dl className="k-fakty">
-              <div><dt>Nagroda</dt><dd>3 sesje po 60 minut, wartość {KONKURS.wartosc}</dd></div>
+              <div><dt>Nagroda główna</dt><dd>3 sesje po 60 minut za darmo, wartość {KONKURS.wartosc}</dd></div>
               <div><dt>Zgłoszenia</dt><dd>{trwa ? `do ${dzienPL(KONKURS.koniec)}` : "zamknięte"}</dd></div>
               <div><dt>Jak wybieram</dt><dd>Czytam każdą odpowiedź. Nie losuję.</dd></div>
             </dl>
@@ -204,7 +215,7 @@ export default async function Page({
                 <div className="k-dalej">
                   <p className="k-dalej-tytul">Nie chcesz czekać do wyników?</p>
                   <p>
-                    Pojedyncza sesja na sali kosztuje 150 zł z wejściem. Termin ustalamy SMS-em w ciągu
+                    Pojedyncza sesja na sali kosztuje 150 zł. Termin ustalamy SMS-em w ciągu
                     24 godzin od zakupu.
                   </p>
                   <a className="k-przycisk" href={TRASY.sala}>Zobacz trening na sali</a>
@@ -292,8 +303,8 @@ export default async function Page({
           <section className="k-nagroda" aria-labelledby="k-nag">
             <h2 id="k-nag" className="k-h2">Co wygrywasz</h2>
             <p>
-              Trzy godziny jeden na jeden, po jednym ruchu na sesję, ustawionym do końca. Stoję obok i
-              poprawiam w tej samej serii. Wejście na salę w cenie. Zaczynamy od ciężaru, który dziś jest
+              Trzy godziny jeden na jeden, za darmo, po jednym ruchu na sesję, ustawionym do końca. Stoję
+              obok i poprawiam w tej samej serii. Wejście na salę opłacasz osobno w Just GYM. Zaczynamy od ciężaru, który dziś jest
               dla Ciebie właściwy, nawet jeśli to pusta sztanga.
             </p>
             <table className="k-karta">

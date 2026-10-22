@@ -81,7 +81,7 @@ const ZAMOWIENIE = (p: Produkt, numer: string, kwota: string) => [
   { etykieta: "Kwota", wartosc: `${kwota}${p.cykliczny ? " / miesiąc" : ""}` },
   { etykieta: "Numer zamówienia", wartosc: numer },
   { etykieta: "Data", wartosc: dataZakupu() },
-  { etykieta: "Kontakt", wartosc: `${KONTAKT_24H(p)}. Tel. ${TELEFON}, ${FIRMA.email}` },
+  { etykieta: "Kontakt", wartosc: `${KONTAKT_24H(p)}. Tel. ${TELEFON}, ${FIRMA.trener.email}` },
 ];
 
 /** Krok z przyciskiem do e-booka. Przy planie i prowadzeniu e-book jest w pakiecie. */
@@ -243,7 +243,7 @@ export function mailDoKlienta(p: Produkt, numer: string, kwota: string, imie: st
   if (t.wskazowki) linie.push(t.wskazowki.tytul.toUpperCase(), ...t.wskazowki.linie, "");
   linie.push("SPOKOJNIE", ...t.gwarancje);
   if (t.linkDodatkowy) linie.push(`${t.linkDodatkowy.etykieta}: ${t.linkDodatkowy.url}`);
-  linie.push("", `Pytania: ${TELEFON}, ${FIRMA.email} albo odpisz na tego maila.`, "Maks Treningi");
+  linie.push("", `Pytania: ${TELEFON}, ${FIRMA.trener.email} albo odpisz na tego maila.`, "Maks Treningi");
   return linie.join("\n");
 }
 
@@ -327,7 +327,7 @@ export function smsDoKlienta(p: Produkt, numer: string, imie: string, kwota: str
 
   if (p.rodzaj === "ebook") {
     return najkrotszaMieszczaca([
-      `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail}, jest w nim link do pobrania PDF. Sprawdź też Spam i Oferty. Pytania? Odpowiadam w 24 h: ${tel}, ${FIRMA.email}`,
+      `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail}, jest w nim link do pobrania PDF. Sprawdź też Spam i Oferty. Pytania? Odpowiadam w 24 h: ${tel}, ${FIRMA.trener.email}`,
       `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail}, jest w nim link do PDF (sprawdź też Spam). Pytania? Odpowiadam w 24 h: ${tel}`,
       `${dzieki} E-book, ${cena}, zam. ${numer}. ${mailKrotko}, link do PDF. Pytania: ${tel}`,
     ], LIMIT_SMS_2);
@@ -337,7 +337,7 @@ export function smsDoKlienta(p: Produkt, numer: string, imie: string, kwota: str
   const ankieta = link ? ` Ankieta (3 min): ${link}` : " Link do ankiety jest w mailu.";
 
   return najkrotszaMieszczaca([
-    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} W 24 h (dni robocze) zadzwonię z nr ${tel} albo napiszę SMS z terminami. Pytania: ${FIRMA.email}`,
+    `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} W 24 h (dni robocze) zadzwonię z nr ${tel} albo napiszę SMS z terminami. Pytania: ${FIRMA.trener.email}`,
     `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mail} (sprawdź też Spam).${ankieta} W 24 h (dni robocze) zadzwonię z nr ${tel} albo napiszę SMS z terminami.`,
     `${dzieki} ${p.nazwa}, ${cena}, zam. ${numer}. ${mailKrotko}.${ankieta} W 24 h zadzwonię z nr ${tel} albo napiszę SMS.`,
     `Dziękuję za zakup (${numer}, ${cena}). ${mailKrotko}. W 24 h zadzwonię z nr ${tel} albo napiszę SMS.`,
@@ -350,7 +350,7 @@ export function smsDoTrenera(p: Produkt, imieNazwisko: string, telefon: string, 
   const kto = imieNazwisko || "Klient";
   const doKiedy = p.telefon ? "Zadzwoń w 24 h." : "Sprawdź, czy wyszedł link do e-booka.";
   return najkrotszaMieszczaca([
-    `Nowe zamówienie! Pełne dane czekają na Gmailu (${FIRMA.email}). ${p.nazwa}, ${kwota}${p.cykliczny ? "/mies." : ""}, zam. ${numer}. Klient: ${kto}, tel. ${tel}${email ? `, ${email}` : ""}. ${doKiedy}`,
+    `Nowe zamówienie! Pełne dane czekają na Gmailu (${FIRMA.trener.email}). ${p.nazwa}, ${kwota}${p.cykliczny ? "/mies." : ""}, zam. ${numer}. Klient: ${kto}, tel. ${tel}${email ? `, ${email}` : ""}. ${doKiedy}`,
     `Nowe zamówienie, szczegóły na Gmailu. ${p.nazwa}, ${kwota}, zam. ${numer}. ${kto}, tel. ${tel}. ${doKiedy}`,
     `Zamówienie: ${p.nazwa}, ${kwota}. ${kto}, ${tel}. Szczegóły na Gmailu.`,
   ], LIMIT_SMS_2);

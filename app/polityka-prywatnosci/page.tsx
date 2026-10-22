@@ -152,6 +152,7 @@ const PARAGRAFY: Paragraf[] = [
         tabela: {
           naglowki: ["Odbiorca", "Do czego", "Siedziba"],
           wiersze: [
+            [`${FIRMA.trener.imie}, trener`, "prowadzenie treningów, planów i prowadzenia, kontakt w sprawie terminów, Ankieta; działa na zlecenie Administratora na podstawie umowy powierzenia danych", "Polska"],
             ["Stripe Payments Europe, Limited", "obsługa płatności i subskrypcji", "Irlandia"],
             ["Resend (resend.com)", "wysyłka e-maili z potwierdzeniami", "USA"],
             ["Twilio Inc.", "wysyłka SMS-ów", "USA"],
@@ -222,7 +223,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Bezpieczeństwo",
     tresc: [
-      "Strona działa przez szyfrowane połączenie (HTTPS). Nie przechowujemy danych kart płatniczych, bo płatności obsługuje wyłącznie Stripe. Dostęp do danych klientów ma tylko Administrator, a konta w usługach, z których korzystamy, są chronione silnymi hasłami i weryfikacją dwuetapową.",
+      "Strona działa przez szyfrowane połączenie (HTTPS). Nie przechowujemy danych kart płatniczych, bo płatności obsługuje wyłącznie Stripe. Dostęp do danych klientów mają tylko Administrator i Trener, a konta w usługach, z których korzystamy, są chronione silnymi hasłami i weryfikacją dwuetapową.",
     ],
   },
   {

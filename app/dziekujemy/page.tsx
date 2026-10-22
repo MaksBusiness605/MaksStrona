@@ -235,7 +235,7 @@ const PO_ZAKUPIE: Record<IdProduktu, PoZakupie> = {
       {
         kiedy: "Do 72 godzin",
         co: "Plan i nagranie w panelu",
-        opis: "Plan na 12 tygodni, wideo do ćwiczeń i pięciominutowe nagranie, w którym tłumaczę każdą decyzję.",
+        opis: "Plan na 12 tygodni i pięciominutowe nagranie, w którym tłumaczę każdą decyzję.",
       },
       {
         kiedy: "Pierwszy tydzień",
@@ -266,7 +266,7 @@ const PO_ZAKUPIE: Record<IdProduktu, PoZakupie> = {
       {
         kiedy: "Do 72 godzin",
         co: "Plan w panelu",
-        opis: "Plan na pierwszy miesiąc, wideo do ćwiczeń i nagranie z omówieniem.",
+        opis: "Plan na pierwszy miesiąc i nagranie z omówieniem.",
       },
       {
         kiedy: "Co 7 dni",
