@@ -1,4 +1,5 @@
 // PLIK: app/lib/maile.ts · MAILE · treść maili i SMS-ów (wygląd maila do klienta: szablon-potwierdzenia.ts)
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { TELEFON, type Produkt } from "./produkty";
 import { FIRMA } from "@/app/tresc/firma";
 
@@ -52,8 +53,8 @@ const KROK_PLATNOSC: Krok = {
   zrobione: true,
 };
 
-function krokAnkieta(numer: string): Krok {
-  const link = linkDoAnkiety(numer);
+function krokAnkieta(numer: string, p: Produkt): Krok {
+  const link = linkDoAnkiety(numer, p);
   return {
     tytul: "Ankieta, 3 minuty",
     opis: link
@@ -115,7 +116,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
-          krokAnkieta(numer),
+          krokAnkieta(numer, p),
           KROK_TELEFON,
           {
             tytul: "Pierwsza sesja",
@@ -141,7 +142,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
-          krokAnkieta(numer),
+          krokAnkieta(numer, p),
           KROK_TELEFON,
           {
             tytul: "Pierwszy trening",
@@ -182,7 +183,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
-          krokAnkieta(numer),
+          krokAnkieta(numer, p),
           ...(linkEbook ? [krokEbook(linkEbook, true)] : []),
           { ...KROK_TELEFON, opis: `${KROK_TELEFON.opis} Kilka minut rozmowy o ankiecie.` },
           {
@@ -201,7 +202,7 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
         zamowienie,
         kroki: [
           KROK_PLATNOSC,
-          krokAnkieta(numer),
+          krokAnkieta(numer, p),
           ...(linkEbook ? [krokEbook(linkEbook, true)] : []),
           { ...KROK_TELEFON, tytul: "Rozmowa diagnostyczna" },
           {
@@ -219,12 +220,53 @@ export function potwierdzenie(p: Produkt, numer: string, kwota: string, imie: st
   }
 }
 
-/** Link do ankiety z numerem zamówienia, żebyś wiedział, czyja to ankieta.
-    Bez ANKIETA_URL zwraca undefined i mail mówi, że link przyjdzie osobno. */
-export function linkDoAnkiety(numer: string): string | undefined {
-  const url = process.env.ANKIETA_URL;
-  if (!url) return undefined;
-  return `${url}${url.includes("?") ? "&" : "?"}zamowienie=${encodeURIComponent(numer)}`;
+/** Rodzaj ankiety na /ankieta: sala, online albo plan (plan i prowadzenie). */
+export function typAnkiety(p: Pick<Produkt, "rodzaj"> | undefined): "sala" | "online" | "plan" | undefined {
+  if (!p) return undefined;
+  if (p.rodzaj === "stacjonarny") return "sala";
+  if (p.rodzaj === "online") return "online";
+  if (p.rodzaj === "plan" || p.rodzaj === "prowadzenie") return "plan";
+  return undefined;
+}
+
+/* ── Dostęp do ankiety tylko po zakupie ─────────────────────────────────
+   Link ma podpis (k), policzony z numeru zamówienia i rodzaju ankiety
+   tajnym kluczem ANKIETA_SEKRET (zmienna w Vercelu). Bez poprawnego
+   podpisu /ankieta pokazuje tylko informację, że jest dla klientów.
+   Podpisu nie da się zgadnąć ani przerobić na inny numer zamówienia.
+   Krótkie nazwy parametrów (z, t, k), żeby link zmieścił się w SMS-ie. */
+const KODY_TYPU = { sala: "s", online: "o", plan: "p" } as const;
+export type TypAnkiety = keyof typeof KODY_TYPU;
+
+function sekretAnkiety(): string {
+  const s = process.env.ANKIETA_SEKRET || process.env.STRIPE_SECRET_KEY || "";
+  if (!s) throw new Error("Brak ANKIETA_SEKRET: ustaw tę zmienną w Vercelu.");
+  return s;
+}
+
+function podpisAnkiety(numer: string, typ: TypAnkiety): string {
+  return createHmac("sha256", sekretAnkiety()).update(`ankieta|${numer}|${typ}`).digest("base64url").slice(0, 12);
+}
+
+/** Sprawdza link z /ankieta. Zwraca numer i rodzaj, gdy podpis się zgadza. */
+export function sprawdzLinkAnkiety(z: unknown, t: unknown, k: unknown): { numer: string; typ: TypAnkiety } | undefined {
+  if (typeof z !== "string" || typeof t !== "string" || typeof k !== "string") return undefined;
+  const numer = z.trim().toUpperCase();
+  if (!/^MT-[A-Z0-9]{4,16}$/.test(numer)) return undefined;
+  const typ = (Object.keys(KODY_TYPU) as TypAnkiety[]).find((x) => KODY_TYPU[x] === t);
+  if (!typ) return undefined;
+  const dobry = Buffer.from(podpisAnkiety(numer, typ));
+  const podany = Buffer.from(k);
+  return dobry.length === podany.length && timingSafeEqual(dobry, podany) ? { numer, typ } : undefined;
+}
+
+/** Link do ankiety na stronie (/ankieta), z podpisem. E-book ankiety nie ma. */
+export function linkDoAnkiety(numer: string, p?: Pick<Produkt, "rodzaj">): string | undefined {
+  const typ = typAnkiety(p);
+  if (!typ) return undefined;
+  const baza = `${(process.env.SITE_URL || FIRMA.strona).replace(/\/+$/, "")}/ankieta`;
+  const parametry = new URLSearchParams({ z: numer, t: KODY_TYPU[typ], k: podpisAnkiety(numer, typ) });
+  return `${baza}?${parametry}`;
 }
 
 /** Wersja tekstowa tego samego maila: dla programów pocztowych bez HTML
@@ -333,7 +375,7 @@ export function smsDoKlienta(p: Produkt, numer: string, imie: string, kwota: str
     ], LIMIT_SMS_2);
   }
 
-  const link = linkDoAnkiety(numer);
+  const link = linkDoAnkiety(numer, p);
   const ankieta = link ? ` Ankieta (3 min): ${link}` : " Link do ankiety jest w mailu.";
 
   return najkrotszaMieszczaca([
