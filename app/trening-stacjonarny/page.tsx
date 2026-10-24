@@ -1,5 +1,7 @@
 // PLIK: app/trening-stacjonarny/page.tsx · STRONA /trening-stacjonarny · Just GYM Łódź (150 / 420 / 650 zł)
 import type { Metadata } from "next";
+import { JsonLd } from "@/app/components/JsonLd";
+import { faq, metaStrony, usluga } from "@/app/lib/seo";
 import {
   Benefits,
   CaseStudies,
@@ -24,12 +26,12 @@ import { ZDJECIA, blok, kadr, zBlokami } from "@/app/tresc/zdjecia";
     app/tresc/zdjecia.ts, nie tutaj. */
 const Z = ZDJECIA.stacjonarny;
 
-export const metadata: Metadata = {
-  title:
-    "Trening personalny Łódź Centrum — 150 zł za sesję, termin ustalamy w 24 h | Maks Treningi",
-  description:
-    "Trening personalny jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Korekta techniki na żywo, zapis obciążeń po każdej sesji. 150 zł, po zakupie odzywam się w ciągu 24 h i ustalamy termin.",
-};
+export const metadata: Metadata = metaStrony({
+  tytul: "Trener personalny Łódź Centrum, trening 1 na 1 od 150 zł | Maks Treningi",
+  opis:
+    "Trener personalny w Łodzi: trening jeden na jeden w Just GYM przy Piotrkowskiej 157A. Korekta techniki na żywo, zapis obciążeń po każdej sesji. Sesja 150 zł, pakiety 3 i 5 sesji, termin w 24 h.",
+  sciezka: "/trening-stacjonarny",
+});
 
 /* ═══════════════════════════════════════════════════════════════════════
    TREŚĆ — tutaj edytujesz wszystkie teksty tej strony
@@ -286,7 +288,7 @@ const DIFFERENTIATORS = {
     },
     {
       title: "Sprzęt, którego nie masz w domu",
-      body: "Sala ma [wymień: platformy, stojaki, sanie, gumy oporowe]. Plan idzie pod ten sprzęt, więc nie robimy wersji zastępczych działających w połowie.",
+      body: "Sala ma szeroką strefę wolnych ciężarów, strefę maszyn i miejsce do ćwiczeń funkcjonalnych. Plan idzie pod ten sprzęt, więc nie robimy wersji zastępczych działających w połowie.",
     },
     {
       title: "Rozgrzewka pod ten konkretny trening",
@@ -604,6 +606,7 @@ const FAQ = [
 export default function Page() {
   return (
     <>
+      <JsonLd dane={[usluga("sala", "/trening-stacjonarny"), faq(FAQ)]} />
       <Header cta={CTA} ctaHref={REZERWACJA} />
 
       <main>

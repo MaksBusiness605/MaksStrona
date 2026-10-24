@@ -1,16 +1,18 @@
 // STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.trener.email (firma.ts)
 import type { Metadata } from "next";
+import { metaStrony } from "@/app/lib/seo";
 import { redirect } from "next/navigation";
 import { Footer, Header } from "@/app/components/sections";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
 import { FIRMA } from "@/app/tresc/firma";
 
-export const metadata: Metadata = {
-  title: "Konkurs: wygraj 3 treningi personalne w Just GYM Łódź | Maks Treningi",
-  description:
+export const metadata: Metadata = metaStrony({
+  tytul: "Konkurs: wygraj 3 treningi personalne w Łodzi | Maks Treningi",
+  opis:
     "Napisz w dwóch zdaniach, co chcesz poprawić w treningu, i wygraj trzy darmowe sesje jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi. Wartość 420 zł. Bez losowania.",
-};
+  sciezka: "/konkurs",
+});
 
 /* ═══════════════════════════════════════════════════════════════════════
    KONKURS — cała strona w jednym pliku. Daty i telefon są w app/lib/dane.ts.

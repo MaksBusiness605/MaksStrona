@@ -1,5 +1,7 @@
 // STRONA: / · STRONA GŁÓWNA · rozdzielnia na trzy warianty (sala, online, plan)
 import type { Metadata } from "next";
+import { JsonLd } from "@/app/components/JsonLd";
+import { firma, faq, metaStrony } from "@/app/lib/seo";
 import { CaseStudies, Footer, Header, Team } from "@/app/components/sections";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, dzienPL } from "@/app/lib/dane";
 import { ZDJECIA, blok, kadr } from "@/app/tresc/zdjecia";
@@ -10,11 +12,12 @@ const Z = ZDJECIA.stacjonarny;
 // Strona sprawdza datę konkursu, więc odświeżamy ją co godzinę.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "Maks Treningi | Trener personalny w Łodzi i online",
-  description:
-    "Trening na sali w Łodzi, trening przez kamerę albo plan pod Twój tydzień. Przestań zgadywać, czy trening coś daje: kryterium progresji i zapis, który zostaje u Ciebie.",
-};
+export const metadata: Metadata = metaStrony({
+  tytul: "Trener personalny Łódź i online | Maks Treningi",
+  opis:
+    "Trener personalny w Łodzi (Just GYM, Piotrkowska 157A) i online. Trening 1 na 1 od 150 zł, trening przez kamerę od 100 zł, plan treningowy pod Twój tydzień. Przestań zgadywać, czy trening coś daje.",
+  sciezka: "/",
+});
 
 /* ═══════════════════════════════════════════════════════════════════════
    STRONA GŁÓWNA. Jedno zadanie: w kilka sekund wysłać człowieka do jednego
@@ -226,6 +229,7 @@ export default function Page() {
   return (
     <>
       <style>{CSS}</style>
+      <JsonLd dane={[firma(), faq(PYTANIA)]} />
       <Header cta="Wybierz, jak trenujesz" ctaHref="#wybor" />
 
       <main className="h">

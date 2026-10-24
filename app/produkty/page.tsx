@@ -1,5 +1,7 @@
 // PLIK: app/produkty/page.tsx · STRONA /produkty · e-book, plan indywidualny, prowadzenie
 import type { Metadata } from "next";
+import { JsonLd } from "@/app/components/JsonLd";
+import { faq, metaStrony, usluga } from "@/app/lib/seo";
 import {
   Benefits,
   CaseStudies,
@@ -23,11 +25,12 @@ import { ZDJECIA, blok, kadr, zBlokami } from "@/app/tresc/zdjecia";
     app/tresc/zdjecia.ts, klucz `produkty`. */
 const Z = ZDJECIA.produkty;
 
-export const metadata: Metadata = {
-  title: "Indywidualny plan treningowy pod Twój tydzień, 249 zł | Maks Treningi",
-  description:
-    "Plan na 12 tygodni pisany po ankiecie pod Twój grafik, sprzęt i ograniczenia, gotowy w 72 h. Do tego prowadzenie miesięczne albo e-book od 99 zł. Płatność BLIK-iem, kartą albo Przelewy24.",
-};
+export const metadata: Metadata = metaStrony({
+  tytul: "Indywidualny plan treningowy na 12 tygodni, 249 zł | Maks Treningi",
+  opis:
+    "Plan treningowy pisany po ankiecie pod Twój grafik, sprzęt i ograniczenia, gotowy w 72 h. Prowadzenie online 349 zł miesięcznie albo e-book Plan Bez Zgadywania za 99 zł.",
+  sciezka: "/produkty",
+});
 
 /* ═══════════════════════════════════════════════════════════════════════
    TREŚĆ
@@ -504,6 +507,7 @@ const ZOBOWIAZANIA = {
 export default function Page() {
   return (
     <>
+      <JsonLd dane={[usluga("plan", "/produkty"), faq(FAQ)]} />
       <Header cta={CTA} ctaHref={CEL} />
 
       <main>

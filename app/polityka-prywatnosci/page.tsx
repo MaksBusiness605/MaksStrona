@@ -15,7 +15,8 @@ export const metadata: Metadata = {
    OPISUJE NARZĘDZIA, KTÓRYCH UŻYWASZ ALBO PLANUJESZ UŻYWAĆ
    Stripe, Resend (maile), Twilio (SMS), Vercel (hosting, Web Analytics,
    Speed Insights), Google Analytics 4, Meta Pixel, Meta Conversions
-   API, Tally (ankieta), Gmail, komunikatory do prowadzenia online.
+   API, ankieta na stronie (/ankieta, odpowiedzi mailem), Gmail,
+   komunikatory do prowadzenia online.
    Cookies są opisane osobno: app/polityka-cookies/page.tsx.
    Przestajesz używać narzędzia albo dodajesz nowe: zmień tabelę w § 3
    i § 4 (tu) oraz tabelę w polityce cookies, a potem datę w
@@ -159,8 +160,7 @@ const PARAGRAFY: Paragraf[] = [
             ["Vercel Inc.", "hosting strony i serwera obsługującego zamówienia, anonimowe statystyki bez cookies (Web Analytics, Speed Insights)", "USA"],
             ["Google Ireland Limited", "Google Analytics 4 (po zgodzie)", "Irlandia"],
             ["Meta Platforms Ireland Limited", "Meta Pixel i Conversions API (po zgodzie)", "Irlandia"],
-            ["Tally BV (tally.so)", "obsługa Ankiety po zakupie", "Belgia"],
-            ["Google Ireland Limited (Gmail)", "skrzynka pocztowa, korespondencja z Tobą", "Irlandia"],
+            ["Google Ireland Limited (Gmail)", "skrzynka pocztowa: korespondencja z Tobą, odpowiedzi z Ankiety i formularzy", "Irlandia"],
           ],
         },
       },

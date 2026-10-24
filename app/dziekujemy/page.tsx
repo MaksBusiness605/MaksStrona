@@ -326,7 +326,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
     ? produkt.kroki.map((k) => (stan === "w-toku" && k === PLATNOSC_ZROBIONA ? PLATNOSC_W_TOKU : k))
     : [];
   const pierwszyOtwarty = kroki.findIndex((k) => !k.zrobione);
-  const ankieta = katalog && katalog.rodzaj !== "ebook" && numer ? linkDoAnkiety(numer) : undefined;
+  const ankieta = katalog && katalog.rodzaj !== "ebook" && numer ? linkDoAnkiety(numer, katalog) : undefined;
   /* E-book (także w planie i prowadzeniu): przycisk tylko przy opłaconej
      sesji. Link i tak sprawdza płatność w Stripe przy każdym pobraniu. */
   const sesja = typeof sp.session_id === "string" ? sp.session_id : demo ? "demo" : undefined;
