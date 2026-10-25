@@ -211,18 +211,53 @@ export default async function Page({
 
       <main className="k">
         <section className="k-hero" aria-labelledby="k-tytul">
-          <div className="k-w">
-            <p className="k-miejsce">Konkurs w Just GYM, Piotrkowska 157A w Łodzi</p>
-            <h1 id="k-tytul" className="k-tytul">Wygraj trzy treningi jeden na jeden</h1>
-            <p className="k-lead">
-              Napisz w dwóch, trzech zdaniach, co chcesz poprawić w swoim treningu. Najbardziej konkretna
-              odpowiedź wygrywa trzy darmowe sesje ze mną na sali.
-            </p>
-            <dl className="k-fakty">
-              <div><dt>Nagroda główna</dt><dd>3 sesje po 60 minut za darmo, wartość {KONKURS.wartosc}</dd></div>
-              <div><dt>Zgłoszenia</dt><dd>{trwa ? `do ${dzienPL(KONKURS.koniec)}` : "zamknięte"}</dd></div>
-              <div><dt>Jak wybieram</dt><dd>Czytam każdą odpowiedź. Nie losuję.</dd></div>
-            </dl>
+          <div className="k-w k-hero-uklad">
+            <div className="k-hero-tekst">
+              <p className="k-miejsce">Konkurs w Just GYM, Piotrkowska 157A w Łodzi</p>
+              <h1 id="k-tytul" className="k-tytul">Wygraj trzy treningi jeden na jeden</h1>
+              <p className="k-lead">
+                Napisz w dwóch, trzech zdaniach, co chcesz poprawić w swoim treningu. Najbardziej konkretna
+                odpowiedź wygrywa trzy darmowe sesje ze mną na sali.
+              </p>
+              {trwa ? (
+                <>
+                  <a className="k-przycisk k-przycisk-hero" href="#zgloszenie">Napisz zgłoszenie</a>
+                  <p className="k-termin">
+                    Zgłoszenia do <strong>{dzienPL(KONKURS.koniec)}</strong>. Czytam każdą odpowiedź, nie losuję.
+                  </p>
+                </>
+              ) : (
+                <p className="k-termin">Zgłoszenia są już zamknięte.</p>
+              )}
+            </div>
+
+            {/* Nagroda: karta, którą zwycięzca dostaje po ostatniej sesji. */}
+            <figure className="k-nagroda-karta" aria-labelledby="k-karta-podpis">
+              <div className="k-karta-gora">
+                <span>Karta obciążeń</span>
+                <span className="k-karta-wartosc">
+                  <s>{KONKURS.wartosc}</s> 0 zł
+                </span>
+              </div>
+              <table className="k-karta">
+                <thead>
+                  <tr><th scope="col">Sesja</th><th scope="col">Ruch</th><th scope="col">Ciężar</th><th scope="col">Powt.</th></tr>
+                </thead>
+                <tbody>
+                  {["Przysiad", "Martwy ciąg", "Wyciskanie"].map((ruch, i) => (
+                    <tr key={ruch}>
+                      <th scope="row">{i + 1}</th>
+                      <td>{ruch}</td>
+                      <td className="k-puste"><span className="k-sr">do wpisania</span></td>
+                      <td className="k-puste"><span className="k-sr">do wpisania</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <figcaption id="k-karta-podpis">
+                Nagroda: 3 sesje po 60 minut jeden na jeden. Karta zostaje u Ciebie po ostatniej.
+              </figcaption>
+            </figure>
           </div>
         </section>
 
@@ -313,18 +348,18 @@ export default async function Page({
               pisać ładnie. Wystarczy, że opiszesz, co się dzieje.
             </p>
             <figure className="k-przyklad k-przyklad-slaby">
-              <figcaption>Za ogólnie</figcaption>
+              <figcaption><span className="k-znak" aria-hidden="true">✕</span>Za ogólnie</figcaption>
               <blockquote>„Chcę być silniejszy i lepiej wyglądać.”</blockquote>
             </figure>
             <figure className="k-przyklad">
-              <figcaption>Konkretnie</figcaption>
+              <figcaption><span className="k-znak" aria-hidden="true">✓</span>Konkretnie</figcaption>
               <blockquote>
                 „Przy martwym ciągu od 60 kg zaokrąglam plecy i po treningu boli mnie lędźwia. Stoję na
                 tym ciężarze od dwóch miesięcy i boję się dokładać.”
               </blockquote>
             </figure>
             <figure className="k-przyklad">
-              <figcaption>Też konkretnie</figcaption>
+              <figcaption><span className="k-znak" aria-hidden="true">✓</span>Też konkretnie</figcaption>
               <blockquote>
                 „Nigdy nie robiłam przysiadu ze sztangą, bo wstydzę się, że zrobię to źle przy ludziach.
                 Chcę się go nauczyć na tyle, żeby robić go sama.”
@@ -339,22 +374,6 @@ export default async function Page({
               obok i poprawiam w tej samej serii. Wejście na salę opłacasz osobno w Just GYM. Zaczynamy od ciężaru, który dziś jest
               dla Ciebie właściwy, nawet jeśli to pusta sztanga.
             </p>
-            <table className="k-karta">
-              <caption>Karta obciążeń zwycięzcy. Zostaje u Ciebie po ostatniej sesji.</caption>
-              <thead>
-                <tr><th scope="col">Sesja</th><th scope="col">Ruch</th><th scope="col">Ciężar</th><th scope="col">Powt.</th></tr>
-              </thead>
-              <tbody>
-                {["Przysiad", "Martwy ciąg", "Wyciskanie"].map((ruch, i) => (
-                  <tr key={ruch}>
-                    <th scope="row">{i + 1}</th>
-                    <td>{ruch}</td>
-                    <td className="k-puste" aria-label="do wpisania" />
-                    <td className="k-puste" aria-label="do wpisania" />
-                  </tr>
-                ))}
-              </tbody>
-            </table>
             <p className="k-drobne">
               Kolejność ruchów ustalamy na pierwszej sesji. Nagrody nie da się wymienić na gotówkę.
             </p>
@@ -362,10 +381,19 @@ export default async function Page({
 
           <section className="k-zasady" aria-labelledby="k-zas">
             <h2 id="k-zas" className="k-h2">Jak to przebiega</h2>
-            <ol className="k-lista">
-              <li>Zgłoszenia przyjmuję do {dataPL(KONKURS.koniec)}. Jedno zgłoszenie na osobę.</li>
-              <li>Czytam wszystkie odpowiedzi i wybieram tę, która najkonkretniej opisuje problem, z którym da się coś zrobić w trzy sesje.</li>
-              <li>Do {dataPL(KONKURS.wyniki)} piszę SMS-em do zwycięzcy z numeru {TELEFON} i ustalamy pierwszy termin.</li>
+            <ol className="k-os">
+              <li>
+                <span className="k-os-kiedy">do {dzienPL(KONKURS.koniec)}</span>
+                <span>Przyjmuję zgłoszenia, do {dataPL(KONKURS.koniec)}. Jedno zgłoszenie na osobę.</span>
+              </li>
+              <li>
+                <span className="k-os-kiedy">potem</span>
+                <span>Czytam wszystkie odpowiedzi i wybieram tę, która najkonkretniej opisuje problem, z którym da się coś zrobić w trzy sesje.</span>
+              </li>
+              <li>
+                <span className="k-os-kiedy">do {dzienPL(KONKURS.wyniki)}</span>
+                <span>Piszę SMS-em do zwycięzcy z numeru {TELEFON} i ustalamy pierwszy termin.</span>
+              </li>
             </ol>
             <p className="k-kto">
               Prowadzę ja, {TRENER.imie}, trener personalny w Just GYM przy Piotrkowskiej. Pytania o
@@ -381,66 +409,88 @@ export default async function Page({
 }
 
 const CSS = `
-.k{--g:#111820;--s:#D6FF3F;--m:#EDEFF2;--sl:#5F6A77;--l:#D3D8DE;--jas:#B4BCC6;--b:#B42318;color:var(--g);background:var(--m)}
-.k-w{box-sizing:border-box;max-width:70rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+.k{--g:#111820;--g2:#1B2430;--s:#D6FF3F;--m:#EDEFF2;--sl:#5F6A77;--l:#D3D8DE;--jas:#B4BCC6;--b:#B42318;--papier:#FBFBF8;color:var(--g);background:var(--m)}
+.k-w{box-sizing:border-box;max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
 .k p{line-height:1.6}
+.k-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
-.k-hero{background:var(--g);color:#fff;padding:clamp(2.5rem,6vw,4rem) 0 clamp(2rem,5vw,3rem)}
-.k-miejsce{margin:0 0 .9rem;color:var(--s);font-weight:600;font-size:.95rem}
-.k-tytul{margin:0 0 1rem;max-width:44rem;font-size:clamp(2.3rem,6vw,4rem);font-weight:800;line-height:1;letter-spacing:-.035em}
-.k-lead{margin:0;max-width:36rem;font-size:1.15rem;color:#D5DBE2}
-.k-fakty{display:grid;gap:1rem 2.5rem;margin:2.25rem 0 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.16)}
-@media(min-width:44rem){.k-fakty{grid-template-columns:repeat(3,auto);justify-content:start}}
-.k-fakty dt{font-size:.85rem;color:var(--jas);margin-bottom:.2rem}
-.k-fakty dd{margin:0;font-weight:700}
+/* HERO: tekst po lewej, karta-nagroda po prawej */
+.k-hero{position:relative;overflow:hidden;background:var(--g);color:#fff;padding:clamp(2.5rem,7vw,5rem) 0 clamp(3rem,7vw,5.5rem);
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:48px 48px}
+.k-hero-uklad{display:grid;gap:clamp(2.5rem,6vw,4rem);align-items:center}
+@media(min-width:60rem){.k-hero-uklad{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.k-miejsce{margin:0 0 1rem;color:var(--s);font-weight:600;font-size:.95rem}
+.k-tytul{margin:0 0 1.1rem;max-width:13ch;font-family:var(--font-display);font-size:clamp(2.6rem,7vw,4.75rem);font-weight:800;line-height:.98;letter-spacing:-.04em;text-wrap:balance}
+.k-lead{margin:0;max-width:34rem;font-size:clamp(1.05rem,1.6vw,1.2rem);color:#D5DBE2}
+.k-przycisk.k-przycisk-hero{display:inline-block;width:auto;margin-top:2rem;padding:1.05rem 2.25rem}
+@media(max-width:35rem){.k-przycisk.k-przycisk-hero{display:block;width:100%}}
+.k-termin{margin:1rem 0 0;font-size:.95rem;color:var(--jas)}
+.k-termin strong{color:#fff}
 
-.k-uklad{display:grid;gap:2.5rem 4rem;padding-top:clamp(2rem,5vw,3.5rem);padding-bottom:clamp(3rem,7vw,5rem);grid-template-areas:"f" "p" "g" "z"}
+/* Karta-nagroda: papier na grafitowym tle, lekko obrócona */
+.k-nagroda-karta{margin:0;justify-self:center;width:100%;max-width:27rem;background:var(--papier);color:var(--g);
+  padding:1.1rem 1.1rem 1rem;transform:rotate(-2deg);box-shadow:0 30px 60px -25px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06)}
+.k-karta-gora{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding-bottom:.75rem;margin-bottom:.75rem;border-bottom:2px solid var(--g);font-family:var(--font-display);font-weight:800;font-size:1.1rem}
+.k-karta-wartosc{font-size:1.5rem;background:var(--s);padding:.1rem .5rem;white-space:nowrap}
+.k-karta-wartosc s{font-size:.9rem;font-weight:600;color:var(--sl);margin-right:.35rem}
+.k-karta{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.95rem}
+.k-karta th,.k-karta td{border-bottom:1px solid var(--l);padding:.8rem .5rem;text-align:left}
+.k-karta thead th{font-size:.8rem;font-weight:600;color:var(--sl);padding-top:0}
+.k-karta tbody th{width:2.25rem;font-family:var(--font-display);font-weight:800;font-size:1.15rem}
+.k-puste{width:4.5rem;background:linear-gradient(to top,#9AA3AE 1px,transparent 1px) no-repeat .5rem calc(100% - .75rem)/calc(100% - 1rem) 100%}
+.k-nagroda-karta figcaption{margin-top:.85rem;font-size:.85rem;line-height:1.45;color:var(--sl)}
+@media(prefers-reduced-motion:no-preference){
+  .k-nagroda-karta{animation:k-wjazd .7s cubic-bezier(.2,.8,.2,1) both .15s}
+  @keyframes k-wjazd{from{opacity:0;transform:translateY(24px) rotate(-6deg)}to{opacity:1;transform:rotate(-2deg)}}
+}
+@media(max-width:59.99rem){.k-nagroda-karta{transform:rotate(-1.5deg);max-width:24rem}}
+
+/* TREŚĆ: opis po lewej, formularz po prawej (na telefonie formularz pierwszy) */
+.k-uklad{display:grid;gap:3rem 4.5rem;padding-top:clamp(2.5rem,6vw,4rem);padding-bottom:clamp(3rem,7vw,5rem);grid-template-areas:"f" "p" "g" "z"}
 .k-formularz{grid-area:f}.k-przyklady{grid-area:p}.k-nagroda{grid-area:g}.k-zasady{grid-area:z}
 .k-przyklady,.k-nagroda,.k-zasady{max-width:36rem}
 @media(min-width:60rem){
-  .k-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"p f" "g f" "z f";align-items:start}
-  .k-formularz{position:sticky;top:1.5rem}
+  .k-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-areas:"p f" "g f" "z f";align-items:start}
+  .k-formularz{position:sticky;top:1.5rem;margin-top:calc(-1 * clamp(4rem,8vw,6rem))}
 }
-.k-formularz{background:#fff;border:1px solid var(--l);border-radius:6px;padding:clamp(1.25rem,3vw,2rem);box-shadow:0 12px 32px -18px rgba(17,24,32,.45)}
+@media(max-width:59.99rem){.k-formularz{margin-top:calc(-1 * clamp(2rem,5vw,3rem))}}
+.k-formularz{position:relative;background:#fff;border-top:5px solid var(--s);padding:clamp(1.25rem,3vw,2rem);box-shadow:0 24px 48px -24px rgba(17,24,32,.5)}
 
-.k-h2{margin:0 0 .75rem;font-size:1.45rem;font-weight:800;line-height:1.2;letter-spacing:-.015em}
+.k-h2{margin:0 0 .75rem;font-family:var(--font-display);font-size:clamp(1.4rem,2.6vw,1.75rem);font-weight:800;line-height:1.15;letter-spacing:-.02em}
 .k-czas{margin:-.4rem 0 1.25rem;display:block}
 .k-drobne{margin:.9rem 0 0;font-size:.85rem;color:var(--sl)}
 
-.k-przyklad{margin:1rem 0 0;padding:1rem 1.1rem;background:#fff;border:1px solid var(--l);border-radius:4px}
-.k-przyklad figcaption{font-size:.85rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem}
-.k-przyklad figcaption::before{content:"";width:10px;height:10px;background:var(--s);outline:1px solid var(--g)}
-.k-przyklad-slaby figcaption::before{background:transparent}
-.k-przyklad-slaby{background:transparent}
+.k-przyklad{margin:1rem 0 0;padding:1rem 1.15rem;background:#fff;border-left:4px solid var(--s)}
+.k-przyklad figcaption{font-size:.85rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.55rem}
+.k-znak{display:inline-grid;place-items:center;width:1.25rem;height:1.25rem;font-size:.75rem;background:var(--s);color:var(--g)}
+.k-przyklad-slaby{background:transparent;border-left-color:var(--l)}
+.k-przyklad-slaby .k-znak{background:var(--l);color:var(--sl)}
 .k-przyklad blockquote{margin:0;line-height:1.55}
-.k-przyklad-slaby blockquote{color:var(--sl)}
+.k-przyklad-slaby blockquote{color:var(--sl);text-decoration:line-through;text-decoration-color:rgba(95,106,119,.5)}
 
-.k-karta{width:100%;margin-top:1.25rem;border-collapse:collapse;background:#fff;font-variant-numeric:tabular-nums}
-.k-karta caption{caption-side:top;padding-bottom:.5rem;text-align:left;font-weight:600}
-.k-karta th,.k-karta td{border:1px solid var(--l);padding:.7rem .8rem;text-align:left}
-.k-karta thead th{font-size:.85rem;font-weight:600;color:var(--sl)}
-.k-karta tbody th{width:3.5rem;font-weight:800;background:var(--g);color:var(--s)}
-.k-puste{width:5.5rem;background:linear-gradient(to top,var(--l) 1px,transparent 1px) no-repeat .8rem calc(100% - .7rem)/calc(100% - 1.6rem) 100%}
-
-.k-lista{margin:0;padding-left:1.25rem;line-height:1.55}.k-lista li+li{margin-top:.6rem}
-.k-lista li::marker{font-weight:800}
-.k-kto{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--l)}
+.k-os{list-style:none;margin:0;padding:0;border-left:2px solid var(--g)}
+.k-os li{position:relative;display:grid;gap:.2rem;padding:0 0 1.4rem 1.4rem;line-height:1.55}
+.k-os li:last-child{padding-bottom:0}
+.k-os li::before{content:"";position:absolute;left:-7px;top:.35rem;width:12px;height:12px;background:var(--g)}
+.k-os li:last-child::before{background:var(--s);outline:2px solid var(--g)}
+.k-os-kiedy{font-family:var(--font-display);font-weight:800}
+.k-kto{margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--l)}
 .k-kto a{color:var(--g);font-weight:700}
 
 .k-pole{display:grid;gap:.35rem;margin-bottom:1.1rem}
 .k-etykieta{font-weight:700;font-size:.95rem}.k-podpowiedz{font-size:.85rem;color:var(--sl)}
-.k-wejscie{box-sizing:border-box;width:100%;padding:.8rem .85rem;font:inherit;color:inherit;background:#fff;border:1px solid #B9C1CA;border-radius:4px}
+.k-wejscie{box-sizing:border-box;width:100%;padding:.85rem .9rem;font:inherit;color:inherit;background:#fff;border:1px solid #B9C1CA;border-radius:0}
 textarea.k-wejscie{min-height:8rem;resize:vertical}
 .k-wejscie::placeholder{color:#8A94A0}
 .k-wejscie:focus-visible{outline:3px solid var(--g);outline-offset:1px;border-color:var(--g)}
 .k-wejscie:user-invalid{border-color:var(--b)}
-.k-blad{margin:0 0 1rem;padding:.75rem .9rem;color:var(--b);background:#FDF0EF;border-radius:4px;font-weight:600}
+.k-blad{margin:0 0 1rem;padding:.75rem .9rem;color:var(--b);background:#FDF0EF;font-weight:600}
 .k-zgoda{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start;margin-bottom:.75rem;font-size:.9rem;line-height:1.45}
 .k-zgoda input{width:1.15rem;height:1.15rem;margin:.15rem 0 0;accent-color:var(--g)}
 .k-zgoda input:focus-visible{outline:3px solid var(--g);outline-offset:2px}.k-zgoda a{color:var(--g);font-weight:600}
-.k-przycisk{box-sizing:border-box;display:block;width:100%;margin-top:.75rem;padding:1rem 1.25rem;font:inherit;font-weight:800;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;text-decoration:none;color:var(--g);background:var(--s);border:0;border-radius:2px;cursor:pointer}
-.k-przycisk:hover{background:#C6F020}.k-przycisk:focus-visible{outline:3px solid var(--g);outline-offset:3px}
-.k-wyroznienie{padding:.9rem 1rem;background:var(--s);font-weight:700;border-radius:4px}
+.k-przycisk{box-sizing:border-box;display:block;width:100%;margin-top:.75rem;padding:1.05rem 1.25rem;font:inherit;font-weight:800;font-size:.95rem;text-align:center;text-decoration:none;color:var(--g);background:var(--s);border:0;cursor:pointer}
+.k-przycisk:hover{background:#C6F020}.k-przycisk:focus-visible{outline:3px solid #fff;outline-offset:3px;box-shadow:0 0 0 6px var(--g)}
+.k-wyroznienie{padding:.9rem 1rem;background:var(--s);font-weight:700}
 .k-dalej{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--l)}
 .k-dalej-tytul{margin:0 0 .25rem;font-weight:800}
 .k-dalej p{margin-top:0}
