@@ -27,9 +27,9 @@ import { ZDJECIA, blok, kadr, zBlokami } from "@/app/tresc/zdjecia";
 const Z = ZDJECIA.coachingOnline;
 
 export const metadata: Metadata = metaStrony({
-  tytul: "Trener personalny online, trening przez kamerę od 100 zł | Maks Treningi",
+  tytul: "Trener personalny online z Łodzi, trening przez kamerę od 100 zł | Maks Treningi",
   opis:
-    "Trening personalny online na żywo przez kamerę: widzę Twoją serię i poprawiam technikę w trakcie. Pojedynczy trening 100 zł, pakiety 260 i 400 zł. Bez abonamentu, termin w 24 h po zakupie.",
+    "Trening personalny online na żywo przez kamerę z trenerem z Łodzi: widzę Twoją serię i poprawiam technikę w trakcie. Pojedynczy trening 100 zł, pakiety 260 i 400 zł. Bez abonamentu, termin w 24 h po zakupie.",
   sciezka: "/trening-online",
 });
 

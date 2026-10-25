@@ -248,8 +248,8 @@ export default function Page() {
         <section className="h-hero h-siatka" aria-labelledby="h-tytul">
           <div className="h-w h-hero-uklad">
             <div className="h-hero-tekst">
-              <p className="h-eyebrow">Trener personalny w Łodzi i online</p>
               <h1 id="h-tytul" className="h-tytul">
+                <span className="h-eyebrow h-eyebrow-h1">Trener personalny Łódź i online</span>
                 Przestań zgadywać, czy Twój trening coś daje
               </h1>
               <p className="h-lead">
@@ -529,6 +529,7 @@ const CSS = `
   background-position:0 0,0 0,100% 0,100% 0,0 100%,0 100%,100% 100%,100% 100%}
 .h-eyebrow{margin:0 0 1.1rem;color:var(--s);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .h-eyebrow-ciemny{color:var(--sl)}
+.h-eyebrow-h1{display:block;font-family:var(--font-sans);line-height:1.4}
 .h-nr{display:inline-grid;place-items:center;width:1.75rem;height:1.75rem;flex:none;background:var(--s);color:var(--g);font-size:.8rem;font-weight:800}
 .h-h2{margin:0;font-size:clamp(2rem,4.2vw,3.1rem);line-height:1.02;letter-spacing:-.035em;font-weight:800}
 .h-h2-duzy{font-size:clamp(2.3rem,5.4vw,4rem)}

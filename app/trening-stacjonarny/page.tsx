@@ -140,7 +140,7 @@ const MAX_OSOB = 30;
    ─────────────────────────────────────────────────────────────────────── */
 
 const HERO = {
-  proof: "Łódź · Just GYM, Piotrkowska 157A · przy Stajni Jednorożców",
+  proof: "Trener personalny Łódź · Just GYM, Piotrkowska 157A",
   title: "Ćwiczysz miesiącami i nikt Ci jeszcze nie powiedział, co robisz źle",
   points: [
     "Poprawiam ustawienie w tej samej serii, w której się psuje — nie tydzień później, z nagrania",
@@ -368,12 +368,13 @@ const ZAKUP = {
 
 const LOKALIZACJA = {
   eyebrow: "Jedno miejsce, bez wyjątków",
-  heading: "Trenujemy wyłącznie w Just GYM przy Piotrkowskiej, obok Stajni Jednorożców",
+  heading: "Trening personalny w centrum Łodzi: wyłącznie w Just GYM przy Piotrkowskiej",
   lead: "Nie dojeżdżam do domów i nie zmieniam sal. Każda sesja odbywa się na tej samej sali i na tym samym sprzęcie, więc to, co ustawimy w poniedziałek, sprawdzamy w czwartek w identycznych warunkach.",
   mapa: {
     address: "ul. Piotrkowska 157A, Łódź",
     details: [
-      "Budynek HiPiotrkowska, tuż przy Stajni Jednorożców, czyli węźle tramwajowym na skrzyżowaniu Piotrkowskiej i al. Mickiewicza",
+      "Budynek HiPiotrkowska, tuż przy Stajni Jednorożców, czyli węźle tramwajowym Piotrkowska Centrum na skrzyżowaniu Piotrkowskiej i al. Mickiewicza",
+      "Dojazd tramwajem z większości dzielnic Łodzi: Śródmieście, Polesie, Górna, Widzew, Bałuty, Retkinia",
       "Sala 1800 m², pełna strefa wolnych ciężarów",
       "Wejście na salę nie jest w cenie sesji: potrzebujesz karnetu albo jednorazowego wejścia do Just GYM",
     ],
@@ -534,8 +535,12 @@ const ZOBOWIAZANIA = {
 
 const FAQ = [
   {
-    q: "Gdzie odbywają się treningi?",
+    q: "Gdzie w Łodzi odbywają się treningi?",
     a: "Just GYM, ul. Piotrkowska 157A w Łodzi, budynek HiPiotrkowska przy Stajni Jednorożców. Wejście na salę nie jest wliczone w cenę sesji: potrzebujesz karnetu albo jednorazowego wejścia do Just GYM. Trenuję wyłącznie tutaj: nie dojeżdżam do domów i nie prowadzę sesji w innych klubach, bo każdą poprawkę sprawdzamy potem na tym samym sprzęcie.",
+  },
+  {
+    q: "Jak dojechać na trening do Just GYM w centrum Łodzi?",
+    a: "Najbliższy przystanek to Piotrkowska Centrum przy Stajni Jednorożców, główny węzeł tramwajowy Łodzi. Z przystanku do Just GYM (Piotrkowska 157A, budynek HiPiotrkowska) dojdziesz w kilka minut. Tramwajem dojedziesz tu z większości dzielnic: Śródmieścia, Polesia, Górnej, Widzewa, Bałut czy Retkini. Dlatego trenują u mnie osoby z całej Łodzi, nie tylko z centrum.",
   },
   {
     q: "Płacę z góry. Jak ustalamy termin?",
@@ -550,8 +555,8 @@ const FAQ = [
     a: "Odwołanie do 24 h przed — przekładamy na inny termin, bez kosztów i bez limitu. Później przełożę pierwszy raz bez pytań; przy kolejnych sesja przepada, bo tej godziny nie odsprzedam już nikomu. Choroba jest wyjątkiem: napisz, znajdziemy termin.",
   },
   {
-    q: "Ile kosztuje sesja?",
-    a: "Pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). Ceny nie obejmują wejścia na salę: karnet albo jednorazowe wejście kupujesz w Just GYM. Pakiety nie mają daty ważności. Niewykorzystane sesje nie podlegają zwrotowi.",
+    q: "Ile kosztuje trener personalny w Łodzi?",
+    a: "W Łodzi pojedynczy trening personalny na siłowni kosztuje zwykle od 120 do 220 zł. U mnie pojedyncza sesja 150 zł, pakiet 3 sesji 420 zł (140 zł za godzinę), pakiet 5 sesji 650 zł (130 zł za godzinę). Ceny nie obejmują wejścia na salę: karnet albo jednorazowe wejście kupujesz w Just GYM. Pakiety nie mają daty ważności. Niewykorzystane sesje nie podlegają zwrotowi.",
   },
   {
     q: "Dlaczego pakiety są tak małe? Wszędzie sprzedają po dziesięć sesji.",
@@ -614,6 +619,7 @@ export default function Page() {
         <HeroShot
           proof={HERO.proof}
           title={HERO.title}
+          proofInTitle
           points={HERO.points}
           reassurance={HERO.reassurance}
           cta={CTA}
