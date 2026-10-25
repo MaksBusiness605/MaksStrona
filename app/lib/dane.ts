@@ -30,8 +30,8 @@ export const TRASY = {
 
 // +01:00 = czas zimowy (zmiana czasu w 2026: 25 października).
 export const KONKURS = {
-  koniec: new Date("2026-10-31T23:59:00+01:00"),
-  wyniki: new Date("2026-11-07T12:00:00+01:00"),
+  koniec: new Date("2026-11-16T23:59:00+01:00"),
+  wyniki: new Date("2026-11-23T12:00:00+01:00"),
   wartosc: "420 zł",
 };
 

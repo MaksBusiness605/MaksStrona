@@ -159,7 +159,7 @@ const PARAGRAFY: Paragraf[] = [
             ["Twilio Inc.", "wysyłka SMS-ów", "USA"],
             ["Vercel Inc.", "hosting strony i serwera obsługującego zamówienia, anonimowe statystyki bez cookies (Web Analytics, Speed Insights)", "USA"],
             ["Google Ireland Limited", "Google Analytics 4 (po zgodzie)", "Irlandia"],
-            ["Meta Platforms Ireland Limited", "Meta Pixel i Conversions API (po zgodzie)", "Irlandia"],
+            ["Meta Platforms Ireland Limited", "Meta Pixel i Conversions API (po zgodzie); formularz zgłoszeniowy do konkursu w reklamie na Facebooku i Instagramie", "Irlandia"],
             ["Google Ireland Limited (Gmail)", "skrzynka pocztowa: korespondencja z Tobą, odpowiedzi z Ankiety i formularzy", "Irlandia"],
           ],
         },

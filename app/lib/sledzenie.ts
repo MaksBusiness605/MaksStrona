@@ -41,7 +41,8 @@ export function zapiszZgode(z: Zgoda) {
 
 type Zdarzenie =
   | { typ: "rozpoczecie"; produkt?: string }
-  | { typ: "zakup"; id: string; numer?: string; wartosc: number; produkt?: string; nazwa?: string };
+  | { typ: "zakup"; id: string; numer?: string; wartosc: number; produkt?: string; nazwa?: string }
+  | { typ: "lead"; id: string; zrodlo: string };
 
 type Okno = Window & {
   gtag?: (...a: unknown[]) => void;
@@ -57,6 +58,13 @@ function wyslij(w: Okno, z: Zdarzenie) {
   if (z.typ === "rozpoczecie") {
     if (zgoda.a) w.gtag?.("event", "begin_checkout", { currency: "PLN", items: z.produkt ? [{ item_id: z.produkt }] : [] });
     if (zgoda.m) w.fbq?.("track", "InitiateCheckout", { currency: "PLN", content_ids: z.produkt ? [z.produkt] : [] });
+  }
+
+  /* Zgłoszenie (np. konkurs). eventID = ten sam co w Conversions API
+     z serwera, więc Meta liczy jedno zgłoszenie raz. */
+  if (z.typ === "lead") {
+    if (zgoda.a) w.gtag?.("event", "generate_lead", { lead_source: z.zrodlo });
+    if (zgoda.m) w.fbq?.("track", "Lead", { content_name: z.zrodlo }, { eventID: z.id });
   }
 
   if (z.typ === "zakup") {
