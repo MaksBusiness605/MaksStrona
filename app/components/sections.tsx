@@ -3674,29 +3674,50 @@ export function Footer() {
   /* Działalność nierejestrowana: bez NIP. */
   const daneFirmy = [`Sprzedawca: ${FIRMA.nazwa}`, FIRMA.adres, `Trener: ${FIRMA.trener.imie}`].filter(Boolean);
 
+  const link = `text-sm text-stal underline-offset-4 hover:text-grafit hover:underline ${FOCUS}`;
+  const naglowek = "mb-4 font-display text-sm font-extrabold text-grafit";
+
   return (
     <footer className="border-t border-stal/15 bg-mgla">
-      <div className={`${WRAP} pb-28 pt-10 md:pb-10`}>
-        {/* Rząd 1: marka i linki prawne */}
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          {/* Logo i nazwa prowadzą na stronę główną. */}
-          <a href="/" aria-label={`${FIRMA.marka}, strona główna`} className={`flex items-center gap-2.5 self-start ${FOCUS}`}>
-            <Logo className="h-8 w-8" />
-            <span className="font-display text-sm font-extrabold tracking-tight">
-              {FIRMA.marka}
-            </span>
-          </a>
+      <div className={`${WRAP} pb-28 pt-12 md:pb-10`}>
+        {/* Rząd 1: marka i kontakt · oferta · dokumenty */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-[1.4fr_1fr_1fr] md:gap-x-12">
+          <div className="col-span-2 md:col-span-1">
+            {/* Logo i nazwa prowadzą na stronę główną. */}
+            <a href="/" aria-label={`${FIRMA.marka}, strona główna`} className={`inline-flex items-center gap-2.5 ${FOCUS}`}>
+              <Logo className="h-8 w-8" />
+              <span className="font-display text-base font-extrabold tracking-tight">{FIRMA.marka}</span>
+            </a>
+            <p className="mt-4 max-w-[34ch] text-sm leading-relaxed text-stal">
+              Trener personalny w Łodzi i online. Treningi 1&nbsp;na&nbsp;1 w Just GYM, ul.&nbsp;Piotrkowska 157A.
+            </p>
+            <p className="mt-5 flex flex-col gap-1.5 text-sm">
+              <a href={FIRMA.trener.telefonHref} className={`tnum font-display text-lg font-extrabold text-grafit hover:underline ${FOCUS}`}>
+                {FIRMA.trener.telefon}
+              </a>
+              <a href={`mailto:${FIRMA.trener.email}`} className={`break-all text-stal hover:text-grafit ${FOCUS}`}>
+                {FIRMA.trener.email}
+              </a>
+            </p>
+          </div>
 
-          <nav aria-label="Dokumenty">
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+          <nav aria-labelledby="stopka-oferta">
+            <p id="stopka-oferta" className={naglowek}>Oferta</p>
+            <ul className="flex flex-col gap-2.5">
+              {oferta.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className={link}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-labelledby="stopka-dokumenty">
+            <p id="stopka-dokumenty" className={naglowek}>Dokumenty</p>
+            <ul className="flex flex-col gap-2.5">
               {linki.map((l) => (
                 <li key={l.href}>
-                  <a
-                    href={l.href}
-                    className={`text-sm text-stal underline-offset-4 hover:text-grafit hover:underline ${FOCUS}`}
-                  >
-                    {l.label}
-                  </a>
+                  <a href={l.href} className={link}>{l.label}</a>
                 </li>
               ))}
               {POKAZ_USTAWIENIA_COOKIES && (
@@ -3704,7 +3725,7 @@ export function Footer() {
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new Event("otworz-ustawienia-cookies"))}
-                    className={`text-sm text-stal underline-offset-4 hover:text-grafit hover:underline ${FOCUS}`}
+                    className={`text-left ${link}`}
                   >
                     Ustawienia cookies
                   </button>
@@ -3714,42 +3735,10 @@ export function Footer() {
           </nav>
         </div>
 
-        {/* Rząd 1b: oferta */}
-        <nav aria-label="Oferta" className="mt-6">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {oferta.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  className={`text-sm font-semibold text-grafit underline-offset-4 hover:underline ${FOCUS}`}
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
         {/* Rząd 2: dane sprzedawcy */}
-        <div className="mt-8 flex flex-col gap-3 border-t border-stal/15 pt-6 text-xs leading-relaxed text-stal md:flex-row md:items-start md:justify-between md:gap-8">
-          <p className="max-w-[60ch]">
-            {daneFirmy.map((d, i) => (
-              <span key={i}>
-                {i > 0 && <span aria-hidden="true" className="mx-2 text-stal/50">·</span>}
-                <span className="whitespace-nowrap">{d}</span>
-              </span>
-            ))}
-          </p>
-
-          <p className="flex flex-wrap gap-x-5 gap-y-1">
-            <a href={`mailto:${FIRMA.trener.email}`} className={`hover:text-grafit ${FOCUS}`}>
-              {FIRMA.trener.email}
-            </a>
-            <a href={FIRMA.trener.telefonHref} className={`tnum hover:text-grafit ${FOCUS}`}>
-              {FIRMA.trener.telefon}
-            </a>
-            <span>© {new Date().getFullYear()} {FIRMA.marka}</span>
-          </p>
+        <div className="mt-10 flex flex-col gap-2 border-t border-stal/15 pt-6 text-xs leading-relaxed text-stal md:flex-row md:justify-between md:gap-8">
+          <p className="max-w-[60ch]">{daneFirmy.join(", ")}</p>
+          <p>© {new Date().getFullYear()} {FIRMA.marka}</p>
         </div>
       </div>
     </footer>
