@@ -39,7 +39,7 @@ const PARAGRAFY: Paragraf[] = [
     tresc: [
       `Organizatorem konkursu „Wygraj trzy treningi jeden na jeden” („Konkurs”) jest ${daneSprzedawcy()} („Organizator”).`,
       `Sesje z nagrody prowadzi trener ${F.trener.imie}. Kontakt w sprawie Konkursu: tel. ${F.trener.telefon}, e-mail ${F.trener.email} albo ${F.email}.`,
-      "Konkurs prowadzony jest na stronie /konkurs („Strona”). Regulamin jest dostępny pod adresem /konkurs/regulamin.",
+      "Konkurs prowadzony jest na stronie /konkurs („Strona”) oraz przez formularz zgłoszeniowy w reklamach Organizatora na Facebooku i Instagramie („Formularz w reklamie”). Oba sposoby zgłoszenia są równoważne. Regulamin jest dostępny pod adresem /konkurs/regulamin.",
     ],
   },
   {
@@ -65,7 +65,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Zadanie konkursowe i wybór zwycięzcy",
     tresc: [
-      "Zadaniem jest odpowiedź w formularzu na pytanie: co chcesz poprawić w swoim treningu i dlaczego akurat to.",
+      "Zadaniem jest odpowiedź w formularzu na Stronie albo w Formularzu w reklamie na pytanie: co chcesz poprawić w swoim treningu i dlaczego akurat to.",
       "Odpowiedź musi być własna, napisana przez Uczestnika, i nie może naruszać prawa ani dóbr osobistych innych osób. Zgłoszenia niespełniające tych warunków nie biorą udziału w Konkursie.",
       "Zwycięzcę wybiera Organizator, kierując się własną, subiektywną oceną, która odpowiedź najkonkretniej opisuje problem, z którym da się coś zrobić w trzech sesjach treningowych. Ocena Organizatora jest ostateczna.",
       "Konkurs nie jest grą losową ani loterią: o wyniku decyduje ocena odpowiedzi, a nie przypadek.",
