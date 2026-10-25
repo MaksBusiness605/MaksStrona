@@ -28,7 +28,7 @@ const Z = ZDJECIA.produkty;
 export const metadata: Metadata = metaStrony({
   tytul: "Indywidualny plan treningowy na 12 tygodni, 249 zł | Maks Treningi",
   opis:
-    "Plan treningowy pisany po ankiecie pod Twój grafik, sprzęt i ograniczenia, gotowy w 72 h. Prowadzenie online 349 zł miesięcznie albo e-book Plan Bez Zgadywania za 99 zł.",
+    "Plan treningowy od trenera personalnego z Łodzi, pisany po ankiecie pod Twój grafik, sprzęt i ograniczenia, gotowy w 72 h. Prowadzenie online 349 zł miesięcznie albo e-book Plan Bez Zgadywania za 99 zł.",
   sciezka: "/produkty",
 });
 

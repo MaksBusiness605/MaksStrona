@@ -29,7 +29,14 @@ const SALA = {
   ulica: "ul. Piotrkowska 157A",
   kod: "90-440",
   miasto: "Łódź",
+  /* Współrzędne Piotrkowskiej 157 (mapa.targeo.pl). Po założeniu wizytówki
+     Google możesz je podmienić na dokładne z pinezki. */
+  szerokosc: 51.75974,
+  dlugosc: 19.45778,
 };
+
+/** Dzielnice i osiedla Łodzi: obszar, z którego dojeżdżają klienci. */
+const DZIELNICE_LODZI = ["Śródmieście", "Polesie", "Górna", "Widzew", "Bałuty", "Retkinia", "Teofilów", "Chojny", "Stoki"];
 
 export function metaStrony(m: { tytul: string; opis: string; sciezka: string }): Metadata {
   return {
@@ -64,7 +71,7 @@ export function firma() {
         name: `${FIRMA.marka}: trener personalny Łódź`,
         alternateName: FIRMA.marka,
         description:
-          "Treningi personalne jeden na jeden w Just GYM przy Piotrkowskiej w Łodzi, treningi online przez kamerę, indywidualne plany treningowe i prowadzenie.",
+          "Trener personalny w Łodzi: treningi personalne jeden na jeden w Just GYM przy ul. Piotrkowskiej 157A (centrum Łodzi, przystanek Piotrkowska Centrum), treningi online przez kamerę, indywidualne plany treningowe i prowadzenie.",
         url: ADRES_STRONY,
         image: `${ADRES_STRONY}/opengraph-image.png`,
         logo: `${ADRES_STRONY}/logo-znak.svg`,
@@ -81,10 +88,14 @@ export function firma() {
           addressRegion: "łódzkie",
           addressCountry: "PL",
         },
+        geo: { "@type": "GeoCoordinates", latitude: SALA.szerokosc, longitude: SALA.dlugosc },
+        hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${SALA.nazwa} ${SALA.ulica} ${SALA.miasto}`)}`,
         areaServed: [
-          { "@type": "City", name: "Łódź" },
+          { "@type": "City", name: "Łódź", sameAs: "https://pl.wikipedia.org/wiki/%C5%81%C3%B3d%C5%BA" },
+          ...DZIELNICE_LODZI.map((d) => ({ "@type": "Place", name: `${d}, Łódź` })),
           { "@type": "Country", name: "Polska" },
         ],
+        knowsLanguage: "pl",
         employee: { "@id": ID_TRENERA },
         ...(SPOLECZNOSCI.length ? { sameAs: SPOLECZNOSCI } : {}),
       },
@@ -92,7 +103,8 @@ export function firma() {
         "@type": "Person",
         "@id": ID_TRENERA,
         name: FIRMA.trener.imie,
-        jobTitle: "Trener personalny",
+        jobTitle: "Trener personalny w Łodzi",
+        workLocation: { "@id": ID_FIRMY },
         worksFor: { "@id": ID_FIRMY },
         knowsAbout: ["trening siłowy", "trójbój siłowy", "technika przysiadu", "martwy ciąg", "trening personalny"],
       },
@@ -102,7 +114,7 @@ export function firma() {
 
 const NAZWY_USLUG: Record<"sala" | "online" | "plan", { nazwa: string; typ: string; rodzaje: Rodzaj[]; obszar: object }> = {
   sala: {
-    nazwa: "Trening personalny w Łodzi",
+    nazwa: "Trener personalny Łódź: trening personalny 1 na 1 w centrum Łodzi",
     typ: "Trening personalny",
     rodzaje: ["stacjonarny"],
     obszar: { "@type": "City", name: "Łódź" },
@@ -153,5 +165,39 @@ export function faq(pytania: ({ q: string; a: string } | { p: string; o: string 
       const [pytanie, odpowiedz] = "q" in x ? [x.q, x.a] : [x.p, x.o];
       return { "@type": "Question", name: pytanie, acceptedAnswer: { "@type": "Answer", text: odpowiedz } };
     }),
+  };
+}
+
+/** Artykuł poradnikowy (np. ceny trenera w Łodzi). */
+export function artykul(a: { tytul: string; opis: string; sciezka: string; data: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: a.tytul,
+    description: a.opis,
+    url: `${ADRES_STRONY}${a.sciezka}`,
+    mainEntityOfPage: `${ADRES_STRONY}${a.sciezka}`,
+    datePublished: a.data,
+    dateModified: a.data,
+    inLanguage: "pl-PL",
+    image: `${ADRES_STRONY}/opengraph-image.png`,
+    author: { "@id": ID_TRENERA },
+    publisher: { "@id": ID_FIRMY },
+    about: { "@type": "Thing", name: "Trener personalny Łódź" },
+    spatialCoverage: { "@type": "City", name: "Łódź" },
+  };
+}
+
+/** Okruszki: Strona główna › strona. */
+export function okruszki(lista: { nazwa: string; sciezka: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ nazwa: "Strona główna", sciezka: "/" }, ...lista].map((x, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: x.nazwa,
+      item: `${ADRES_STRONY}${x.sciezka === "/" ? "" : x.sciezka}`,
+    })),
   };
 }

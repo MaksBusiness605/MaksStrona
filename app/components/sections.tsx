@@ -468,8 +468,11 @@ export function HeroShot({
   imageRatio = "0.786",
   titleWide = false,
   split,
+  proofInTitle = false,
 }: {
   proof: string;
+  /** SEO: linijka `proof` staje się częścią nagłówka h1 (wygląda tak samo). */
+  proofInTitle?: boolean;
   title: string;
   /** Akapit pod nagłówkiem. Pomiń, jeśli same punkty wystarczą. */
   lead?: string;
@@ -517,9 +520,17 @@ export function HeroShot({
 
       <div className={`${WRAP} ${GAP} ${PAD_LG} grid items-center ${kolumny}`}>
         <div>
-          <p className="eyebrow text-sygnal">{proof}</p>
-
-          <h1 className={`${T.h1} mt-5 max-w-[16ch] ${liniaTytulu}`}>{title}</h1>
+          {proofInTitle ? (
+            <h1 className={`${T.h1} max-w-[16ch] ${liniaTytulu}`}>
+              <span className="eyebrow mb-5 block max-w-none font-sans text-sygnal">{proof}</span>
+              {title}
+            </h1>
+          ) : (
+            <>
+              <p className="eyebrow text-sygnal">{proof}</p>
+              <h1 className={`${T.h1} mt-5 max-w-[16ch] ${liniaTytulu}`}>{title}</h1>
+            </>
+          )}
 
           {lead && (
             <p className={`${T.lead} mt-6 max-w-[46ch] text-white/70`}>{lead}</p>
@@ -3652,6 +3663,14 @@ export function Footer() {
     { href: "/polityka-cookies", label: "Polityka cookies" },
   ];
 
+  /* SEO: linki do ofert z hasłami, pod które ma się wyświetlać strona. */
+  const oferta = [
+    { href: "/trening-stacjonarny", label: "Trener personalny Łódź" },
+    { href: "/trening-online", label: "Trener personalny online" },
+    { href: "/produkty", label: "Plan treningowy" },
+    { href: "/ile-kosztuje-trener-personalny-lodz", label: "Ile kosztuje trener personalny w Łodzi" },
+  ];
+
   /* Działalność nierejestrowana: bez NIP. */
   const daneFirmy = [`Sprzedawca: ${FIRMA.nazwa}`, FIRMA.adres, `Trener: ${FIRMA.trener.imie}`].filter(Boolean);
 
@@ -3694,6 +3713,22 @@ export function Footer() {
             </ul>
           </nav>
         </div>
+
+        {/* Rząd 1b: oferta */}
+        <nav aria-label="Oferta" className="mt-6">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {oferta.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  className={`text-sm font-semibold text-grafit underline-offset-4 hover:underline ${FOCUS}`}
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Rząd 2: dane sprzedawcy */}
         <div className="mt-8 flex flex-col gap-3 border-t border-stal/15 pt-6 text-xs leading-relaxed text-stal md:flex-row md:items-start md:justify-between md:gap-8">

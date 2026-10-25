@@ -276,7 +276,7 @@ export const ZDJECIA = {
   stacjonarny: {
     hero: {
       plik: "/hero-stacjonarny.jpg",
-      alt: "Asekuracja przy wyciskaniu na ławce: trener stoi nad sztangą, podopieczna w dolnej fazie ruchu",
+      alt: "Trener personalny w Łodzi asekuruje wyciskanie na ławce w Just GYM przy Piotrkowskiej",
       brief:
         "KADR pionowy 4:5, aparat na wysokości klatki piersiowej, z boku pod kątem 45°, ogniskowa 35–50 mm, podopieczny w kadrze od kolan w górę. " +
         "W KADRZE: podopieczny w dolnej fazie ruchu przy sztandze, dłoń trenera oparta o biodro albo łopatkę, twarz trenera skierowana na sztangę, nie w obiektyw. W tle prawdziwa sala: stojak, talerze, ktoś ćwiczący poza ostrością. " +
@@ -316,7 +316,7 @@ export const ZDJECIA = {
 
     team: {
       plik: ktoprowadzi,
-      alt: "Trener poprawiający ustawienie łopatek przy wyciskaniu",
+      alt: "Trener personalny z Łodzi poprawia ustawienie łopatek przy wyciskaniu, Just GYM",
       brief:
         "KADR pionowy 4:5, aparat na wysokości ławki, z boku, ogniskowa 50 mm, trener w kadrze do pasa. " +
         "W KADRZE: Ty w trakcie pracy: dłoń na łopatce podopiecznego przy wyciskaniu, wzrok na sztandze. Ubranie robocze, w którym realnie prowadzisz sesje, bez logotypów obcych marek. " +
