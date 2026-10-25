@@ -2,6 +2,11 @@
 import type { Metadata } from "next";
 import { metaStrony } from "@/app/lib/seo";
 import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { randomUUID } from "node:crypto";
+import { ZdarzenieLead } from "@/app/components/ZdarzenieLead";
+import { leadDoMety } from "@/app/lib/meta-capi";
+import { czytajZgode } from "@/app/lib/sledzenie";
 import { Footer, Header } from "@/app/components/sections";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
@@ -160,15 +165,39 @@ async function wyslij(f: FormData) {
     console.error("[konkurs] ZGŁOSZENIE NIEZAPISANE:", { imie, telefon, odpowiedz, zgodaMarketing });
   }
 
-  redirect(mailOk || webhookOk ? "/konkurs?wyslane=1#zgloszenie" : "/konkurs?blad=serwer#zgloszenie");
+  if (!mailOk && !webhookOk) redirect("/konkurs?blad=serwer#zgloszenie");
+
+  /* 3 · Zgłoszenie do Mety jako „Lead” (reklamy na leady uczą się na nim).
+     Tylko przy zgodzie na cookies marketingowe. Ten sam id dostaje Pixel
+     na stronie po przekierowaniu, więc Meta liczy zgłoszenie raz. */
+  const eventId = randomUUID();
+  const ciastka = await cookies();
+  const h = await headers();
+  if (czytajZgode(h.get("cookie"))?.m) {
+    const strona = (process.env.SITE_URL || FIRMA.strona).replace(/\/+$/, "");
+    await leadDoMety({
+      eventId,
+      zrodlo: "Konkurs",
+      url: `${strona}/konkurs`,
+      telefon,
+      imie,
+      ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined,
+      ua: h.get("user-agent") || undefined,
+      fbp: ciastka.get("_fbp")?.value,
+      fbc: ciastka.get("_fbc")?.value,
+    });
+  }
+
+  redirect(`/konkurs?wyslane=1&e=${eventId}#zgloszenie`);
 }
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ wyslane?: string; blad?: string }>;
+  searchParams: Promise<{ wyslane?: string; blad?: string; e?: string }>;
 }) {
-  const { wyslane, blad } = await searchParams;
+  const { wyslane, blad, e } = await searchParams;
+  const idZgloszenia = typeof e === "string" && /^[0-9a-f-]{36}$/.test(e) ? e : undefined;
   const trwa = Date.now() < KONKURS.koniec.getTime();
   const komunikat = blad ? BLEDY[blad] : undefined;
 
@@ -208,6 +237,7 @@ export default async function Page({
               </>
             ) : wyslane ? (
               <div role="status">
+                {idZgloszenia && <ZdarzenieLead id={idZgloszenia} zrodlo="Konkurs" />}
                 <h2 id="k-zgl" className="k-h2">Zgłoszenie wysłane</h2>
                 <p>
                   Wyniki do {dataPL(KONKURS.wyniki)}. Jeśli wygrasz, napiszę SMS-em z numeru {TELEFON}.

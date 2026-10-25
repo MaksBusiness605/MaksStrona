@@ -1,4 +1,4 @@
-// PLIK: app/lib/meta-capi.ts · META CONVERSIONS API · zakup z serwera do Mety (tylko przy zgodzie)
+// PLIK: app/lib/meta-capi.ts · META CONVERSIONS API · zakup i zgłoszenie (lead) z serwera do Mety (tylko przy zgodzie)
 import { createHash } from "node:crypto";
 import type Stripe from "stripe";
 
@@ -76,5 +76,55 @@ export async function zakupDoMety(s: Stripe.Checkout.Session, nazwaProduktu: str
   });
   if (!odp.ok) {
     console.error("[meta-capi]", odp.status, (await odp.text()).slice(0, 500));
+  }
+}
+
+/** Zgłoszenie (np. konkurs) z serwera do Mety jako „Lead”. Tylko przy zgodzie
+    na cookies marketingowe. eventId = ten sam co w Pixelu (ZdarzenieLead). */
+export async function leadDoMety(l: {
+  eventId: string;
+  zrodlo: string;
+  url: string;
+  telefon?: string;
+  imie?: string;
+  ip?: string;
+  ua?: string;
+  fbp?: string;
+  fbc?: string;
+}): Promise<void> {
+  const pixel = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const token = process.env.META_CAPI_TOKEN;
+  if (!pixel || !token) return;
+
+  const telefon = telefonDoMety(l.telefon);
+  const zdarzenie = {
+    event_name: "Lead",
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: l.eventId,
+    action_source: "website",
+    event_source_url: l.url,
+    user_data: {
+      ...(telefon ? { ph: [skrot(telefon)] } : {}),
+      ...(l.imie ? { fn: [skrot(l.imie)] } : {}),
+      ...(l.ip ? { client_ip_address: l.ip } : {}),
+      ...(l.ua ? { client_user_agent: l.ua } : {}),
+      ...(l.fbp ? { fbp: l.fbp } : {}),
+      ...(l.fbc ? { fbc: l.fbc } : {}),
+      country: [skrot("pl")],
+    },
+    custom_data: { content_name: l.zrodlo },
+  };
+
+  const test = process.env.META_TEST_EVENT_CODE;
+  try {
+    const odp = await fetch(`https://graph.facebook.com/${WERSJA_API}/${pixel}/events?access_token=${encodeURIComponent(token)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [zdarzenie], ...(test ? { test_event_code: test } : {}) }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!odp.ok) console.error("[meta-capi] lead", odp.status, (await odp.text()).slice(0, 500));
+  } catch (e) {
+    console.error("[meta-capi] lead:", e);
   }
 }
