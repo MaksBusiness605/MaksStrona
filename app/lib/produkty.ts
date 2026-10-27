@@ -88,7 +88,7 @@ const KATALOG = {
   },
   ebook: {
     nazwa: "E-book",
-    opis: "Zasady układania treningu, wideo do ćwiczeń i arkusz progresji",
+    opis: "PDF: zasady układania treningu i jedzenia, plan na 12 tygodni i arkusz progresji",
     cenaGrosze: 9900,
     rodzaj: "ebook",
     cykliczny: false,
