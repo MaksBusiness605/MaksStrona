@@ -440,10 +440,8 @@ const CSS = `
 .k-karta tbody th{width:2.25rem;font-family:var(--font-display);font-weight:800;font-size:1.15rem}
 .k-puste{width:4.5rem;background:linear-gradient(to top,#9AA3AE 1px,transparent 1px) no-repeat .5rem calc(100% - .75rem)/calc(100% - 1rem) 100%}
 .k-nagroda-karta figcaption{margin-top:.85rem;font-size:.85rem;line-height:1.45;color:var(--sl)}
-@media(prefers-reduced-motion:no-preference){
-  .k-nagroda-karta{animation:k-wjazd .7s cubic-bezier(.2,.8,.2,1) both .15s}
-  @keyframes k-wjazd{from{opacity:0;transform:translateY(24px) rotate(-6deg)}to{opacity:1;transform:rotate(-2deg)}}
-}
+/* Bez animacji: karta stoi od razu, przewijanie do formularza bez płynnego przesuwania. */
+html:has(.k){scroll-behavior:auto!important}
 @media(max-width:59.99rem){.k-nagroda-karta{transform:rotate(-1.5deg);max-width:24rem}}
 
 /* TREŚĆ: opis po lewej, formularz po prawej (na telefonie formularz pierwszy) */
@@ -451,13 +449,14 @@ const CSS = `
 .k-formularz{grid-area:f}.k-przyklady{grid-area:p}.k-nagroda{grid-area:g}.k-zasady{grid-area:z}
 .k-przyklady,.k-nagroda,.k-zasady{max-width:36rem}
 @media(min-width:60rem){
-  .k-uklad{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-areas:"p f" "g f" "z f";align-items:start}
+  .k-uklad{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-areas:"p f" "g f" "z f";align-items:start}
   .k-formularz{position:sticky;top:1.5rem;margin-top:calc(-1 * clamp(4rem,8vw,6rem))}
 }
 @media(max-width:59.99rem){.k-formularz{margin-top:calc(-1 * clamp(2rem,5vw,3rem))}}
-.k-formularz{position:relative;background:#fff;border-top:5px solid var(--s);padding:clamp(1.25rem,3vw,2rem);box-shadow:0 24px 48px -24px rgba(17,24,32,.5)}
+.k-formularz{position:relative;background:#fff;border-top:6px solid var(--s);padding:clamp(1.5rem,3.5vw,2.75rem);box-shadow:0 24px 48px -24px rgba(17,24,32,.5)}
 
 .k-h2{margin:0 0 .75rem;font-family:var(--font-display);font-size:clamp(1.4rem,2.6vw,1.75rem);font-weight:800;line-height:1.15;letter-spacing:-.02em}
+.k-formularz .k-h2{font-size:clamp(1.65rem,3vw,2.15rem)}
 .k-czas{margin:-.4rem 0 1.25rem;display:block}
 .k-drobne{margin:.9rem 0 0;font-size:.85rem;color:var(--sl)}
 
@@ -478,18 +477,18 @@ const CSS = `
 .k-kto{margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--l)}
 .k-kto a{color:var(--g);font-weight:700}
 
-.k-pole{display:grid;gap:.35rem;margin-bottom:1.1rem}
-.k-etykieta{font-weight:700;font-size:.95rem}.k-podpowiedz{font-size:.85rem;color:var(--sl)}
-.k-wejscie{box-sizing:border-box;width:100%;padding:.85rem .9rem;font:inherit;color:inherit;background:#fff;border:1px solid #B9C1CA;border-radius:0}
-textarea.k-wejscie{min-height:8rem;resize:vertical}
+.k-pole{display:grid;gap:.45rem;margin-bottom:1.4rem}
+.k-etykieta{font-weight:700;font-size:1.05rem}.k-podpowiedz{font-size:.9rem;color:var(--sl)}
+.k-wejscie{box-sizing:border-box;width:100%;min-height:3.5rem;padding:1rem 1.1rem;font:inherit;font-size:1.1rem;color:inherit;background:#fff;border:1px solid #B9C1CA;border-radius:0}
+textarea.k-wejscie{min-height:11rem;resize:vertical;line-height:1.5}
 .k-wejscie::placeholder{color:#8A94A0}
 .k-wejscie:focus-visible{outline:3px solid var(--g);outline-offset:1px;border-color:var(--g)}
 .k-wejscie:user-invalid{border-color:var(--b)}
 .k-blad{margin:0 0 1rem;padding:.75rem .9rem;color:var(--b);background:#FDF0EF;font-weight:600}
-.k-zgoda{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start;margin-bottom:.75rem;font-size:.9rem;line-height:1.45}
-.k-zgoda input{width:1.15rem;height:1.15rem;margin:.15rem 0 0;accent-color:var(--g)}
+.k-zgoda{display:grid;grid-template-columns:auto 1fr;gap:.75rem;align-items:start;margin-bottom:1rem;font-size:.95rem;line-height:1.5;cursor:pointer}
+.k-zgoda input{width:1.35rem;height:1.35rem;margin:.1rem 0 0;accent-color:var(--g)}
 .k-zgoda input:focus-visible{outline:3px solid var(--g);outline-offset:2px}.k-zgoda a{color:var(--g);font-weight:600}
-.k-przycisk{box-sizing:border-box;display:block;width:100%;margin-top:.75rem;padding:1.05rem 1.25rem;font:inherit;font-weight:800;font-size:.95rem;text-align:center;text-decoration:none;color:var(--g);background:var(--s);border:0;cursor:pointer}
+.k-przycisk{box-sizing:border-box;display:block;width:100%;margin-top:.75rem;padding:1.25rem 1.5rem;font:inherit;font-weight:800;font-size:1.1rem;text-align:center;text-decoration:none;color:var(--g);background:var(--s);border:0;cursor:pointer}
 .k-przycisk:hover{background:#C6F020}.k-przycisk:focus-visible{outline:3px solid #fff;outline-offset:3px;box-shadow:0 0 0 6px var(--g)}
 .k-wyroznienie{padding:.9rem 1rem;background:var(--s);font-weight:700}
 .k-dalej{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--l)}
