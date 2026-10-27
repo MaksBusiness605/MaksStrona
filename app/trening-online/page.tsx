@@ -609,7 +609,7 @@ export default function Page() {
 
       <main>
         {/* 1 · hero */}
-        <HeroShot {...HERO} cta={CTA} ctaHref={KOSZYK.jeden} {...kadr(Z.hero)} />
+        <HeroShot {...HERO} cta={CTA} ctaHref={KOSZYK.jeden} {...kadr(Z.hero)} imageRatio="1" />
 
         {/* 2 · pasek */}
         <IconStrip items={ICON_STRIP} tone="fog" />

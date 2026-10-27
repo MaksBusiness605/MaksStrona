@@ -402,11 +402,11 @@ export const ZDJECIA = {
      ───────────────────────────────────────────────────────────────────── */
   produkty: {
     hero: {
-      /* Trening w domu z telefonem na statywie: plan i nagrania serii.
-         Kwadrat 1200 × 1200, plik: public/produkty-trening-w-domu.jpg.
-         Proporcję (1) ustawia app/produkty/page.tsx. */
-      plik: "/produkty-trening-w-domu.jpg",
-      alt: "Trening w domu według planu: deska na macie, telefon na statywie nagrywa serię do omówienia",
+      /* Okładka e-booka „Plan Bez Zgadywania” w proporcji hero (0,786).
+         Plik: public/ebook-okladka.jpg. Gdy zmienisz okładkę w PDF,
+         podmień też ten plik. */
+      plik: "/ebook-okladka.jpg",
+      alt: "Okładka e-booka Plan Bez Zgadywania: trening, jedzenie i plan na 12 tygodni",
       brief:
         "KADR pionowy 4:5, aparat nisko, na wysokości sztangi, ogniskowa 35–50 mm, ostrość na ekranie telefonu. " +
         "W KADRZE: telefon z otwartym planem oparty o gryf, obok kartka z odręcznie zapisanymi ciężarami i długopis. Na ekranie widać realny plan z panelu, czytelne nazwy ćwiczeń i serie. W tle rozmyta sala. " +
@@ -517,8 +517,11 @@ export const ZDJECIA = {
      ───────────────────────────────────────────────────────────────────── */
   coachingOnline: {
     hero: {
-      plik: makieta("pion", "Hero", "NAGRYWANIE SERII", "statyw"),
-      alt: "Podopieczny nagrywa serię telefonem na statywie",
+      /* Trening w domu przez kamerę. Kwadrat 1200 × 1200,
+         plik: public/produkty-trening-w-domu.jpg. Proporcję (1) ustawia
+         app/trening-online/page.tsx. */
+      plik: "/produkty-trening-w-domu.jpg",
+      alt: "Trening online w domu: deska na macie, telefon na statywie pokazuje serię trenerowi na żywo",
       brief:
         "KADR pionowy 4:5, aparat za statywem i lekko z boku, ogniskowa 35 mm — widz ma zobaczyć dokładnie ten kadr, który widzi trener. " +
         "W KADRZE: telefon na statywie ustawiony z boku pod kątem 45°, w tle podopieczny w trakcie serii przysiadów, na ekranie telefonu widoczny obraz z kamery. Zwykła sala albo pokój z matą. " +

@@ -512,7 +512,7 @@ export default function Page() {
 
       <main>
         {/* 1 · hero */}
-        <HeroShot {...HERO} {...kadr(Z.hero)} imageRatio="1" cta={CTA} ctaHref={CEL} />
+        <HeroShot {...HERO} {...kadr(Z.hero)} cta={CTA} ctaHref={CEL} />
 
         {/* 2 · pasek */}
         <IconStrip items={ICON_STRIP} tone="fog" />
