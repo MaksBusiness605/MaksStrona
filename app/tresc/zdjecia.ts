@@ -402,11 +402,11 @@ export const ZDJECIA = {
      ───────────────────────────────────────────────────────────────────── */
   produkty: {
     hero: {
-      /* Okładka e-booka „Plan Bez Zgadywania” w proporcji hero (0,786).
-         Plik: public/ebook-okladka.jpg. Gdy zmienisz okładkę w PDF,
-         podmień też ten plik. */
-      plik: "/ebook-okladka.jpg",
-      alt: "Okładka e-booka Plan Bez Zgadywania: trening, jedzenie i plan na 12 tygodni",
+      /* Trening w domu z telefonem na statywie: plan i nagrania serii.
+         Kwadrat 1200 × 1200, plik: public/produkty-trening-w-domu.jpg.
+         Proporcję (1) ustawia app/produkty/page.tsx. */
+      plik: "/produkty-trening-w-domu.jpg",
+      alt: "Trening w domu według planu: deska na macie, telefon na statywie nagrywa serię do omówienia",
       brief:
         "KADR pionowy 4:5, aparat nisko, na wysokości sztangi, ogniskowa 35–50 mm, ostrość na ekranie telefonu. " +
         "W KADRZE: telefon z otwartym planem oparty o gryf, obok kartka z odręcznie zapisanymi ciężarami i długopis. Na ekranie widać realny plan z panelu, czytelne nazwy ćwiczeń i serie. W tle rozmyta sala. " +
