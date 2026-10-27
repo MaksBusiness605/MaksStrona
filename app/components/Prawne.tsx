@@ -121,7 +121,7 @@ export function StronaPrawna({
             <img src="/logo-znak.svg" alt="" width={32} height={32} className="h-8 w-8" />
             <span className="font-display text-[0.9375rem] font-extrabold tracking-tight">{FIRMA.marka}</span>
           </a>
-          <a href={FIRMA.trener.telefonHref} className={`text-sm font-semibold underline underline-offset-4 ${FOCUS}`}>
+          <a href={FIRMA.trener.telefonHref} className={`inline-block py-2 text-sm font-semibold underline underline-offset-4 ${FOCUS}`}>
             {FIRMA.trener.telefon}
           </a>
         </div>
@@ -142,7 +142,7 @@ export function StronaPrawna({
             <ol className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
               {paragrafy.map((p, i) => (
                 <li key={i}>
-                  <a href={`#p${i + 1}`} className={`group flex gap-3 text-grafit/80 hover:text-grafit ${FOCUS}`}>
+                  <a href={`#p${i + 1}`} className={`group flex gap-3 py-1.5 text-grafit/80 hover:text-grafit ${FOCUS}`}>
                     <span className="w-6 shrink-0 font-display font-bold text-stal tnum">§{i + 1}</span>
                     <span className="underline-offset-4 group-hover:underline">{p.tytul}</span>
                   </a>

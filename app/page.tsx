@@ -230,7 +230,7 @@ export default function Page() {
     <>
       <style>{CSS}</style>
       <JsonLd dane={[firma(), faq(PYTANIA)]} />
-      <Header cta="Wybierz, jak trenujesz" ctaHref="#wybor" />
+      <Header cta="Wybierz, jak trenujesz" ctaKrotko="Wybierz trening" ctaHref="#wybor" />
 
       <main className="h">
         {konkursTrwa && (
@@ -512,7 +512,7 @@ export default function Page() {
 const CSS = `
 .h{--g:#111820;--g2:#1A222C;--s:#D6FF3F;--s2:#C6F020;--m:#EDEFF2;--sl:#5F6A77;--l:#D8DDE3;--jas:#AAB3BE;color:var(--g);background:#fff}
 .h *,.h *::before,.h *::after{box-sizing:border-box}
-:where(.h) a{color:inherit}
+@layer base{:where(.h) a{color:inherit}}
 .h-w{max-width:75rem;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
 .h p{line-height:1.6}
 .h-drobne{margin:.75rem 0 0;font-size:.85rem;color:var(--sl)}
@@ -631,12 +631,12 @@ const CSS = `
 .h-decyzja-tak,.h-decyzja-nie{display:grid;gap:.15rem;justify-items:center;text-align:center;padding:1rem .75rem}
 .h-decyzja-tak{background:var(--s);color:var(--g)}
 .h-decyzja-nie{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff}
-.h-decyzja-etykieta{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.h-decyzja-etykieta{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 .h-decyzja-tak strong,.h-decyzja-nie strong{font-size:1.35rem;letter-spacing:-.02em;line-height:1.15}
 .h-decyzja-tak span:last-child,.h-decyzja-nie span:last-child{font-size:.8rem}
 
 .h-karta-mini{margin-top:1.5rem;border:1px solid var(--l);font-size:.85rem}
-.h-karta-mini-gora{display:flex;justify-content:space-between;padding:.6rem .8rem;background:var(--g);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.h-karta-mini-gora{display:flex;justify-content:space-between;padding:.6rem .8rem;background:var(--g);color:#fff;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .h-karta-mini-gora span:last-child{color:var(--s)}
 .h-karta-mini-wiersz{display:grid;grid-template-columns:4rem 1fr 3.5rem;gap:.75rem;align-items:center;padding:.6rem .8rem;border-top:1px solid var(--l);font-variant-numeric:tabular-nums}
 .h-karta-mini-wiersz span:first-child{color:var(--sl)}
@@ -665,7 +665,7 @@ const CSS = `
 .h-karta-cena span{display:block;margin-top:.4rem;font-size:.8rem;font-weight:600;letter-spacing:0;color:var(--sl)}
 .h-dl{margin:0 0 1.5rem;flex:1}
 .h-dl div{padding:.85rem 0;border-top:1px solid var(--l)}
-.h-dl dt{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sl);margin-bottom:.3rem}
+.h-dl dt{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sl);margin-bottom:.3rem}
 .h-dl dd{margin:0;line-height:1.5;font-size:.95rem}
 .h-dl-ryzyko dd{padding-left:.75rem;border-left:3px solid var(--s);font-weight:600}
 
@@ -691,7 +691,7 @@ const CSS = `
 .h-final-karta{max-width:52rem;margin:0 auto;padding:clamp(2rem,5vw,3.5rem);text-align:center;background-color:rgba(17,24,32,.8)}
 .h-final-przyciski{display:grid;gap:.6rem;margin:2rem 0 1.5rem;text-align:left}
 .h .h-final-opcja{color:var(--g)}
-.h-final-opcja{display:grid;grid-template-columns:auto 1fr auto auto;gap:1rem;align-items:center;padding:1rem 1.1rem;background:var(--s);color:var(--g);text-decoration:none;font-weight:800;transition:background .15s}
+.h-final-opcja{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:.75rem;align-items:center;padding:1rem 1.1rem;background:var(--s);color:var(--g);text-decoration:none;font-weight:800;transition:background .15s}
 .h-final-opcja:hover{background:var(--s2)}
 .h-final-opcja .h-nr{background:var(--g);color:var(--s)}
 .h-final-nazwa{font-size:1.05rem}

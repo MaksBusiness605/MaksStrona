@@ -90,7 +90,7 @@ export default function Page() {
           faq(FAQ),
         ]}
       />
-      <Header cta="Trening w Łodzi od 150 zł" ctaHref="/trening-stacjonarny" />
+      <Header cta="Trening w Łodzi od 150 zł" ctaKrotko={"Trening od 150\u00a0zł"} ctaHref="/trening-stacjonarny" />
 
       <main className="c">
         <section className="c-hero">
@@ -270,7 +270,7 @@ const CSS = `
 .c p,.c li{line-height:1.65}
 .c-hero{background:var(--g);color:#fff;padding:clamp(2rem,6vw,3.5rem) 0 clamp(1.75rem,5vw,2.75rem)}
 .c-okruszki{font-size:.85rem;color:#AEB7C2;margin:0 0 1.25rem}
-.c-okruszki a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.c-okruszki a{display:inline-block;padding:.5rem 0;color:#fff;text-decoration:underline;text-underline-offset:3px}
 .c-nadtytul{margin:0 0 .8rem;color:var(--s);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .c-tytul{margin:0 0 1rem;font-family:var(--font-display);font-size:clamp(2rem,6vw,3.4rem);font-weight:800;line-height:1.04;letter-spacing:-.03em;text-wrap:balance}
 .c-lead{margin:0;color:#D5DBE2;font-size:1.08rem;max-width:60ch}
@@ -286,7 +286,7 @@ const CSS = `
 .c-tabela tbody th{font-weight:500}
 .c-tabela td{white-space:nowrap;font-weight:700}
 .c-tabela tr:last-child th,.c-tabela tr:last-child td{border-bottom:0}
-.c-tabela a{color:inherit;text-underline-offset:3px}
+.c-tabela a{display:inline-block;padding:.35rem 0;color:inherit;text-underline-offset:3px}
 .c-przypis{margin:.6rem 0 0;font-size:.85rem;color:var(--sl)}
 .c-lista,.c-lista-nr{margin:0;padding-left:1.25rem;display:grid;gap:.6rem}
 .c-karta{background:#fff;border:1px solid var(--l);border-left:4px solid var(--s);padding:clamp(1.25rem,3vw,2rem)}

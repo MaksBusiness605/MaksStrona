@@ -166,7 +166,7 @@ export function Waypoint({
   dark?: boolean;
 }) {
   const s = {
-    sm: "h-6 w-6 text-[11px]",
+    sm: "h-6 w-6 text-xs",
     md: "h-9 w-9 text-sm",
     lg: "h-14 w-14 text-lg",
   }[size];
@@ -310,11 +310,14 @@ function Corners({ tone = "light" }: { tone?: "light" | "dark" | "signal" }) {
 
 export function Header({
   cta,
+  ctaKrotko,
   ctaHref = "#oferty",
   phone = "666 222 699",
   phoneHref = "tel:+48666222699",
 }: {
   cta: string;
+  /** Krótszy napis przycisku na telefonie (np. „Kup za 150 zł”), żeby nagłówek miał jedną-dwie linie. */
+  ctaKrotko?: string;
   ctaHref?: string;
   phone?: string;
   phoneHref?: string;
@@ -345,7 +348,7 @@ export function Header({
           <a
             href={phoneHref}
             aria-label={`Zadzwoń: ${phone}`}
-            className={`flex h-11 w-11 items-center justify-center text-grafit sm:hidden ${FOCUS}`}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center text-grafit sm:hidden ${FOCUS}`}
           >
             <Phone aria-hidden="true" strokeWidth={1.75} className="h-5 w-5" />
           </a>
@@ -358,9 +361,10 @@ export function Header({
 
           <a
             href={ctaHref}
-            className={`inline-flex min-h-[2.75rem] max-w-[11rem] items-center truncate bg-grafit px-4 py-2.5 font-display text-[0.6875rem] font-bold uppercase tracking-[0.09em] text-white transition-colors hover:bg-sygnal hover:text-grafit sm:max-w-none sm:px-5 sm:text-xs ${FOCUS}`}
+            className={`inline-flex min-h-[2.75rem] max-w-[9.5rem] items-center justify-center bg-grafit px-3 py-2 text-center font-display text-xs font-bold uppercase leading-tight tracking-[0.06em] text-white transition-colors hover:bg-sygnal hover:text-grafit sm:max-w-none sm:whitespace-nowrap sm:px-5 sm:tracking-[0.09em] ${FOCUS}`}
           >
-            {cta}
+            <span className="sm:hidden">{ctaKrotko ?? cta}</span>
+            <span className="hidden sm:inline">{cta}</span>
           </a>
         </div>
       </div>
@@ -650,7 +654,7 @@ export function StickyCta({
         {label}
       </Cta>
       {note && (
-        <p className="mt-2 text-center text-[0.6875rem] leading-snug text-white/60">
+        <p className="mt-2 text-center text-xs leading-snug text-white/60">
           {note}
         </p>
       )}
@@ -2265,7 +2269,7 @@ export function Offers({
                 }`}
               >
                 {o.ribbon && (
-                  <span className="absolute -top-3 left-7 bg-sygnal px-3 py-1.5 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-grafit">
+                  <span className="absolute -top-3 left-7 bg-sygnal px-3 py-1.5 font-display text-xs font-bold uppercase tracking-[0.1em] text-grafit">
                     {o.ribbon}
                   </span>
                 )}
@@ -2304,7 +2308,7 @@ export function Offers({
 
                   {o.save && (
                     <span
-                      className={`mt-3.5 inline-block px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-[0.1em] ${
+                      className={`mt-3.5 inline-block px-2.5 py-1 font-display text-xs font-bold uppercase tracking-[0.1em] ${
                         dark ? "bg-sygnal text-grafit" : "bg-grafit text-sygnal"
                       }`}
                     >
@@ -2516,7 +2520,7 @@ export function CennikRzedy({
                 {/* Dla kogo */}
                 <div>
                   {o.ribbon && (
-                    <span className="mb-3 inline-block bg-sygnal px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-grafit">
+                    <span className="mb-3 inline-block bg-sygnal px-2.5 py-1 font-display text-xs font-bold uppercase tracking-[0.1em] text-grafit">
                       {o.ribbon}
                     </span>
                   )}
@@ -2547,7 +2551,7 @@ export function CennikRzedy({
                   </p>
                   {o.save && (
                     <span
-                      className={`mt-2.5 inline-block px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-[0.1em] ${
+                      className={`mt-2.5 inline-block px-2 py-0.5 font-display text-xs font-bold uppercase tracking-[0.1em] ${
                         dark ? "bg-sygnal text-grafit" : "bg-grafit text-sygnal"
                       }`}
                     >
@@ -2755,7 +2759,7 @@ export function CennikWybor({
             <div>
               <div className="min-w-0">
                 {o.ribbon && (
-                  <span className="mb-3 inline-block bg-sygnal px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-grafit">
+                  <span className="mb-3 inline-block bg-sygnal px-2.5 py-1 font-display text-xs font-bold uppercase tracking-[0.1em] text-grafit">
                     {o.ribbon}
                   </span>
                 )}
@@ -2777,7 +2781,7 @@ export function CennikWybor({
                 <p className="mt-2 text-[0.8125rem] text-white/70">
                   {o.note}
                   {o.save && (
-                    <span className="mt-2.5 block w-fit bg-sygnal px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-grafit">
+                    <span className="mt-2.5 block w-fit bg-sygnal px-2 py-0.5 font-display text-xs font-bold uppercase tracking-[0.1em] text-grafit">
                       {o.save}
                     </span>
                   )}
@@ -3336,7 +3340,7 @@ export function Lokalizacja({
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapa.query)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`text-center text-sm font-semibold underline underline-offset-4 sm:text-left ${FOCUS}`}
+                className={`block py-3 text-center text-sm font-semibold underline underline-offset-4 sm:inline-block sm:text-left ${FOCUS}`}
               >
                 Otwórz w Mapach Google
               </a>
@@ -3674,7 +3678,7 @@ export function Footer() {
   /* Działalność nierejestrowana: bez NIP. */
   const daneFirmy = [`Sprzedawca: ${FIRMA.nazwa}`, FIRMA.adres, `Trener: ${FIRMA.trener.imie}`].filter(Boolean);
 
-  const link = `text-sm text-stal underline-offset-4 hover:text-grafit hover:underline ${FOCUS}`;
+  const link = `inline-block py-2 text-sm text-stal underline-offset-4 hover:text-grafit hover:underline ${FOCUS}`;
   const naglowek = "mb-4 font-display text-sm font-extrabold text-grafit";
 
   return (
@@ -3691,19 +3695,19 @@ export function Footer() {
             <p className="mt-4 max-w-[34ch] text-sm leading-relaxed text-stal">
               Trener personalny w Łodzi i online. Treningi 1&nbsp;na&nbsp;1 w Just GYM, ul.&nbsp;Piotrkowska 157A.
             </p>
-            <p className="mt-5 flex flex-col gap-1.5 text-sm">
-              <a href={FIRMA.trener.telefonHref} className={`tnum font-display text-lg font-extrabold text-grafit hover:underline ${FOCUS}`}>
+            <p className="mt-4 flex flex-col items-start text-sm">
+              <a href={FIRMA.trener.telefonHref} className={`tnum inline-block py-1.5 font-display text-lg font-extrabold text-grafit hover:underline ${FOCUS}`}>
                 {FIRMA.trener.telefon}
               </a>
-              <a href={`mailto:${FIRMA.trener.email}`} className={`break-all text-stal hover:text-grafit ${FOCUS}`}>
+              <a href={`mailto:${FIRMA.trener.email}`} className={`inline-block break-all py-1.5 text-stal hover:text-grafit ${FOCUS}`}>
                 {FIRMA.trener.email}
               </a>
             </p>
           </div>
 
           <nav aria-labelledby="stopka-oferta">
-            <p id="stopka-oferta" className={naglowek}>Oferta</p>
-            <ul className="flex flex-col gap-2.5">
+            <p id="stopka-oferta" className={`${naglowek} mb-2`}>Oferta</p>
+            <ul className="flex flex-col">
               {oferta.map((l) => (
                 <li key={l.href}>
                   <a href={l.href} className={link}>{l.label}</a>
@@ -3713,8 +3717,8 @@ export function Footer() {
           </nav>
 
           <nav aria-labelledby="stopka-dokumenty">
-            <p id="stopka-dokumenty" className={naglowek}>Dokumenty</p>
-            <ul className="flex flex-col gap-2.5">
+            <p id="stopka-dokumenty" className={`${naglowek} mb-2`}>Dokumenty</p>
+            <ul className="flex flex-col">
               {linki.map((l) => (
                 <li key={l.href}>
                   <a href={l.href} className={link}>{l.label}</a>

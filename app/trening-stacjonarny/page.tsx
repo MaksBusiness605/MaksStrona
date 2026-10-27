@@ -612,7 +612,7 @@ export default function Page() {
   return (
     <>
       <JsonLd dane={[usluga("sala", "/trening-stacjonarny"), faq(FAQ)]} />
-      <Header cta={CTA} ctaHref={REZERWACJA} />
+      <Header cta={CTA} ctaKrotko={"Kup za 150\u00a0zł"} ctaHref={REZERWACJA} />
 
       <main>
         {/* 1 · hero + zdjęcie */}

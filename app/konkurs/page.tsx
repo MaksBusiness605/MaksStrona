@@ -206,6 +206,7 @@ export default async function Page({
       <style>{CSS}</style>
       <Header
         cta={trwa ? "Wyślij zgłoszenie" : "Trening na sali"}
+        ctaKrotko={trwa ? "Weź udział" : "Trening na sali"}
         ctaHref={trwa ? "#zgloszenie" : TRASY.sala}
       />
 
