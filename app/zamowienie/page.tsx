@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const TELEFON = "537 483 233";
-const TELEFON_HREF = "tel:+48537483233";
+const TELEFON = "666 222 699";
+const TELEFON_HREF = "tel:+48666222699";
 
 /* ─────────────────────────────────────────────────────── 1 · PRODUKTY */
 
@@ -225,7 +225,7 @@ const PROCES_STACJONARNY: Krok[] = [
   {
     kiedy: "Na sali, 60 minut",
     co: "Pierwsza sesja",
-    opis: "Just GYM, Piotrkowska 157A, przy Stajni Jednorożców. Wejście na salę w cenie. Po sesji dostajesz kartę obciążeń.",
+    opis: "Just GYM, Piotrkowska 157A, przy Stajni Jednorożców. Wejście na salę nie jest w cenie (karnet albo jednorazowe wejście do Just GYM). Po sesji dostajesz kartę obciążeń.",
   },
 ];
 
@@ -835,7 +835,7 @@ const CSS = `
 .zm-gora{background:var(--grafit);color:var(--bialy)}
 .zm-gora-wnetrze{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .zm-marka{font-weight:700;font-size:1.05rem}
-.zm-wstecz{color:#c9ced6;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
+.zm-wstecz{display:inline-block;padding:.6rem 0;color:#c9ced6;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
 .zm-wstecz:hover{color:var(--bialy)}
 .zm-postep{max-width:1120px;margin:0 auto;padding:0 24px 22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none}
 .zm-etap{border-top:3px solid #3a414b;padding-top:10px;font-size:.85rem;color:#9aa1ac}
@@ -874,7 +874,7 @@ textarea.zm-wejscie{min-height:88px;resize:vertical;line-height:1.45}
 .zm-podpowiedz{font-size:.85rem;color:var(--szary);line-height:1.45;margin:0}
 .zm-oddzielnik{border:0;border-top:1px solid var(--linia);margin:26px 0}
 .zm-ankieta{font-size:1.05rem;margin:0 0 14px}
-.zm-faktura summary{cursor:pointer;font-weight:600;font-size:.95rem;margin-bottom:0}
+.zm-faktura summary{cursor:pointer;font-weight:600;font-size:.95rem;margin-bottom:0;padding:.6rem 0}
 .zm-faktura[open] summary{margin-bottom:18px}
 .zm-faktura summary:focus-visible{outline:3px solid var(--limonka);outline-offset:3px;border-radius:4px}
 .zm-zgody{display:grid;gap:14px;margin:0 0 18px;padding:0;border:0}

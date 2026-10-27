@@ -508,7 +508,7 @@ export default function Page() {
   return (
     <>
       <JsonLd dane={[usluga("plan", "/produkty"), faq(FAQ)]} />
-      <Header cta={CTA} ctaHref={CEL} />
+      <Header cta={CTA} ctaKrotko={"Plan za 249\u00a0zł"} ctaHref={CEL} />
 
       <main>
         {/* 1 · hero */}

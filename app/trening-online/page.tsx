@@ -605,7 +605,7 @@ export default function Page() {
   return (
     <>
       <JsonLd dane={[usluga("online", "/trening-online"), faq(FAQ)]} />
-      <Header cta={CTA} ctaHref={KOSZYK.jeden} />
+      <Header cta={CTA} ctaKrotko={"Kup za 100\u00a0zł"} ctaHref={KOSZYK.jeden} />
 
       <main>
         {/* 1 · hero */}

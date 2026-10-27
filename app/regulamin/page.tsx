@@ -315,7 +315,7 @@ function WzorOdstapienia() {
         e-mail własnymi słowami.
       </p>
 
-      <div className="mt-6 space-y-4 bg-mgla p-6 font-mono text-[0.875rem] leading-[1.75] text-grafit sm:p-8">
+      <div className="mt-6 space-y-4 bg-mgla p-5 font-mono text-[0.875rem] leading-[1.75] text-grafit [overflow-wrap:anywhere] sm:p-8">
         <p>
           Adresat: {[FIRMA.nazwa, FIRMA.adres, `e-mail: ${FIRMA.email}`].filter(Boolean).join(", ")}
         </p>
