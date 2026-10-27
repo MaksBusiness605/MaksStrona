@@ -15,8 +15,6 @@ import { KOLOR, esc, stopka } from "./wyslij-mail";
    element, a przyciski to komórki tabeli z tłem. Tak wygląda to samo
    w Gmailu na telefonie i w Outlooku na komputerze.
 
-   Podgląd bez płacenia (npm run dev):
-     http://localhost:3000/api/dev/podglad-maila?produkt=stacjonarny-1
    ═══════════════════════════════════════════════════════════════════════ */
 
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
