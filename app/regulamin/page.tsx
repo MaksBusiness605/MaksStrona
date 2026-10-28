@@ -48,7 +48,7 @@ const PARAGRAFY: Paragraf[] = [
           `Regulamin określa zasady sprzedaży usług treningowych i treści cyfrowych przez stronę ${F.strona} („Strona”) oraz zasady korzystania ze Strony.`,
           `Usługodawcą i sprzedawcą jest ${daneSprzedawcy()} („Usługodawca”).`,
           `Usługi w imieniu Usługodawcy prowadzi trener ${F.trener.imie} („Trener”). Za wykonanie usług wobec Klienta odpowiada Usługodawca.`,
-          `Kontakt z Usługodawcą: e-mail ${F.email}, telefon ${F.telefon}. W sprawach terminów i treningów: Trener, telefon ${F.trener.telefon}, e-mail ${F.trener.email} (w dni robocze).`,
+          `Kontakt z Usługodawcą: e-mail ${F.email}, telefon ${F.telefon}${F.adres ? `, adres do korespondencji: ${F.adres}` : ""}. W sprawach terminów i treningów: Trener, telefon ${F.trener.telefon}, e-mail ${F.trener.email} (w dni robocze).`,
           "Regulamin jest udostępniany nieodpłatnie na Stronie w sposób, który pozwala go pobrać, zapisać i wydrukować. Przed złożeniem zamówienia Klient zapoznaje się z Regulaminem i akceptuje go.",
           "Usługi są przeznaczone dla osób pełnoletnich. Osoba niepełnoletnia może skorzystać z usług wyłącznie za zgodą przedstawiciela ustawowego, który składa zamówienie w jej imieniu.",
         ],
@@ -191,7 +191,7 @@ const PARAGRAFY: Paragraf[] = [
       {
         lista: [
           "Konsument i Przedsiębiorca na prawach konsumenta mogą odstąpić od umowy bez podawania przyczyny w terminie 14 dni od dnia jej zawarcia.",
-          `Aby odstąpić od umowy, wystarczy wysłać przed upływem terminu jednoznaczne oświadczenie, np. e-mailem na adres ${F.email} albo ${F.trener.email}. Można skorzystać ze wzoru formularza zamieszczonego na końcu Regulaminu, ale nie jest to obowiązkowe. Usługodawca niezwłocznie potwierdza otrzymanie oświadczenia e-mailem.`,
+          `Aby odstąpić od umowy, wystarczy wysłać przed upływem terminu jednoznaczne oświadczenie, np. e-mailem na adres ${F.email} albo ${F.trener.email}${F.adres ? ` lub listem na adres ${F.adres}` : ""}. Można skorzystać ze wzoru formularza zamieszczonego na końcu Regulaminu, ale nie jest to obowiązkowe. Usługodawca niezwłocznie potwierdza otrzymanie oświadczenia e-mailem.`,
           "Usługodawca zwraca płatność w ciągu 14 dni od otrzymania oświadczenia, tą samą metodą płatności, której użył Klient, chyba że Klient zgodzi się na inną. Klient nie ponosi kosztów zwrotu.",
           "Jeśli Klient zażądał rozpoczęcia usługi przed upływem terminu na odstąpienie (§ 4 ust. 3) i część usługi została już wykonana, Klient płaci za usługi spełnione do chwili odstąpienia. Przy Pakiecie jest to cena Pakietu podzielona przez liczbę Sesji, pomnożona przez liczbę Sesji odbytych lub przepadłych zgodnie z § 6 ust. 3. Przy Prowadzeniu jest to część ceny proporcjonalna do liczby dni świadczenia.",
           "Prawo odstąpienia od umowy nie przysługuje:",

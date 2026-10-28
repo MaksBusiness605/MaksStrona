@@ -25,11 +25,9 @@ export const FIRMA = {
   /** Kto sprzedaje. Działalność bez rejestracji w CEIDG: imię i nazwisko. */
   nazwa: "Jarosław Sitek",
   wlasciciel: "Jarosław Sitek",
-  /** Adres do korespondencji: tu klient wysyła odstąpienie i reklamację.
-      ⚠ Przepisy wymagają adresu sprzedawcy. Puste pole znika ze stopki
-      i dokumentów, ale wpisz go jak najszybciej (adres zamieszkania
-      albo wirtualne biuro), np. "ul. Przykładowa 1/2, 90-001 Łódź". */
-  adres: "",
+  /** Adres do korespondencji: tu klient może wysłać odstąpienie
+      i reklamację. Pokazuje się w stopce, regulaminach i politykach. */
+  adres: "ul. Targowa 38/38, 90-043 Łódź",
   /** Działalność nierejestrowana: bez NIP i REGON. Puste pola znikają. */
   nip: "",
   regon: "",
@@ -55,7 +53,7 @@ export const FIRMA = {
 } as const;
 
 /** Wersja dokumentów. Zmieniasz regulamin albo politykę: zmień datę. */
-export const DATA_DOKUMENTOW = "23.10.2026";
+export const DATA_DOKUMENTOW = "28.10.2026";
 
 /** „Jarosław Sitek, ul. Targowa …” i NIP/REGON, tylko jeśli są wpisane.
     Do regulaminu, polityk i stopki. */
