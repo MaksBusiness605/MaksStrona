@@ -40,6 +40,8 @@ const PARAGRAFY: Paragraf[] = [
       `Organizatorem konkursu „Wygraj trzy treningi jeden na jeden” („Konkurs”) jest ${daneSprzedawcy()} („Organizator”).`,
       `Sesje z nagrody prowadzi trener ${F.trener.imie}. Kontakt w sprawie Konkursu: tel. ${F.trener.telefon}, e-mail ${F.trener.email}.`,
       "Konkurs prowadzony jest na stronie /konkurs („Strona”) oraz przez formularz zgłoszeniowy w reklamach Organizatora na Facebooku i Instagramie („Formularz w reklamie”). Oba sposoby zgłoszenia są równoważne. Regulamin jest dostępny pod adresem /konkurs/regulamin.",
+      /* Wymóg Meta dla konkursów promowanych na Facebooku i Instagramie. */
+      "Konkurs nie jest sponsorowany, popierany, przeprowadzany ani w żaden sposób powiązany z Meta Platforms Ireland Limited ani z serwisami Facebook i Instagram. Meta nie odpowiada za Konkurs, a Uczestnik zwalnia ją z odpowiedzialności z nim związanej. Zgłoszenie trafia do Organizatora, nie do Meta.",
     ],
   },
   {
