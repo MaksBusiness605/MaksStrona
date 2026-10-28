@@ -57,14 +57,15 @@ export const metadata: Metadata = metaStrony({
 /** Pole z firma.ts jest uzupełnione, gdy nie ma w nim „[…]”. */
 const jest = (s: string) => Boolean(s.trim()) && !s.includes("[");
 
+/* Administrator to sprzedawca (firma.ts); kontakt w sprawie konkursu
+   i danych: skrzynka i telefon trenera. */
 const ADMIN = [
   `Administrator danych: ${jest(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel}`,
   jest(FIRMA.adres) ? FIRMA.adres : "",
-  `e-mail: ${FIRMA.email}`,
-  `tel. ${FIRMA.telefon}.`,
 ]
   .filter(Boolean)
   .join(", ")
+  .concat(`. Kontakt w sprawie konkursu i danych: ${FIRMA.trener.email}, tel. ${FIRMA.trener.telefon}.`)
   .concat(
     " Dane z konkursu usuwam 30 dni po ogłoszeniu wyników, chyba że zgodzisz się na SMS-y o ofertach: wtedy do czasu wycofania zgody.",
   );
@@ -85,11 +86,37 @@ const TRENER_KONKURS = {
 };
 
 const BLEDY: Record<string, string> = {
-  dane: "Sprawdź imię, numer telefonu i odpowiedź (co najmniej 20 znaków), a potem wyślij jeszcze raz.",
+  dane: "Sprawdź imię, numer telefonu, e-mail i odpowiedź, a potem wyślij jeszcze raz.",
   zgoda: "Zaakceptuj regulamin, żeby wysłać zgłoszenie.",
   zamkniete: "Zgłoszenia są już zamknięte.",
   serwer: `Zgłoszenie nie doszło. Spróbuj za chwilę albo zadzwoń: ${TELEFON}.`,
 };
+
+/** Mail do uczestnika zaraz po wysłaniu zgłoszenia. */
+function mailPotwierdzenia(imie: string, odpowiedz: string) {
+  const strona = (process.env.SITE_URL || FIRMA.strona).replace(/\/+$/, "");
+  return [
+    `Cześć ${imie},`,
+    "",
+    "dziękuję za zgłoszenie do konkursu „Wygraj trzy treningi jeden na jeden”. Dotarło i biorę je pod uwagę.",
+    "",
+    "TWOJA ODPOWIEDŹ",
+    odpowiedz,
+    "",
+    "CO DALEJ",
+    `Zgłoszenia przyjmuję do ${dataPL(KONKURS.koniec)}.`,
+    `Wyniki ogłoszę do ${dataPL(KONKURS.wyniki)}. Czytam każdą odpowiedź, nie losuję.`,
+    `Jeśli wygrasz, napiszę SMS-em z numeru ${TELEFON}. Zapisz go, żeby wiadomość nie umknęła.`,
+    "",
+    `Nie chcesz czekać do wyników? Pojedyncza sesja w Just GYM przy Piotrkowskiej kosztuje 150 zł: ${strona}${TRASY.sala}`,
+    "",
+    `Regulamin konkursu: ${strona}/konkurs/regulamin`,
+    `Pytania? Odpisz na tego maila albo zadzwoń: ${TELEFON}.`,
+    "",
+    "Maks",
+    "Maks Treningi",
+  ].join("\n");
+}
 
 /** 666222699 / +48666222699 → "+48 666 222 699" (do maila, żeby dało się kliknąć i zadzwonić). */
 function telefonCzytelny(t: string) {
@@ -113,11 +140,14 @@ async function wyslij(f: FormData) {
   const imie = t("imie");
   const telefon = t("telefon").replace(/[\s()-]/g, "");
   const odpowiedz = t("odpowiedz");
+  const email = t("email").toLowerCase();
 
   const poprawne =
     imie && imie.length <= 40 &&
     /^(?:\+?48)?[1-9]\d{8}$/.test(telefon) &&
-    odpowiedz.length >= 20 && odpowiedz.length <= 500;
+    email.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) &&
+    /* Bez limitu dla uczestnika; 10 000 znaków to tylko bezpiecznik przed botami. */
+    odpowiedz.length > 0 && odpowiedz.length <= 10000;
   if (!poprawne) redirect("/konkurs?blad=dane#zgloszenie");
   if (f.get("zgodaRegulamin") !== "on") redirect("/konkurs?blad=zgoda#zgloszenie");
 
@@ -140,11 +170,13 @@ async function wyslij(f: FormData) {
           "UCZESTNIK",
           `Imię:     ${imie}`,
           `Telefon:  ${telefonCzytelny(telefon)}`,
+          `E-mail:   ${email}`,
           `SMS-y marketingowe: ${zgodaMarketing ? "TAK, zgoda wyrażona" : "nie"}`,
           "",
           "ODPOWIEDŹ KONKURSOWA",
           odpowiedz,
         ].join("\n"),
+        odpowiedzDo: email,
       });
       mailOk = true;
       console.log(`[konkurs] mail wysłany do ${trener} (${imie})`);
@@ -163,7 +195,7 @@ async function wyslij(f: FormData) {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imie, telefon, odpowiedz, zgodaMarketing, zgloszono: zgloszono.toISOString() }),
+        body: JSON.stringify({ imie, telefon, email, odpowiedz, zgodaMarketing, zgloszono: zgloszono.toISOString() }),
         signal: AbortSignal.timeout(8000),
       });
       webhookOk = res.ok;
@@ -175,10 +207,23 @@ async function wyslij(f: FormData) {
   /* Bez maila i bez webhooka zgłoszenie by przepadło: pokazujemy błąd,
      a dane zostają w logach Vercela, żeby nic nie zginęło. */
   if (!mailOk && !webhookOk) {
-    console.error("[konkurs] ZGŁOSZENIE NIEZAPISANE:", { imie, telefon, odpowiedz, zgodaMarketing });
+    console.error("[konkurs] ZGŁOSZENIE NIEZAPISANE:", { imie, telefon, email, odpowiedz, zgodaMarketing });
   }
 
   if (!mailOk && !webhookOk) redirect("/konkurs?blad=serwer#zgloszenie");
+
+  /* 2b · Potwierdzenie dla uczestnika. Błąd nie blokuje zgłoszenia:
+     zgłoszenie już dotarło do trenera. Odpowiedź na ten mail trafia do trenera. */
+  try {
+    await wyslijMail({
+      do: email,
+      temat: "Twoje zgłoszenie do konkursu dotarło · Maks Treningi",
+      tresc: mailPotwierdzenia(imie, odpowiedz),
+      odpowiedzDo: FIRMA.trener.email,
+    });
+  } catch (e) {
+    console.error("[konkurs] potwierdzenie do uczestnika nie wyszło:", e);
+  }
 
   /* 3 · Zgłoszenie do Mety jako „Lead” (reklamy na leady uczą się na nim).
      Tylko przy zgodzie na cookies marketingowe. Ten sam id dostaje Pixel
@@ -194,6 +239,7 @@ async function wyslij(f: FormData) {
       url: `${strona}/konkurs`,
       telefon,
       imie,
+      email,
       ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined,
       ua: h.get("user-agent") || undefined,
       fbp: ciastka.get("_fbp")?.value,
@@ -322,11 +368,18 @@ export default async function Page({
                 </label>
 
                 <label className="k-pole">
+                  <span className="k-etykieta">E-mail</span>
+                  <span className="k-podpowiedz">Wyślę na niego potwierdzenie zgłoszenia.</span>
+                  <input name="email" type="email" required maxLength={120} autoComplete="email"
+                    inputMode="email" className="k-wejscie" />
+                </label>
+
+                <label className="k-pole">
                   <span className="k-etykieta">Co chcesz poprawić w swoim treningu i dlaczego akurat to?</span>
                   <span className="k-podpowiedz">
                     Napisz, z czym masz problem i od kiedy. Wygrywa konkret, nie długość.
                   </span>
-                  <textarea name="odpowiedz" required minLength={20} maxLength={500} className="k-wejscie"
+                  <textarea name="odpowiedz" required className="k-wejscie"
                     placeholder="Np. przy przysiadzie ze sztangą od 50 kg…" />
                 </label>
 
