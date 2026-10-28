@@ -54,18 +54,8 @@ export const metadata: Metadata = metaStrony({
      nikt nie traci. Wpisz go też do regulaminu konkursu jako możliwe
      wyróżnienia, bez podawania szczegółów. */
 
-/** Pole z firma.ts jest uzupełnione, gdy nie ma w nim „[…]”. */
-const jest = (s: string) => Boolean(s.trim()) && !s.includes("[");
-
-/* Administrator to sprzedawca (firma.ts); kontakt w sprawie konkursu
-   i danych: skrzynka i telefon trenera. */
-const ADMIN = [
-  `Administrator danych: ${jest(FIRMA.nazwa) ? FIRMA.nazwa : FIRMA.wlasciciel}`,
-  jest(FIRMA.adres) ? FIRMA.adres : "",
-]
-  .filter(Boolean)
-  .join(", ")
-  .concat(`. Kontakt w sprawie konkursu i danych: ${FIRMA.trener.email}, tel. ${FIRMA.trener.telefon}.`)
+/* Administrator danych z konkursu: trener (firma.ts → trener). */
+const ADMIN = `Administrator danych: ${FIRMA.trener.imie}, ${FIRMA.trener.email}, tel. ${FIRMA.trener.telefon}.`
   .concat(
     " Dane z konkursu usuwam 30 dni po ogłoszeniu wyników, chyba że zgodzisz się na SMS-y o ofertach: wtedy do czasu wycofania zgody.",
   );
