@@ -87,6 +87,7 @@ export async function leadDoMety(l: {
   url: string;
   telefon?: string;
   imie?: string;
+  email?: string;
   ip?: string;
   ua?: string;
   fbp?: string;
@@ -106,6 +107,7 @@ export async function leadDoMety(l: {
     user_data: {
       ...(telefon ? { ph: [skrot(telefon)] } : {}),
       ...(l.imie ? { fn: [skrot(l.imie)] } : {}),
+      ...(l.email ? { em: [skrot(l.email)] } : {}),
       ...(l.ip ? { client_ip_address: l.ip } : {}),
       ...(l.ua ? { client_user_agent: l.ua } : {}),
       ...(l.fbp ? { fbp: l.fbp } : {}),

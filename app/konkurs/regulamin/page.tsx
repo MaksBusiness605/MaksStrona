@@ -38,7 +38,7 @@ const PARAGRAFY: Paragraf[] = [
     tytul: "Organizator",
     tresc: [
       `Organizatorem konkursu „Wygraj trzy treningi jeden na jeden” („Konkurs”) jest ${daneSprzedawcy()} („Organizator”).`,
-      `Sesje z nagrody prowadzi trener ${F.trener.imie}. Kontakt w sprawie Konkursu: tel. ${F.trener.telefon}, e-mail ${F.trener.email} albo ${F.email}.`,
+      `Sesje z nagrody prowadzi trener ${F.trener.imie}. Kontakt w sprawie Konkursu: tel. ${F.trener.telefon}, e-mail ${F.trener.email}.`,
       "Konkurs prowadzony jest na stronie /konkurs („Strona”) oraz przez formularz zgłoszeniowy w reklamach Organizatora na Facebooku i Instagramie („Formularz w reklamie”). Oba sposoby zgłoszenia są równoważne. Regulamin jest dostępny pod adresem /konkurs/regulamin.",
     ],
   },
@@ -83,10 +83,11 @@ const PARAGRAFY: Paragraf[] = [
     ],
   },
   {
-    tytul: "Kontakt z Uczestnikiem: telefon i SMS",
+    tytul: "Kontakt z Uczestnikiem: telefon, SMS i e-mail",
     tresc: [
       "Wysyłając zgłoszenie, Uczestnik zgadza się, aby Organizator kontaktował się z nim telefonicznie i SMS-em na podany numer w sprawach związanych z Konkursem: ogłoszenia wyników, przekazania nagrody lub wyróżnienia i ustalenia terminów sesji.",
       `Organizator kontaktuje się z numeru ${F.trener.telefon}.`,
+      "Po wysłaniu zgłoszenia przez Stronę Uczestnik dostaje na podany adres e-mail potwierdzenie zgłoszenia.",
       "Jeśli nagrodzona osoba nie odpowie w ciągu 7 dni od pierwszej próby kontaktu, traci prawo do nagrody, a Organizator może przyznać ją innemu Uczestnikowi.",
       "Wiadomości o ofertach i wolnych terminach, niezwiązane z Konkursem, Organizator wysyła tylko osobom, które zaznaczyły na to osobną, nieobowiązkową zgodę w formularzu. Zgodę można wycofać w każdej chwili, odpisując SMS-em, telefonicznie albo e-mailem.",
     ],
@@ -101,7 +102,7 @@ const PARAGRAFY: Paragraf[] = [
           wiersze: [
             [
               "Przeprowadzenie Konkursu, wybór zwycięzcy, kontakt i wydanie nagrody",
-              "imię, numer telefonu, odpowiedź konkursowa",
+              "imię, numer telefonu, adres e-mail, odpowiedź konkursowa",
               "art. 6 ust. 1 lit. b: udział w Konkursie na zasadach tego regulaminu",
               "30 dni od ogłoszenia wyników; dane zwycięzcy do wykorzystania nagrody",
             ],
@@ -128,7 +129,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Reklamacje",
     tresc: [
-      `Reklamacje dotyczące Konkursu można zgłaszać do 14 dni od ogłoszenia wyników e-mailem na ${F.email} albo SMS-em na ${F.trener.telefon}. Reklamacja powinna zawierać imię, numer telefonu podany w zgłoszeniu i opis sprawy.`,
+      `Reklamacje dotyczące Konkursu można zgłaszać do 14 dni od ogłoszenia wyników e-mailem na ${F.trener.email} albo SMS-em na ${F.trener.telefon}. Reklamacja powinna zawierać imię, numer telefonu podany w zgłoszeniu i opis sprawy.`,
       "Organizator odpowiada na reklamację w ciągu 14 dni od jej otrzymania, w ten sam sposób, w jaki została zgłoszona.",
       "Reklamacja nie może dotyczyć samej oceny odpowiedzi, która należy do Organizatora (§ 4 ust. 3).",
     ],
