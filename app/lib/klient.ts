@@ -9,6 +9,24 @@ import Stripe from "stripe";
 
 const klucz = process.env.STRIPE_SECRET_KEY;
 
-export const stripe = klucz ? new Stripe(klucz) : null;
+/* TYLKO LIVE NA ŻYWEJ STRONIE. Na produkcji (Vercel → Production) klucz
+   testowy albo z piaskownicy (sk_test_…, rk_test_…) jest odrzucany:
+   strona nie utworzy płatności testowej, nie przyjmie webhooka z
+   piaskownicy i nie wyda e-booka z testowego zamówienia. Zamiast tego
+   klient widzi „Płatności są chwilowo niedostępne”, a w logach Vercela
+   jest błąd z instrukcją. Podglądy (Preview) i `npm run dev` mogą
+   używać kluczy testowych. */
+const naZywo = process.env.VERCEL_ENV
+  ? process.env.VERCEL_ENV === "production"
+  : process.env.NODE_ENV === "production";
+export const kluczTestowyNaProdukcji = naZywo && !!klucz && /^(sk|rk)_test_/.test(klucz);
+if (kluczTestowyNaProdukcji) {
+  console.error(
+    "[stripe] STRIPE_SECRET_KEY to klucz testowy/sandbox, a to produkcja. Płatności wyłączone. " +
+      "Wpisz w Vercelu klucz sk_live_… i STRIPE_WEBHOOK_SECRET z webhooka live, potem Redeploy.",
+  );
+}
+
+export const stripe = klucz && !kluczTestowyNaProdukcji ? new Stripe(klucz) : null;
 
 export const trybPokazowy = !klucz && process.env.NODE_ENV !== "production";
