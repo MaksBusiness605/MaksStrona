@@ -95,7 +95,7 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Dane osobowe",
     tresc: [
-      `Administratorem danych Uczestników jest Organizator (${daneSprzedawcy()}).`,
+      `Administratorem danych osobowych Uczestników jest ${F.trener.imie}, trener prowadzący Konkurs i sesje z nagrody (e-mail: ${F.trener.email}, tel. ${F.trener.telefon}).`,
       {
         tabela: {
           naglowki: ["Cel", "Dane", "Podstawa (RODO)", "Jak długo"],
@@ -121,8 +121,9 @@ const PARAGRAFY: Paragraf[] = [
           ],
         },
       },
-      "Podanie danych jest dobrowolne, ale bez imienia, numeru telefonu i odpowiedzi nie można wziąć udziału w Konkursie.",
-      "Zgłoszenia trafiają do Organizatora e-mailem (dostawcy: Resend, Google Ireland Limited, Vercel Inc.). Szczegóły, w tym prawa Uczestnika (dostęp, sprostowanie, usunięcie, ograniczenie, sprzeciw, wycofanie zgody, skarga do Prezesa UODO), opisuje Polityka prywatności pod adresem /polityka-prywatnosci.",
+      "Podanie danych jest dobrowolne, ale bez imienia, numeru telefonu, adresu e-mail i odpowiedzi nie można wziąć udziału w Konkursie przez Stronę.",
+      `Zgłoszenia trafiają do administratora e-mailem; przy zgłoszeniu z reklamy dane przetwarza też Meta Platforms Ireland Limited. Dostawcy techniczni: Resend (wysyłka e-maili), Google Ireland Limited (skrzynka Gmail), Vercel Inc. (strona).`,
+      `Uczestnik ma prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu, wycofania zgody w każdej chwili oraz skargi do Prezesa UODO. Żeby skorzystać z tych praw, wystarczy napisać na ${F.trener.email} albo SMS na ${F.trener.telefon}.`,
       "Organizator nie publikuje imion ani odpowiedzi Uczestników bez ich osobnej zgody.",
     ],
   },
