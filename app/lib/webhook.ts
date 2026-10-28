@@ -1,7 +1,7 @@
 // PLIK: app/lib/webhook.ts · STRIPE · potwierdzenie płatności i wysyłka maili (wołane z app/api/stripe/webhook/route.ts)
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe } from "./klient";
+import { czystaZmienna, stripe } from "./klient";
 import { mailDoKlienta, mailDoTrenera, mailNieudana, potwierdzenie, smsDoKlienta, smsDoTrenera, smsNieudana } from "./maile";
 import { htmlPotwierdzenia } from "./szablon-potwierdzenia";
 import { linkDoEbooka, maEbooka } from "./ebook";
@@ -35,8 +35,12 @@ import { wyslijMail } from "./wyslij-mail";
    ═══════════════════════════════════════════════════════════════════════ */
 
 export async function obsluzWebhook(req: Request) {
-  const sekret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !sekret) return new NextResponse("Webhook nieskonfigurowany", { status: 503 });
+  const sekret = czystaZmienna(process.env.STRIPE_WEBHOOK_SECRET);
+  if (!stripe || !sekret) {
+    const brak = [!stripe && "STRIPE_SECRET_KEY", !sekret && "STRIPE_WEBHOOK_SECRET"].filter(Boolean).join(" i ");
+    console.error(`[stripe/webhook] brak ${brak}`);
+    return new NextResponse(`Webhook nieskonfigurowany: w Vercelu (Production) brakuje ${brak}.`, { status: 503 });
+  }
 
   const podpis = req.headers.get("stripe-signature");
   if (!podpis) return new NextResponse("Brak podpisu", { status: 400 });
@@ -45,7 +49,13 @@ export async function obsluzWebhook(req: Request) {
   try {
     zdarzenie = stripe.webhooks.constructEvent(await req.text(), podpis, sekret);
   } catch {
-    return new NextResponse("Zły podpis", { status: 400 });
+    /* Końcówka sekretu (4 znaki z 32) wystarczy, żeby porównać go
+       z „Signing secret” w Stripe, i nic nie zdradza. */
+    const info =
+      `Zły podpis. STRIPE_WEBHOOK_SECRET na stronie kończy się na „${sekret.slice(-4)}”. ` +
+      "Porównaj z Signing secret tego webhooka w Stripe. Inna końcówka: popraw w Vercelu (Production) i zrób Redeploy.";
+    console.error("[stripe/webhook]", info);
+    return new NextResponse(info, { status: 400 });
   }
 
   try {
