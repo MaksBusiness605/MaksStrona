@@ -7,7 +7,14 @@ import Stripe from "stripe";
    Klucz testowy zaczyna się od sk_test_, produkcyjny od sk_live_.
    Klucz NIGDY nie trafia do kodu ani do zmiennej z prefiksem NEXT_PUBLIC_. */
 
-const klucz = process.env.STRIPE_SECRET_KEY;
+/** Wartość z Vercela bez przypadkowych spacji, entera i cudzysłowów,
+    które łatwo wkleić razem z kluczem. */
+export function czystaZmienna(v: string | undefined): string | undefined {
+  const c = v?.trim().replace(/^["']+|["']+$/g, "").trim();
+  return c || undefined;
+}
+
+const klucz = czystaZmienna(process.env.STRIPE_SECRET_KEY);
 
 /* TYLKO LIVE NA ŻYWEJ STRONIE. Na produkcji (Vercel → Production) klucz
    testowy albo z piaskownicy (sk_test_…, rk_test_…) jest odrzucany:
