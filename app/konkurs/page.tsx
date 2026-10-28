@@ -7,7 +7,8 @@ import { randomUUID } from "node:crypto";
 import { ZdarzenieLead } from "@/app/components/ZdarzenieLead";
 import { leadDoMety } from "@/app/lib/meta-capi";
 import { czytajZgode } from "@/app/lib/sledzenie";
-import { Footer, Header } from "@/app/components/sections";
+import { Footer, Header, Team } from "@/app/components/sections";
+import { ZDJECIA, kadr } from "@/app/tresc/zdjecia";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
 import { FIRMA } from "@/app/tresc/firma";
@@ -70,6 +71,18 @@ const ADMIN = [
 
 // TODO: np. "Każdy uczestnik dostanie SMS-em kod na pierwszą sesję za 120 zł zamiast 150 zł, ważny do 30 listopada."
 const DLA_WSZYSTKICH: string | null = null;
+
+/* Sekcja „Kto prowadzi” na dole strony. Treść jak na stronie głównej. */
+const TRENER_KONKURS = {
+  heading: "Kto prowadzi konkurs i treningi",
+  name: "Maksymilian Lehman",
+  role: "Trener personalny · Just GYM, Piotrkowska 157A, Łódź",
+  paragraphs: [
+    "Pracuję z ludźmi o różnym poziomie zaawansowania i w bardzo różnym wieku. Prowadzę zarówno treningi pod cele sportowe, jak i treningi prozdrowotne. Nie boję się pracy z osobami po kontuzjach i wiem, kiedy trzeba skorzystać z pomocy fizjoterapeuty albo ortopedy.",
+    "Pierwszy raz przyszedłem na siłownię 9 lat temu. Zaczynałem od pustej sztangi i nie potrafiłem podciągnąć się na drążku. Próbowałem treningu kulturystycznego i kalisteniki, aż odkryłem trójbój siłowy. Największą motywacją okazały się dla mnie wyniki w przysiadzie, wyciskaniu i martwym ciągu.",
+    "Jestem pasjonatem i zawodnikiem trójboju siłowego, ale na co dzień pracuję z lekarzami, informatykami, sportowcami, kobietami po ciąży i osobami, które dopiero zaczynają. To ja czytam każde zgłoszenie i to ze mną zwycięzca spędzi trzy sesje.",
+  ],
+};
 
 const BLEDY: Record<string, string> = {
   dane: "Sprawdź imię, numer telefonu i odpowiedź (co najmniej 20 znaków), a potem wyślij jeszcze raz.",
@@ -402,6 +415,15 @@ export default async function Page({
             </p>
           </section>
         </div>
+
+        {/* Kto prowadzi: ten sam opis i zdjęcie co na stronie głównej. */}
+        <Team
+          {...TRENER_KONKURS}
+          {...kadr(ZDJECIA.stacjonarny.team)}
+          cta={trwa ? "Wyślij zgłoszenie" : "Zobacz trening na sali"}
+          ctaHref={trwa ? "#zgloszenie" : TRASY.sala}
+          odstepGora
+        />
       </main>
 
       <Footer />
