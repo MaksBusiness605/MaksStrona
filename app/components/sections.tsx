@@ -24,7 +24,7 @@ import {
   Video,
 } from "lucide-react";
 import { LeadForm } from "@/app/components/LeadForm";
-import { FIRMA } from "@/app/tresc/firma";
+import { FIRMA, profile } from "@/app/tresc/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════
    SYSTEM · co się zmieniło w tej wersji
@@ -3703,6 +3703,16 @@ export function Footer() {
                 {FIRMA.trener.email}
               </a>
             </p>
+            {profile().length > 0 && (
+              <p className="mt-2 flex flex-wrap gap-x-5 text-sm">
+                {profile().map((p) => (
+                  <a key={p.nazwa} href={p.url} target="_blank" rel="noopener noreferrer"
+                    className={`inline-block py-2 font-semibold text-grafit underline underline-offset-4 hover:no-underline ${FOCUS}`}>
+                    {p.nazwa}
+                  </a>
+                ))}
+              </p>
+            )}
           </div>
 
           <nav aria-labelledby="stopka-oferta">

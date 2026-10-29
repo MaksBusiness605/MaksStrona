@@ -11,7 +11,7 @@ import { Footer, Header, Team } from "@/app/components/sections";
 import { ZDJECIA, kadr } from "@/app/tresc/zdjecia";
 import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
-import { FIRMA } from "@/app/tresc/firma";
+import { FIRMA, profile } from "@/app/tresc/firma";
 
 export const metadata: Metadata = metaStrony({
   tytul: "Konkurs: wygraj 3 treningi personalne w Łodzi | Maks Treningi",
@@ -98,6 +98,12 @@ function mailPotwierdzenia(imie: string, odpowiedz: string) {
     `Wyniki ogłoszę do ${dataPL(KONKURS.wyniki)}. Czytam każdą odpowiedź, nie losuję.`,
     `Jeśli wygrasz, napiszę SMS-em z numeru ${TELEFON}. Zapisz go, żeby wiadomość nie umknęła.`,
     "",
+    ...(profile().length
+      ? [
+          `Do czasu wyników możesz mnie obserwować: ${profile().map((p) => `${p.nazwa} ${p.url}`).join(", ")}. To dobrowolne i nie wpływa na wybór zwycięzcy.`,
+          "",
+        ]
+      : []),
     `Nie chcesz czekać do wyników? Pojedyncza sesja w Just GYM przy Piotrkowskiej kosztuje 150 zł: ${strona}${TRASY.sala}`,
     "",
     `Regulamin konkursu: ${strona}/konkurs/regulamin`,
@@ -329,6 +335,21 @@ export default async function Page({
                   Zapisz go, żeby wiadomość nie wylądowała w spamie.
                 </p>
                 {DLA_WSZYSTKICH && <p className="k-wyroznienie">{DLA_WSZYSTKICH}</p>}
+                {profile().length > 0 && (
+                  <div className="k-obserwuj">
+                    <p className="k-dalej-tytul">Zostańmy w kontakcie do wyników</p>
+                    <p>Obserwuj mnie, żeby zobaczyć, z kim będziesz trenować, jeśli wygrasz.</p>
+                    <div className="k-obserwuj-linki">
+                      {profile().map((p) => (
+                        <a key={p.nazwa} className="k-przycisk k-przycisk-obrys" href={p.url}
+                          target="_blank" rel="noopener noreferrer">
+                          {p.nazwa}
+                        </a>
+                      ))}
+                    </div>
+                    <p className="k-drobne">Dobrowolne. Nie ma wpływu na wybór zwycięzcy.</p>
+                  </div>
+                )}
                 <div className="k-dalej">
                   <p className="k-dalej-tytul">Nie chcesz czekać do wyników?</p>
                   <p>
@@ -560,4 +581,9 @@ textarea.k-wejscie{min-height:11rem;resize:vertical;line-height:1.5}
 .k-dalej-tytul{margin:0 0 .25rem;font-weight:800}
 .k-dalej p{margin-top:0}
 .k-ukryte{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.k-obserwuj{margin-top:1.5rem;padding:1.25rem;background:var(--m)}
+.k-obserwuj p{margin:0 0 .9rem}.k-obserwuj .k-drobne{margin:.75rem 0 0}
+.k-obserwuj-linki{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.k-przycisk.k-przycisk-obrys{margin-top:0;padding:1rem;background:#fff;box-shadow:inset 0 0 0 2px var(--g)}
+.k-przycisk.k-przycisk-obrys:hover{background:var(--s)}
 `;

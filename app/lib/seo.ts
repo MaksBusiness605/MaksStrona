@@ -1,7 +1,7 @@
 // PLIK: app/lib/seo.ts · SEO · metadane stron (tytuł, opis, canonical, Open Graph) i dane strukturalne (JSON-LD)
 import type { Metadata } from "next";
 import { ID_PRODUKTOW, znajdzProdukt, type Rodzaj } from "./produkty";
-import { FIRMA } from "@/app/tresc/firma";
+import { FIRMA, profile } from "@/app/tresc/firma";
 
 /* ═══════════════════════════════════════════════════════════════════════
    SEO
@@ -14,14 +14,14 @@ import { FIRMA } from "@/app/tresc/firma";
       · faq()     → pytania i odpowiedzi.
    Wstawia je komponent <JsonLd /> (app/components/JsonLd.tsx).
 
-   PROFILE W SIECI: wpisz linki do SPOLECZNOSCI, gdy założysz profil
-   Google, Instagram albo Facebook. Google łączy je wtedy z firmą.
+   PROFILE W SIECI: linki do Instagrama i Facebooka wpisujesz w
+   app/tresc/firma.ts → PROFILE. Google łączy je wtedy z firmą.
    ═══════════════════════════════════════════════════════════════════════ */
 
 export const ADRES_STRONY = (process.env.SITE_URL || FIRMA.strona).replace(/\/+$/, "");
 
-/** Linki do profili firmy, np. "https://www.instagram.com/makstreningi". */
-const SPOLECZNOSCI: string[] = [];
+/** Linki do profili (Instagram, Facebook) z app/tresc/firma.ts → PROFILE. */
+const SPOLECZNOSCI: string[] = profile().map((p) => p.url);
 
 /** Miejsce treningów stacjonarnych: to samo co w wizytówce Google. */
 const SALA = {
