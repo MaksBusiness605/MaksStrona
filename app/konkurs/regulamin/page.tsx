@@ -40,8 +40,6 @@ const PARAGRAFY: Paragraf[] = [
       `Organizatorem konkursu „Wygraj trzy treningi jeden na jeden” („Konkurs”) jest ${daneSprzedawcy()} („Organizator”).`,
       `Sesje z nagrody prowadzi trener ${F.trener.imie}. Kontakt w sprawie Konkursu: tel. ${F.trener.telefon}, e-mail ${F.trener.email}.`,
       "Konkurs prowadzony jest na stronie /konkurs („Strona”) oraz przez formularz zgłoszeniowy w reklamach Organizatora na Facebooku i Instagramie („Formularz w reklamie”). Oba sposoby zgłoszenia są równoważne. Regulamin jest dostępny pod adresem /konkurs/regulamin.",
-      /* Wymóg Meta dla konkursów promowanych na Facebooku i Instagramie. */
-      "Konkurs nie jest sponsorowany, popierany, przeprowadzany ani w żaden sposób powiązany z Meta Platforms Ireland Limited ani z serwisami Facebook i Instagram. Meta nie odpowiada za Konkurs, a Uczestnik zwalnia ją z odpowiedzialności z nim związanej. Zgłoszenie trafia do Organizatora, nie do Meta.",
     ],
   },
   {
@@ -147,7 +145,8 @@ const PARAGRAFY: Paragraf[] = [
   {
     tytul: "Postanowienia końcowe",
     tresc: [
-      "Konkurs nie jest sponsorowany, popierany ani przeprowadzany przez Meta Platforms (Facebook, Instagram) ani w żaden sposób z nią związany. Meta nie odpowiada za Konkurs.",
+      "Konkurs nie jest sponsorowany, popierany ani przeprowadzany przez Meta Platforms (Facebook, Instagram) ani w żaden sposób z nią związany. Meta nie odpowiada za Konkurs, a Uczestnik zwalnia ją z odpowiedzialności z nim związanej.",
+      "Obserwowanie profili trenera na Instagramie i Facebooku jest dobrowolne i nie ma wpływu na wybór zwycięzcy.",
       "W sprawach nieuregulowanych stosuje się przepisy prawa polskiego, w szczególności Kodeksu cywilnego.",
       "Wysłanie zgłoszenia oznacza akceptację tego regulaminu.",
     ],

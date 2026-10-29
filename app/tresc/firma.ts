@@ -52,6 +52,22 @@ export const FIRMA = {
   sala: "Just GYM, ul. Piotrkowska 157A, Łódź",
 } as const;
 
+/** Profile trenera w mediach społecznościowych (pełne linki). Puste pole
+    = link nigdzie się nie pokazuje. Pokazują się w stopce, po wysłaniu
+    zgłoszenia do konkursu, w mailu z potwierdzeniem i w danych dla Google. */
+export const PROFILE = {
+  instagram: "",
+  facebook: "",
+} as const;
+
+/** Lista uzupełnionych profili: [{ nazwa: "Instagram", url }, …]. */
+export function profile(): { nazwa: string; url: string }[] {
+  return [
+    { nazwa: "Instagram", url: PROFILE.instagram },
+    { nazwa: "Facebook", url: PROFILE.facebook },
+  ].filter((p) => p.url.trim() !== "");
+}
+
 /** Wersja dokumentów. Zmieniasz regulamin albo politykę: zmień datę. */
 export const DATA_DOKUMENTOW = "28.10.2026";
 
