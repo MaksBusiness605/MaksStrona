@@ -56,8 +56,8 @@ export const FIRMA = {
     = link nigdzie się nie pokazuje. Pokazują się w stopce, po wysłaniu
     zgłoszenia do konkursu, w mailu z potwierdzeniem i w danych dla Google. */
 export const PROFILE = {
-  instagram: "",
-  facebook: "",
+  instagram: "https://www.instagram.com/max.trening/",
+  facebook: "https://www.facebook.com/people/Maksymilian-Lehman-Treningi/61595102681011/",
 } as const;
 
 /** Lista uzupełnionych profili: [{ nazwa: "Instagram", url }, …]. */
