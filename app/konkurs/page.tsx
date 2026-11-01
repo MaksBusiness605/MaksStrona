@@ -1,6 +1,5 @@
 // STRONA: /konkurs · KONKURS · formularz zgłoszeń, każde zgłoszenie przychodzi mailem na FIRMA.trener.email (firma.ts)
 import type { Metadata } from "next";
-import { Caveat } from "next/font/google";
 import { metaStrony } from "@/app/lib/seo";
 import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
@@ -14,8 +13,9 @@ import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "
 import { wyslijMail } from "@/app/lib/wyslij-mail";
 import { FIRMA, profile } from "@/app/tresc/firma";
 
-/* Pismo odręczne na karcie obciążeń: wpisy długopisem i naklejka. */
-const reka = Caveat({ subsets: ["latin", "latin-ext"], weight: ["500", "700"], display: "swap", variable: "--font-reka" });
+/** 16.11 — data na pieczątce vouchera. */
+const dataKrotka = (d: Date) =>
+  d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", timeZone: "Europe/Warsaw" });
 
 export const metadata: Metadata = metaStrony({
   tytul: "Konkurs: wygraj 3 treningi personalne w Łodzi | Maks Treningi",
@@ -291,47 +291,37 @@ export default async function Page({
               )}
             </div>
 
-            {/* Nagroda: papierowa karta obciążeń, ta sama co w reklamie. Zwycięzca
-                dostaje ją po ostatniej sesji. */}
-            <figure className={`k-nagroda-karta ${reka.variable}`} aria-labelledby="k-karta-podpis">
-              <span className="k-tasma k-tasma-l" aria-hidden="true" />
-              <span className="k-tasma k-tasma-p" aria-hidden="true" />
-              <p className="k-naklejka">
-                <span className="k-naklejka-gora">nagroda</span>
-                <span className="k-sr">wartość </span>
-                <s>{KONKURS.wartosc}</s>
-                <span className="k-sr">, dla Ciebie </span>
-                <strong>0 zł</strong>
-              </p>
-              <p className="k-karta-tytul">Karta obciążeń</p>
-              <p className="k-karta-imie">
-                <span>Imię</span>
-                <span className="k-reka">Twoje?</span>
-              </p>
-              <table className="k-karta">
-                <thead>
-                  <tr><th scope="col">Sesja</th><th scope="col">Ruch</th><th scope="col">Ciężar</th><th scope="col">Powt.</th></tr>
-                </thead>
-                <tbody>
-                  {["Przysiad", "Martwy ciąg", "Wyciskanie"].map((ruch, i) => (
-                    <tr key={ruch}>
-                      <th scope="row"><span className="k-punkt">{i + 1}</span></th>
-                      <td>{ruch}</td>
-                      <td className="k-puste"><span className="k-sr">do wpisania</span></td>
-                      <td className="k-puste"><span className="k-sr">do wpisania</span></td>
-                    </tr>
+            {/* Nagroda jako voucher: trzy odrywane kupony, po jednym na sesję.
+                Kolejność ruchów ustalamy na pierwszej sesji, więc kupony nie
+                mają przypisanych ćwiczeń. */}
+            <figure className="k-voucher" aria-labelledby="k-voucher-podpis">
+              <div className="k-voucher-bilet">
+                <div className="k-voucher-gora">
+                  <p className="k-voucher-rodzaj">Voucher</p>
+                  <p className="k-voucher-nazwa">3 treningi jeden na jeden</p>
+                  <p className="k-voucher-miejsce">Just GYM, Piotrkowska 157A, Łódź</p>
+                  <p className="k-voucher-cena">
+                    <span className="k-sr">Wartość </span>
+                    <s>{KONKURS.wartosc}</s>
+                    <span className="k-sr">, dla zwycięzcy </span>
+                    <strong>0 zł</strong>
+                  </p>
+                  <p className="k-pieczatka" aria-hidden="true">
+                    <span>Konkurs</span>
+                    <span>do {dataKrotka(KONKURS.koniec)}</span>
+                  </p>
+                </div>
+                <ul className="k-voucher-kupony">
+                  {[1, 2, 3].map((n) => (
+                    <li key={n}>
+                      <span className="k-kupon-nr">Sesja {n}</span>
+                      <span className="k-kupon-czas">60 min</span>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-              <p className="k-karta-notka">
-                <span className="k-reka">wpisujemy razem na sesji</span>
-                <svg aria-hidden="true" viewBox="0 0 48 46" width="40" height="38">
-                  <path d="M3 40C24 41 35 30 34 6" />
-                  <path d="M34 6l-7 8M34 6l5 9" />
-                </svg>
-              </p>
-              <figcaption id="k-karta-podpis">
-                Nagroda: 3 sesje po 60 minut jeden na jeden. Karta zostaje u Ciebie po ostatniej.
+                </ul>
+              </div>
+              <figcaption id="k-voucher-podpis">
+                Nagroda dla najbardziej konkretnej odpowiedzi. Wejście na salę opłacasz osobno w Just GYM.
               </figcaption>
             </figure>
           </div>
@@ -534,37 +524,36 @@ const CSS = `
 .k-termin{margin:1rem 0 0;font-size:.95rem;color:var(--jas)}
 .k-termin strong{color:#fff}
 
-/* Karta-nagroda: prawdziwa papierowa karta na grafitowym tle. Ziarno
-   papieru, dwa paski taśmy, limonkowa naklejka i wpisy długopisem. */
-.k-nagroda-karta{position:relative;margin:1rem 0 0;justify-self:center;width:100%;max-width:27rem;color:var(--g);
-  background-color:#F6F4EE;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .12 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  padding:1.6rem 1.35rem 1.15rem;transform:rotate(-2.5deg);
-  box-shadow:0 1px 3px rgba(0,0,0,.4),0 32px 60px -24px rgba(0,0,0,.8)}
-.k-tasma{position:absolute;top:-.75rem;width:5.25rem;height:1.55rem;background:rgba(226,230,236,.62);box-shadow:0 1px 2px rgba(0,0,0,.18);
-  clip-path:polygon(0 8%,6% 0,12% 10%,18% 0,24% 8%,30% 0,36% 9%,42% 0,48% 8%,54% 0,60% 10%,66% 0,72% 8%,78% 0,84% 9%,90% 0,96% 8%,100% 0,100% 92%,94% 100%,88% 90%,82% 100%,76% 92%,70% 100%,64% 91%,58% 100%,52% 92%,46% 100%,40% 90%,34% 100%,28% 92%,22% 100%,16% 91%,10% 100%,4% 92%,0 100%)}
-.k-tasma-l{left:1.25rem;transform:rotate(-5deg)}
-.k-tasma-p{left:44%;transform:rotate(3deg)}
-.k-naklejka{position:absolute;top:-1.6rem;right:-1.1rem;z-index:1;margin:0;width:7.25rem;height:7.25rem;border-radius:50%;background:var(--s);color:var(--g);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;text-align:center;font-family:var(--font-reka),cursive;transform:rotate(9deg);
-  box-shadow:0 8px 16px -8px rgba(0,0,0,.6),inset 0 0 0 1px rgba(17,24,32,.06)}
-.k-naklejka-gora{font-size:1rem;font-weight:500}
-.k-naklejka s{font-size:1.25rem;font-weight:500;text-decoration-thickness:2px;margin-top:.15rem}
-.k-naklejka strong{font-size:2.35rem;font-weight:700}
-.k-karta-tytul{margin:0;font-family:var(--font-display);font-weight:800;font-size:1.3rem;letter-spacing:-.01em}
-.k-karta-imie{display:flex;align-items:baseline;gap:.75rem;max-width:62%;margin:.6rem 0 .9rem;padding-bottom:.15rem;border-bottom:1px solid #9AA3AE;font-size:.85rem;color:var(--sl)}
-.k-reka{font-family:var(--font-reka),cursive;color:#2A3F9D;font-weight:500;font-size:1.45rem;line-height:1}
-.k-karta{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.95rem;border-top:2px solid var(--g)}
-.k-karta th,.k-karta td{border-bottom:1px solid var(--l);padding:.8rem .5rem;text-align:left}
-.k-karta thead th{font-size:.8rem;font-weight:600;color:var(--sl);padding-top:.6rem}
-.k-karta tbody th{width:2.5rem}
-.k-punkt{display:inline-grid;place-items:center;width:1.65rem;height:1.65rem;background:var(--s);font-family:var(--font-display);font-weight:800;font-size:1rem}
-.k-puste{width:4.5rem;background:linear-gradient(to top,#8D96A2 1px,transparent 1px) no-repeat .5rem calc(100% - .75rem)/calc(100% - 1rem) 100%}
-.k-karta-notka{display:flex;align-items:flex-end;justify-content:flex-end;gap:.2rem;margin:-.2rem .2rem 0 0;transform:rotate(-2deg)}
-.k-karta-notka svg{flex:none;margin-bottom:.45rem;fill:none;stroke:#2A3F9D;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.k-nagroda-karta figcaption{margin-top:.6rem;font-size:.85rem;line-height:1.45;color:var(--sl)}
+/* Nagroda jako voucher: limonkowy bilet, pod nim trzy białe kupony
+   oddzielone perforacją, z wycięciami na brzegach jak w prawdziwym bilecie.
+   Pieczątka „Konkurs” odbita grafitowym tuszem. */
+.k-voucher{margin:0;justify-self:center;width:100%;max-width:26rem}
+.k-voucher-bilet{position:relative;transform:rotate(-2deg);box-shadow:0 34px 60px -26px rgba(0,0,0,.85),0 2px 4px rgba(0,0,0,.35)}
+.k-voucher-gora{position:relative;background:var(--s);color:var(--g);padding:1.5rem 1.5rem 1.4rem}
+.k-voucher-gora p{margin:0;line-height:1.35}
+.k-voucher-rodzaj{font-weight:600;font-size:.95rem}
+.k-voucher-gora .k-voucher-nazwa{margin-top:.4rem;max-width:11ch;font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,1.4rem + 1.6vw,2.4rem);line-height:1;letter-spacing:-.03em}
+.k-voucher-gora .k-voucher-miejsce{margin-top:.8rem;font-size:.9rem}
+.k-voucher-gora .k-voucher-cena{display:flex;align-items:baseline;gap:.75rem;margin-top:1rem;font-family:var(--font-display);font-weight:800;font-variant-numeric:tabular-nums}
+.k-voucher-cena s{font-size:1.15rem;font-weight:700;text-decoration-thickness:2px;opacity:.6}
+.k-voucher-cena strong{font-size:3.25rem;line-height:.9;letter-spacing:-.03em}
+.k-pieczatka{position:absolute;right:1.1rem;bottom:1.2rem;display:flex;flex-direction:column;align-items:center;padding:.4rem .7rem .45rem;border:3px solid currentColor;border-radius:.45rem;
+  color:rgba(17,24,32,.82);font-family:var(--font-display);font-weight:800;line-height:1.05;text-align:center;transform:rotate(-11deg);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.k-pieczatka span:first-child{font-size:1.15rem;letter-spacing:.02em}
+.k-pieczatka span:last-child{font-size:.8rem;font-weight:700}
+.k-voucher-kupony{position:relative;color:var(--g);display:grid;grid-template-columns:repeat(3,1fr);margin:0;padding:0;list-style:none;background:#F6F4EE;border-top:2px dashed rgba(17,24,32,.45)}
+.k-voucher-kupony::before,.k-voucher-kupony::after{content:"";position:absolute;top:-.8rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--g)}
+.k-voucher-kupony::before{left:-.75rem}.k-voucher-kupony::after{right:-.75rem}
+.k-voucher-kupony li{display:grid;gap:.15rem;padding:1rem .9rem 1.1rem}
+.k-voucher-kupony li+li{border-left:2px dashed rgba(17,24,32,.3)}
+.k-kupon-nr{font-family:var(--font-display);font-weight:800;font-size:1.05rem}
+.k-kupon-czas{font-size:.85rem;color:var(--sl);font-variant-numeric:tabular-nums}
+.k-voucher figcaption{margin-top:1.4rem;font-size:.9rem;line-height:1.5;color:var(--jas)}
 /* Bez animacji: karta stoi od razu, przewijanie do formularza bez płynnego przesuwania. */
 html:has(.k){scroll-behavior:auto!important}
-@media(max-width:59.99rem){.k-nagroda-karta{transform:rotate(-1.5deg);max-width:24rem;margin-top:1.75rem}.k-naklejka{width:6.25rem;height:6.25rem;right:-.5rem}.k-naklejka strong{font-size:2rem}.k-naklejka-gora{font-size:.9rem}.k-naklejka s{font-size:1.1rem}}
+@media(max-width:59.99rem){.k-voucher{max-width:24rem;margin-top:.5rem}.k-voucher-bilet{transform:rotate(-1.5deg)}}
 
 /* TREŚĆ: opis po lewej, formularz po prawej (na telefonie formularz pierwszy) */
 .k-uklad{display:grid;gap:3rem 4.5rem;padding-top:clamp(2.5rem,6vw,4rem);padding-bottom:clamp(3rem,7vw,5rem);grid-template-areas:"f" "p" "g" "z"}
