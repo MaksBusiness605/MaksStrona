@@ -9,7 +9,7 @@ import { leadDoMety } from "@/app/lib/meta-capi";
 import { czytajZgode } from "@/app/lib/sledzenie";
 import { Footer, Header, Team } from "@/app/components/sections";
 import { ZDJECIA, kadr } from "@/app/tresc/zdjecia";
-import { KONKURS, TELEFON, TELEFON_HREF, TRASY, TRENER, dataPL, dzienPL } from "@/app/lib/dane";
+import { KONKURS, TELEFON, TRASY, dataPL, dzienPL } from "@/app/lib/dane";
 import { wyslijMail } from "@/app/lib/wyslij-mail";
 import { FIRMA, profile } from "@/app/tresc/firma";
 
@@ -276,8 +276,9 @@ export default async function Page({
               <p className="k-miejsce">Konkurs w Just GYM, Piotrkowska 157A w Łodzi</p>
               <h1 id="k-tytul" className="k-tytul">Wygraj trzy treningi jeden na jeden</h1>
               <p className="k-lead">
-                Napisz w dwóch, trzech zdaniach, co chcesz poprawić w swoim treningu. Najbardziej konkretna
-                odpowiedź wygrywa trzy darmowe sesje ze mną na sali.
+                Stoisz w miejscu, chociaż trenujesz? Zwykle to nie motywacja, tylko technika, której nikt nie
+                poprawił. Napisz w 2–3 zdaniach, co chcesz poprawić. Najbardziej konkretna odpowiedź wygrywa
+                trzy darmowe sesje ze mną na sali.
               </p>
               {trwa ? (
                 <>
@@ -453,10 +454,18 @@ export default async function Page({
                 Chcę się go nauczyć na tyle, żeby robić go sama.”
               </blockquote>
             </figure>
+            <figure className="k-przyklad">
+              <figcaption><span className="k-znak" aria-hidden="true">✓</span>Też konkretnie</figcaption>
+              <blockquote>
+                „Trenuję 3 razy w tygodniu od roku z planów z internetu i nie wiem, czy robię progres. Chcę
+                wiedzieć, kiedy dokładać ciężar.”
+              </blockquote>
+            </figure>
           </section>
 
           <section className="k-nagroda" aria-labelledby="k-nag">
             <h2 id="k-nag" className="k-h2">Co wygrywasz</h2>
+            <p className="k-rezultat">Po trzech sesjach robisz te ruchy samodzielnie i wiesz, kiedy dołożyć ciężar.</p>
             <p>
               Trzy godziny jeden na jeden, za darmo, po jednym ruchu na sesję, ustawionym do końca. Stoję
               obok i poprawiam w tej samej serii. Wejście na salę opłacasz osobno w Just GYM. Zaczynamy od ciężaru, który dziś jest
@@ -465,6 +474,16 @@ export default async function Page({
             <p className="k-drobne">
               Kolejność ruchów ustalamy na pierwszej sesji. Nagrody nie da się wymienić na gotówkę.
             </p>
+            <figure className="k-dowod">
+              <figcaption>Z karty obciążeń: Marysia, 50 lat, trening na sali</figcaption>
+              <ul>
+                <li><span>Martwy ciąg</span> 0 kg → <strong>105 kg</strong></li>
+                <li><span>Przysiad</span> 4 kg → <strong>100 kg</strong></li>
+                <li><span>Treningi w tygodniu</span> 0 → <strong>4</strong></li>
+              </ul>
+              <blockquote>„Polubiłam siłownię.”</blockquote>
+              <p className="k-drobne">Historia publikowana za zgodą. Liczby pochodzą z jej karty obciążeń.</p>
+            </figure>
           </section>
 
           <section className="k-zasady" aria-labelledby="k-zas">
@@ -483,10 +502,6 @@ export default async function Page({
                 <span>Piszę SMS-em do zwycięzcy z numeru {TELEFON} i ustalamy pierwszy termin.</span>
               </li>
             </ol>
-            <p className="k-kto">
-              Prowadzę ja, {TRENER.imie}, trener personalny w Just GYM przy Piotrkowskiej. Pytania o
-              konkurs: <a href={TELEFON_HREF}>{TELEFON}</a>.
-            </p>
           </section>
         </div>
 
@@ -585,8 +600,13 @@ html:has(.k){scroll-behavior:auto!important}
 .k-os li::before{content:"";position:absolute;left:-7px;top:.35rem;width:12px;height:12px;background:var(--g)}
 .k-os li:last-child::before{background:var(--s);outline:2px solid var(--g)}
 .k-os-kiedy{font-family:var(--font-display);font-weight:800}
-.k-kto{margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--l)}
-.k-kto a{color:var(--g);font-weight:700}
+.k-nagroda .k-rezultat{margin:0 0 .75rem;font-family:var(--font-display);font-weight:800;font-size:1.2rem;line-height:1.3}
+.k-dowod{margin:1.5rem 0 0;padding:1.1rem 1.2rem;background:#fff;border-left:4px solid var(--g)}
+.k-dowod figcaption{font-weight:700;font-size:.95rem}
+.k-dowod ul{list-style:none;margin:.75rem 0 0;padding:0;display:grid;gap:.35rem;font-variant-numeric:tabular-nums}
+.k-dowod li span{display:inline-block;min-width:9.5rem;color:var(--sl)}
+.k-dowod li strong{font-family:var(--font-display);font-weight:800}
+.k-dowod blockquote{margin:.85rem 0 0;font-weight:600}
 
 .k-pole{display:grid;gap:.45rem;margin-bottom:1.4rem}
 .k-etykieta{font-weight:700;font-size:1.05rem}.k-podpowiedz{font-size:.9rem;color:var(--sl)}
