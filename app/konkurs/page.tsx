@@ -293,8 +293,8 @@ export default async function Page({
             </div>
 
             {/* Nagroda jako voucher: trzy odrywane kupony, po jednym na sesję.
-                Kolejność ruchów ustalamy na pierwszej sesji, więc kupony nie
-                mają przypisanych ćwiczeń. */}
+                Zakres sesji dopasowujemy do zgłoszenia, więc kupony nie mają
+                przypisanych ćwiczeń. */}
             <figure className="k-voucher" aria-labelledby="k-voucher-podpis">
               <div className="k-voucher-bilet">
                 <div className="k-voucher-gora">
@@ -465,14 +465,18 @@ export default async function Page({
 
           <section className="k-nagroda" aria-labelledby="k-nag">
             <h2 id="k-nag" className="k-h2">Co wygrywasz</h2>
-            <p className="k-rezultat">Po trzech sesjach robisz te ruchy samodzielnie i wiesz, kiedy dołożyć ciężar.</p>
+            <p className="k-rezultat">
+              Po trzech sesjach wiesz, jak trenować samodzielnie: co robić, jak to robić i kiedy dołożyć ciężar.
+            </p>
             <p>
-              Trzy godziny jeden na jeden, za darmo, po jednym ruchu na sesję, ustawionym do końca. Stoję
-              obok i poprawiam w tej samej serii. Wejście na salę opłacasz osobno w Just GYM. Zaczynamy od ciężaru, który dziś jest
-              dla Ciebie właściwy, nawet jeśli to pusta sztanga.
+              Trzy godziny jeden na jeden, za darmo. Pokażę Ci, jak trenować: technikę ćwiczeń, które są dla
+              Ciebie najważniejsze, jak ułożyć trening pod Twój tydzień i jak zapisywać ciężary, żeby widzieć
+              progres. Stoję obok i poprawiam w trakcie serii. Zaczynamy od ciężaru, który dziś jest dla Ciebie
+              właściwy, nawet jeśli to pusta sztanga.
             </p>
             <p className="k-drobne">
-              Kolejność ruchów ustalamy na pierwszej sesji. Nagrody nie da się wymienić na gotówkę.
+              Plan sesji układam pod Twoje zgłoszenie. Wejście na salę opłacasz osobno w Just GYM. Nagrody nie
+              da się wymienić na gotówkę.
             </p>
             <figure className="k-dowod">
               <figcaption>Z karty obciążeń: Marysia, 50 lat, trening na sali</figcaption>
